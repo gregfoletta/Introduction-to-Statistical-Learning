@@ -30,7 +30,7 @@ Create a scatterplot matrix of the first ten variables.
 	library(ggally)
 	college %>% ggpairs(columns = 1:10)
 
-![Scatter Plot](scatter.png)
+![Scatter Plot](pairs.png)
 
 
 ### iii)
@@ -43,7 +43,7 @@ Create a new variable *Elite* by binning the *Top10perc* variable. We divide uni
 
 	college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No)))
 
-![Box Plot](boxplot.png)
+![Box Plot](box.png)
 
 We now get a summary of the *Elite* 	
 
@@ -68,4 +68,6 @@ Create some histograms with differing bins for the quantitative variables:
 
 ### vi)
 
-Some other information
+Some other information:
+
+
