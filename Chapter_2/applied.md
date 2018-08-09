@@ -74,8 +74,8 @@ Create some histograms with differing bins for the quantitative variables:
 
 ###	a) Which predictors are quantative and which are qualitative?
 
-	* **Quantitative** - mpg, displacement, horsepower, weight, acceleration.
-	* **Qualitative** - cylinders, year, origin, name.
+ **Quantitative** - mpg, displacement, horsepower, weight, acceleration.
+ **Qualitative** - cylinders, year, origin, name.
 
 ### b) What is the range of each quantitative predictor?
 
@@ -131,7 +131,7 @@ How many cars were produced per year, with colours representing the proportion o
 
 	auto %>% ggplot + geom_bar(aes(year, fill = as.factor(cylinders)))
 
-![Number per year with cylinder breakdown](horsepower_vs_mpg.png)
+![Number per year with cylinder breakdown](num_per_year.png)
 
 	
 
