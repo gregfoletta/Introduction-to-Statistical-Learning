@@ -59,7 +59,13 @@ Create some histograms with differing bins for the quantitative variables:
 * The amount of enrollments in bin widths of 100
 	college %>% ggplot + geom_histogram(aes(Enroll), binwidth = 100)
 
+![Enrollment Histogram](hist_enroll.png)
+
 * The number of PhD students in bin widths of 1
 	college %>% ggplot + geom_histogram(aes(PhD), binwidth = 1)
 
+![PhD Histogram](hist_phd.png)
+
 ### vi)
+
+Some other information
