@@ -1,5 +1,7 @@
 # Chapter 2 - Applied
 
+# 9
+
 ## a)
 
 Load in the college data frame - we convert it to a tibble.
@@ -70,7 +72,7 @@ Create some histograms with differing bins for the quantitative variables:
 
 ![PhD Histogram](hist_phd.png)
 
-## d) - Auto data
+# 9 - Auto data
 
 ###	a) Which predictors are quantative and which are qualitative?
 
@@ -133,7 +135,12 @@ How many cars were produced per year, with colours representing the proportion o
 
 ![Number per year with cylinder breakdown](num_per_year.png)
 
+### f) What variables appear to be useful in predicting mpg?
+
+Using `ggpairs` we can see a relationship between *mpg* and *displacement*, *horsepower* and *weight*.
 	
+
+# 10 - Boston Data Set
 
 
 
