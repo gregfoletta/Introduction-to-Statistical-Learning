@@ -1,0 +1,112 @@
+```{r knitr}
+opts_knit$set(base.dir='./')
+```
+# Chapter 2 - Applied
+
+# 9
+
+## a)
+
+Load in the college data frame - we convert it to a tibble.
+    
+```{r setup}
+library(ISLR)
+library(tidyverse)
+
+college <- as_tibble(College)
+```
+
+## c) - College Data
+
+### i)
+
+```{r college_summary}
+summary(college)
+```
+
+### ii)
+
+Create a scatterplot matrix of the first ten variables.	
+
+```{r college_ggpairs, echo = FALSE, message = FALSE}
+	library(GGally)
+	college %>% ggpairs(columns = 1:10)
+```
+
+### iii)
+
+Create a boxplot of *Outstate* versus *Private*
+
+```{r college_boxplot}
+opts_knit$set(base.uri='/')
+college %>% ggplot + geom_boxplot(aes(Private, Outstate))
+```
+
+### iv)
+Create a new variable *Elite* by binning the *Top10perc* variable. We divide universities into two groups depending on whether or not the proportion of students coming from the top 10% of their high schools exceeds 10%.
+
+```{r elite_mutation}
+college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No")))
+```
+We now get a summary of the *Elite* 	
+
+```{r elite_summary}
+summary(college['Elite'])
+```
+
+### v)
+
+Create some histograms with differing bins for the quantitative variables:
+
+* The amount of enrollments in bin widths of 100
+
+```{r enrollment_histogram}
+	college %>% ggplot + geom_histogram(aes(Enroll), binwidth = 100)
+```
+
+* The number of PhD students in bin widths of 1
+
+```{r phd_histogram}
+college %>% ggplot + geom_histogram(aes(PhD), binwidth = 1)
+```
+
+# 9 - Auto data
+
+###	a) Which predictors are quantative and which are qualitative?
+
+ **Quantitative** - mpg, displacement, horsepower, weight, acceleration.
+ **Qualitative** - cylinders, year, origin, name.
+
+### b) What is the range of each quantitative predictor?
+
+```{r mtcars_quantitative_range}
+auto <- as.tibble(mtcars)
+auto %>% summarise_at(vars(mpg, disp, hp, wt), funs(min, max))
+```
+
+### c) What is the mean and standard deviation for each quantitative predictor?
+
+```{r mtcars_quantitative_mean_sd}
+auto %>% summarise_at(vars(mpg, disp, hp, wt), funs(mean, sd))
+```
+
+### d) Remove the 10th to 85th observations. What is the range, mean and standard deviation of each predictor?
+
+```{r mtcars_quantitative_removed}
+auto[-c(10:85),] %>% summarise_at(vars(mpg, disp, hp, wt), funs(mean, sd))
+```
+
+### e) Some graphical representations
+
+Relationship between the miles per gallon and the horsepower, with the colour of the points representing the number of cylinders.
+
+```{r mtcars_hp_vs_mpg}
+auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cylinders)))
+```
+
+### f) What variables appear to be useful in predicting mpg?
+
+Using `ggpairs` we can see a relationship between *mpg* and *disp*, *hp* and *wt*.
+	
+
+

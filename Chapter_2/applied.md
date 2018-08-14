@@ -1,3 +1,7 @@
+
+```r
+opts_knit$set(base.dir='./')
+```
 # Chapter 2 - Applied
 
 # 9
@@ -84,7 +88,7 @@ summary(college)
 
 Create a scatterplot matrix of the first ten variables.	
 
-![plot of chunk college_ggpairs](/figure/college_ggpairs-1.png)
+![plot of chunk college_ggpairs](figure/college_ggpairs-1.png)
 
 ### iii)
 
@@ -92,6 +96,7 @@ Create a boxplot of *Outstate* versus *Private*
 
 
 ```r
+opts_knit$set(base.uri='/')
 college %>% ggplot + geom_boxplot(aes(Private, Outstate))
 ```
 
