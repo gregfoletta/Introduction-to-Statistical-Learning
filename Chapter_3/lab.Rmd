@@ -38,7 +38,7 @@ boston <- boston %>% mutate(medv_resid = residuals(lm_boston))
 
 We now graph these:
 
-```{r}
+```{r medv lstat plot}
 boston %>% ggplot(aes(lstat, medv)) + 
     geom_smooth(method = 'lm') + 
     geom_point(alpha = .4) + 
