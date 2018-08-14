@@ -6,7 +6,7 @@
 
 Load in the college data frame - we convert it to a tibble.
     
-```{r setup, echo = FALSE}
+```{r setup, message = FALSE}
 library(ISLR)
 library(tidyverse)
 
