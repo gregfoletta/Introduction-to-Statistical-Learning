@@ -98,7 +98,7 @@ boston %>% ggplot(aes(lstat, medv)) +
     geom_segment(aes(xend = lstat, yend = medv_pred), alpha = .5, colour = 'grey')
 ```
 
-![plot of chunk medv lstat plot](figure/medv lstat plot-1.png)
+![plot of chunk medv_lstat_plot](figure/medv_lstat_plot-1.png)
 
 
 
