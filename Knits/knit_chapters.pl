@@ -59,12 +59,16 @@ my @rmd_files;
 find( sub { push @rmd_files, $_ if m{\.Rmd$} }, '.' );
 
 for my $file (@rmd_files) {
-    my ($chapter) = split('_', $file);
+    my ($chapter, $md_file) = split('_', $file);
+
+    # Replace the .Rmd with md
+    $md_file =~ s{\.rmd$}{.md}i;
+
     croak "No chapter mapping for '$chapter' (file: $file)" unless $paths{$chapter};
 
     my @R_commands = (
         qq{ library(knitr) },
-        qq{ knit(input = '$file', output = '$paths{$chapter}') }
+        qq{ knit(input = '$file', output = '$paths{$chapter}/$md_file') }
     );
 
 

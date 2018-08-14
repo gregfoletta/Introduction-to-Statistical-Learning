@@ -10,7 +10,26 @@ Load in the college data frame - we convert it to a tibble.
 ```r
 library(ISLR)
 library(tidyverse)
+```
 
+```
+## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──
+```
+
+```
+## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
+## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
+## ✔ readr   1.1.1     ✔ forcats 0.3.0
+```
+
+```
+## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+```
+
+```r
 college <- as_tibble(College)
 ```
 
@@ -65,26 +84,7 @@ summary(college)
 
 Create a scatterplot matrix of the first ten variables.	
 
-
-```r
-	library(GGally)
-	college %>% ggpairs(columns = 1:10)
-```
-
-```
-##  plot: [1,1] [---------------------------------------------]  1% est: 0s  plot: [1,2] [>--------------------------------------------]  2% est: 3s  plot: [1,3] [>--------------------------------------------]  3% est: 4s  plot: [1,4] [=>-------------------------------------------]  4% est: 5s  plot: [1,5] [=>-------------------------------------------]  5% est: 5s  plot: [1,6] [==>------------------------------------------]  6% est: 6s  plot: [1,7] [==>------------------------------------------]  7% est: 6s  plot: [1,8] [===>-----------------------------------------]  8% est: 6s  plot: [1,9] [===>-----------------------------------------]  9% est: 6s  plot: [1,10] [===>----------------------------------------] 10% est: 6s  plot: [2,1] [====>----------------------------------------] 11% est: 6s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [2,2] [====>----------------------------------------] 12% est: 6s  plot: [2,3] [=====>---------------------------------------] 13% est: 6s  plot: [2,4] [=====>---------------------------------------] 14% est: 6s  plot: [2,5] [======>--------------------------------------] 15% est: 6s  plot: [2,6] [======>--------------------------------------] 16% est: 6s  plot: [2,7] [=======>-------------------------------------] 17% est: 5s  plot: [2,8] [=======>-------------------------------------] 18% est: 5s  plot: [2,9] [========>------------------------------------] 19% est: 5s  plot: [2,10] [========>-----------------------------------] 20% est: 5s  plot: [3,1] [========>------------------------------------] 21% est: 5s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [3,2] [=========>-----------------------------------] 22% est: 5s  plot: [3,3] [=========>-----------------------------------] 23% est: 5s  plot: [3,4] [==========>----------------------------------] 24% est: 5s  plot: [3,5] [==========>----------------------------------] 25% est: 5s  plot: [3,6] [===========>---------------------------------] 26% est: 5s  plot: [3,7] [===========>---------------------------------] 27% est: 5s  plot: [3,8] [============>--------------------------------] 28% est: 5s  plot: [3,9] [============>--------------------------------] 29% est: 4s  plot: [3,10] [============>-------------------------------] 30% est: 4s  plot: [4,1] [=============>-------------------------------] 31% est: 4s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [4,2] [=============>-------------------------------] 32% est: 4s  plot: [4,3] [==============>------------------------------] 33% est: 4s  plot: [4,4] [==============>------------------------------] 34% est: 4s  plot: [4,5] [===============>-----------------------------] 35% est: 4s  plot: [4,6] [===============>-----------------------------] 36% est: 4s  plot: [4,7] [================>----------------------------] 37% est: 4s  plot: [4,8] [================>----------------------------] 38% est: 4s  plot: [4,9] [=================>---------------------------] 39% est: 4s  plot: [4,10] [=================>--------------------------] 40% est: 4s  plot: [5,1] [=================>---------------------------] 41% est: 4s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [5,2] [==================>--------------------------] 42% est: 4s  plot: [5,3] [==================>--------------------------] 43% est: 4s  plot: [5,4] [===================>-------------------------] 44% est: 4s  plot: [5,5] [===================>-------------------------] 45% est: 3s  plot: [5,6] [====================>------------------------] 46% est: 3s  plot: [5,7] [====================>------------------------] 47% est: 3s  plot: [5,8] [=====================>-----------------------] 48% est: 3s  plot: [5,9] [=====================>-----------------------] 49% est: 3s  plot: [5,10] [=====================>----------------------] 50% est: 3s  plot: [6,1] [======================>----------------------] 51% est: 3s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [6,2] [======================>----------------------] 52% est: 3s  plot: [6,3] [=======================>---------------------] 53% est: 3s  plot: [6,4] [=======================>---------------------] 54% est: 3s  plot: [6,5] [========================>--------------------] 55% est: 3s  plot: [6,6] [========================>--------------------] 56% est: 3s  plot: [6,7] [=========================>-------------------] 57% est: 3s  plot: [6,8] [=========================>-------------------] 58% est: 3s  plot: [6,9] [==========================>------------------] 59% est: 3s  plot: [6,10] [=========================>------------------] 60% est: 2s  plot: [7,1] [==========================>------------------] 61% est: 2s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [7,2] [===========================>-----------------] 62% est: 2s  plot: [7,3] [===========================>-----------------] 63% est: 2s  plot: [7,4] [============================>----------------] 64% est: 2s  plot: [7,5] [============================>----------------] 65% est: 2s  plot: [7,6] [=============================>---------------] 66% est: 2s  plot: [7,7] [=============================>---------------] 67% est: 2s  plot: [7,8] [==============================>--------------] 68% est: 2s  plot: [7,9] [==============================>--------------] 69% est: 2s  plot: [7,10] [==============================>-------------] 70% est: 2s  plot: [8,1] [===============================>-------------] 71% est: 2s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [8,2] [===============================>-------------] 72% est: 2s  plot: [8,3] [================================>------------] 73% est: 2s  plot: [8,4] [================================>------------] 74% est: 2s  plot: [8,5] [=================================>-----------] 75% est: 2s  plot: [8,6] [=================================>-----------] 76% est: 2s  plot: [8,7] [==================================>----------] 77% est: 1s  plot: [8,8] [==================================>----------] 78% est: 1s  plot: [8,9] [===================================>---------] 79% est: 1s  plot: [8,10] [==================================>---------] 80% est: 1s  plot: [9,1] [===================================>---------] 81% est: 1s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [9,2] [====================================>--------] 82% est: 1s  plot: [9,3] [====================================>--------] 83% est: 1s  plot: [9,4] [=====================================>-------] 84% est: 1s  plot: [9,5] [=====================================>-------] 85% est: 1s  plot: [9,6] [======================================>------] 86% est: 1s  plot: [9,7] [======================================>------] 87% est: 1s  plot: [9,8] [=======================================>-----] 88% est: 1s  plot: [9,9] [=======================================>-----] 89% est: 1s  plot: [9,10] [=======================================>----] 90% est: 1s  plot: [10,1] [=======================================>----] 91% est: 1s `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-##  plot: [10,2] [=======================================>----] 92% est: 0s  plot: [10,3] [========================================>---] 93% est: 0s  plot: [10,4] [========================================>---] 94% est: 0s  plot: [10,5] [=========================================>--] 95% est: 0s  plot: [10,6] [=========================================>--] 96% est: 0s  plot: [10,7] [==========================================>-] 97% est: 0s  plot: [10,8] [==========================================>-] 98% est: 0s  plot: [10,9] [===========================================>] 99% est: 0s  plot: [10,10] [===========================================]100% est: 0s                                                                          
-```
-
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk college_ggpairs](figure/college_ggpairs-1.png)
 
 ### iii)
 
@@ -95,20 +95,34 @@ Create a boxplot of *Outstate* versus *Private*
 college %>% ggplot + geom_boxplot(aes(Private, Outstate))
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+![plot of chunk college_boxplot](figure/college_boxplot-1.png)
 
 ### iv)
 Create a new variable *Elite* by binning the *Top10perc* variable. We divide universities into two groups depending on whether or not the proportion of students coming from the top 10% of their high schools exceeds 10%.
 
 
 ```r
-college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No)))
+college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No")))
 ```
 
 ```
-## Error: <text>:1:65: unexpected INCOMPLETE_STRING
-## 1: college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No)))
-##                                                                     ^
+## # A tibble: 777 x 19
+##    Private  Apps Accept Enroll Top10perc Top25perc F.Undergrad P.Undergrad
+##    <fct>   <dbl>  <dbl>  <dbl>     <dbl>     <dbl>       <dbl>       <dbl>
+##  1 Yes      1660   1232    721        23        52        2885         537
+##  2 Yes      2186   1924    512        16        29        2683        1227
+##  3 Yes      1428   1097    336        22        50        1036          99
+##  4 Yes       417    349    137        60        89         510          63
+##  5 Yes       193    146     55        16        44         249         869
+##  6 Yes       587    479    158        38        62         678          41
+##  7 Yes       353    340    103        17        45         416         230
+##  8 Yes      1899   1720    489        37        68        1594          32
+##  9 Yes      1038    839    227        30        63         973         306
+## 10 Yes       582    498    172        21        44         799          78
+## # ... with 767 more rows, and 11 more variables: Outstate <dbl>,
+## #   Room.Board <dbl>, Books <dbl>, Personal <dbl>, PhD <dbl>,
+## #   Terminal <dbl>, S.F.Ratio <dbl>, perc.alumni <dbl>, Expend <dbl>,
+## #   Grad.Rate <dbl>, Elite <fct>
 ```
 We now get a summary of the *Elite* 	
 
@@ -132,7 +146,7 @@ Create some histograms with differing bins for the quantitative variables:
 	college %>% ggplot + geom_histogram(aes(Enroll), binwidth = 100)
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk enrollment_histogram](figure/enrollment_histogram-1.png)
 
 * The number of PhD students in bin widths of 1
 
@@ -141,7 +155,7 @@ Create some histograms with differing bins for the quantitative variables:
 college %>% ggplot + geom_histogram(aes(PhD), binwidth = 1)
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+![plot of chunk phd_histogram](figure/phd_histogram-1.png)
 
 # 9 - Auto data
 
@@ -155,66 +169,42 @@ college %>% ggplot + geom_histogram(aes(PhD), binwidth = 1)
 
 ```r
 auto <- as.tibble(mtcars)
-
-range(auto['mpg'])
+auto %>% summarise_at(vars(mpg, disp, hp, wt), funs(min, max))
 ```
 
 ```
-## [1] 10.4 33.9
-```
-
-```r
-range(auto['displacement'])
-```
-
-```
-## Error: Column `displacement` not found
-```
-
-```r
-range(auto['horsepower'])
-```
-
-```
-## Error: Column `horsepower` not found
-```
-
-```r
-range(auto['weight'])
-```
-
-```
-## Error: Column `weight` not found
-```
-
-```r
-range(auto['acceleration'])
-```
-
-```
-## Error: Column `acceleration` not found
+## # A tibble: 1 x 8
+##   mpg_min disp_min hp_min wt_min mpg_max disp_max hp_max wt_max
+##     <dbl>    <dbl>  <dbl>  <dbl>   <dbl>    <dbl>  <dbl>  <dbl>
+## 1    10.4     71.1     52   1.51    33.9      472    335   5.42
 ```
 
 ### c) What is the mean and standard deviation for each quantitative predictor?
 
 
 ```r
-auto %>% select(-cylinders, -year, -origin, -name) %>% summarise_all(mean)
+auto %>% summarise_at(vars(mpg, disp, hp, wt), funs(mean, sd))
 ```
 
 ```
-## Error in is_character(x): object 'cylinders' not found
+## # A tibble: 1 x 8
+##   mpg_mean disp_mean hp_mean wt_mean mpg_sd disp_sd hp_sd wt_sd
+##      <dbl>     <dbl>   <dbl>   <dbl>  <dbl>   <dbl> <dbl> <dbl>
+## 1     20.1      231.    147.    3.22   6.03    124.  68.6 0.978
 ```
 
 ### d) Remove the 10th to 85th observations. What is the range, mean and standard deviation of each predictor?
 
 
 ```r
-auto[-c(10:85),] %>% select(-cylinders, -year, -origin, -name) %>% summarise_all(mean)
+auto[-c(10:85),] %>% summarise_at(vars(mpg, disp, hp, wt), funs(mean, sd))
 ```
 
 ```
-## Error in is_character(x): object 'cylinders' not found
+## # A tibble: 1 x 8
+##   mpg_mean disp_mean hp_mean wt_mean mpg_sd disp_sd hp_sd wt_sd
+##      <dbl>     <dbl>   <dbl>   <dbl>  <dbl>   <dbl> <dbl> <dbl>
+## 1     20.5      213.    123.    3.09   3.05    94.6  54.6 0.415
 ```
 
 ### e) Some graphical representations
@@ -223,34 +213,18 @@ Relationship between the miles per gallon and the horsepower, with the colour of
 
 
 ```r
-auto %>% ggplot + geom_point(aes(horsepower, mpg, colour = as.factor(cylinders)))
+auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cylinders)))
 ```
 
 ```
-## Error in FUN(X[[i]], ...): object 'horsepower' not found
+## Error in is.factor(x): object 'cylinders' not found
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
-
-How many cars were produced per year, with colours representing the proportion of cylinders.
-
-
-```r
-auto %>% ggplot + geom_bar(aes(year, fill = as.factor(cylinders)))
-```
-
-```
-## Error in FUN(X[[i]], ...): object 'year' not found
-```
-
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![plot of chunk mtcars_hp_vs_mpg](figure/mtcars_hp_vs_mpg-1.png)
 
 ### f) What variables appear to be useful in predicting mpg?
 
-Using `ggpairs` we can see a relationship between *mpg* and *displacement*, *horsepower* and *weight*.
+Using `ggpairs` we can see a relationship between *mpg* and *disp*, *hp* and *wt*.
 	
-
-# 10 - Boston Data Set
-
 
 
