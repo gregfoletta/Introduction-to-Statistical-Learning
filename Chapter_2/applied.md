@@ -84,7 +84,7 @@ summary(college)
 
 Create a scatterplot matrix of the first ten variables.	
 
-![plot of chunk college_ggpairs](figure/college_ggpairs-1.png)
+![plot of chunk college_ggpairs](/figure/college_ggpairs-1.png)
 
 ### iii)
 
