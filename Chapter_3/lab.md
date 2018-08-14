@@ -11,7 +11,7 @@ library(ISLR)
 boston <- as.tibble(Boston)
 ```
 
-Calculate the linear regression of lstat (lower status of population) on to medv (median value of owner-occupied homes) and tidy it using broom:
+Calculate the linear regression of lstat (lower status of population) on to medv (median value of owner-occupied homes).
 
 
 ```r
@@ -94,12 +94,8 @@ We now graph these:
 boston %>% ggplot(aes(lstat, medv)) + 
     geom_smooth(method = 'lm') + 
     geom_point(alpha = .4) + 
-    geom_point(aes(lstat, medv_lm), shape = 1) + 
-    geom_segment(aes(xend = lstat, yend = medv_lm), alpha = .5, colour = 'grey')
-```
-
-```
-## Error in FUN(X[[i]], ...): object 'medv_lm' not found
+    geom_point(aes(lstat, medv_pred), shape = 1) + 
+    geom_segment(aes(xend = lstat, yend = medv_pred), alpha = .5, colour = 'grey')
 ```
 
 ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
