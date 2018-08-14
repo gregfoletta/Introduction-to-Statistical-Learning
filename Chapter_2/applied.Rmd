@@ -1,6 +1,3 @@
-```{r knitr}
-opts_knit$set(base.dir='./')
-```
 # Chapter 2 - Applied
 
 # 9
@@ -9,7 +6,7 @@ opts_knit$set(base.dir='./')
 
 Load in the college data frame - we convert it to a tibble.
     
-```{r setup}
+```{r setup, echo = FALSE, message = FALSE}
 library(ISLR)
 library(tidyverse)
 
@@ -101,7 +98,7 @@ auto[-c(10:85),] %>% summarise_at(vars(mpg, disp, hp, wt), funs(mean, sd))
 Relationship between the miles per gallon and the horsepower, with the colour of the points representing the number of cylinders.
 
 ```{r mtcars_hp_vs_mpg}
-auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cylinders)))
+auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cyl)))
 ```
 
 ### f) What variables appear to be useful in predicting mpg?

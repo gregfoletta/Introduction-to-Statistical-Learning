@@ -1,7 +1,3 @@
-
-```r
-opts_knit$set(base.dir='./')
-```
 # Chapter 2 - Applied
 
 # 9
@@ -11,31 +7,6 @@ opts_knit$set(base.dir='./')
 Load in the college data frame - we convert it to a tibble.
     
 
-```r
-library(ISLR)
-library(tidyverse)
-```
-
-```
-## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──
-```
-
-```
-## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
-## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
-## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
-## ✔ readr   1.1.1     ✔ forcats 0.3.0
-```
-
-```
-## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-```
-
-```r
-college <- as_tibble(College)
-```
 
 ## c) - College Data
 
@@ -218,11 +189,7 @@ Relationship between the miles per gallon and the horsepower, with the colour of
 
 
 ```r
-auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cylinders)))
-```
-
-```
-## Error in is.factor(x): object 'cylinders' not found
+auto %>% ggplot + geom_point(aes(hp, mpg, colour = as.factor(cyl)))
 ```
 
 ![plot of chunk mtcars_hp_vs_mpg](figure/mtcars_hp_vs_mpg-1.png)
