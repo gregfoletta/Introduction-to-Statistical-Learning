@@ -25,7 +25,7 @@ summary(college)
 
 Create a scatterplot matrix of the first ten variables.	
 
-```{r college_ggpairs, echo = FALSE, message = FALSE}
+```{r college_ggpairs, message = FALSE}
 	library(GGally)
 	college %>% ggpairs(columns = 1:10)
 ```

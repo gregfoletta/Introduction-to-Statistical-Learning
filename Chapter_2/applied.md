@@ -7,6 +7,22 @@
 Load in the college data frame - we convert it to a tibble.
     
 
+```
+## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──
+```
+
+```
+## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
+## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
+## ✔ readr   1.1.1     ✔ forcats 0.3.0
+```
+
+```
+## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+```
 
 ## c) - College Data
 
@@ -58,6 +74,12 @@ summary(college)
 ### ii)
 
 Create a scatterplot matrix of the first ten variables.	
+
+
+```r
+	library(GGally)
+	college %>% ggpairs(columns = 1:10)
+```
 
 ![plot of chunk college_ggpairs](figure/college_ggpairs-1.png)
 
