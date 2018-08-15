@@ -1,5 +1,7 @@
 # Chapter 3 - Lab
 
+## Simple Linear Regression
+
 Load the required libraries, and convert the the Boston data to a tibble:
 
 ```r
@@ -107,7 +109,7 @@ augment(lm_boston) %>% ggplot(aes(lstat, medv)) +
 
 ![plot of chunk medv_lstat_plot](figure/medv_lstat_plot-1.png)
 
-## Predicted versus Residuals
+### Predicted versus Residuals
 
 We plot the predited values versus the residuals to get an idea if the
 
@@ -124,7 +126,7 @@ augment(lm_boston) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth
 
 We can see a U shape, indicating non-linearity in the data.
 
-## Leverage
+### Leverage
 
 
 ```r
@@ -132,6 +134,80 @@ augment(lm_boston) %>% mutate(index = c(1:nrow(augment(lm_boston)))) %>% ggplot(
 ```
 
 ![plot of chunk medv_lstat_leverage](figure/medv_lstat_leverage-1.png)
+
+## Multiple Linear Regression
+
+To perform a linear regression with multiple variables, add the predictors together with `+`:
+
+
+```r
+mult_lm_boston <- lm(medv ~ lstat + age, data = boston)
+summary(mult_lm_boston)
+```
+
+```
+## 
+## Call:
+## lm(formula = medv ~ lstat + age, data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -15.981  -3.978  -1.283   1.968  23.158 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 33.22276    0.73085  45.458  < 2e-16 ***
+## lstat       -1.03207    0.04819 -21.416  < 2e-16 ***
+## age          0.03454    0.01223   2.826  0.00491 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.173 on 503 degrees of freedom
+## Multiple R-squared:  0.5513,	Adjusted R-squared:  0.5495 
+## F-statistic:   309 on 2 and 503 DF,  p-value: < 2.2e-16
+```
+
+To perform a regression against all of the predictors, the `.` can be used:
+
+
+```r
+mult_lm_boston <- lm(medv ~ ., boston)
+summary(mult_lm_boston)
+```
+
+```
+## 
+## Call:
+## lm(formula = medv ~ ., data = boston)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -15.595  -2.730  -0.518   1.777  26.199 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  3.646e+01  5.103e+00   7.144 3.28e-12 ***
+## crim        -1.080e-01  3.286e-02  -3.287 0.001087 ** 
+## zn           4.642e-02  1.373e-02   3.382 0.000778 ***
+## indus        2.056e-02  6.150e-02   0.334 0.738288    
+## chas         2.687e+00  8.616e-01   3.118 0.001925 ** 
+## nox         -1.777e+01  3.820e+00  -4.651 4.25e-06 ***
+## rm           3.810e+00  4.179e-01   9.116  < 2e-16 ***
+## age          6.922e-04  1.321e-02   0.052 0.958229    
+## dis         -1.476e+00  1.995e-01  -7.398 6.01e-13 ***
+## rad          3.060e-01  6.635e-02   4.613 5.07e-06 ***
+## tax         -1.233e-02  3.760e-03  -3.280 0.001112 ** 
+## ptratio     -9.527e-01  1.308e-01  -7.283 1.31e-12 ***
+## black        9.312e-03  2.686e-03   3.467 0.000573 ***
+## lstat       -5.248e-01  5.072e-02 -10.347  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.745 on 492 degrees of freedom
+## Multiple R-squared:  0.7406,	Adjusted R-squared:  0.7338 
+## F-statistic: 108.1 on 13 and 492 DF,  p-value: < 2.2e-16
+```
+
 
 
 

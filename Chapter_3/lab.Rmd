@@ -1,5 +1,7 @@
 # Chapter 3 - Lab
 
+## Simple Linear Regression
+
 Load the required libraries, and convert the the Boston data to a tibble:
 ```{r setup, message = FALSE}
 library(tidyverse)
@@ -42,7 +44,7 @@ augment(lm_boston) %>% ggplot(aes(lstat, medv)) +
     geom_segment(aes(xend = lstat, yend = .fitted), alpha = .5, colour = 'grey')
 ```
 
-## Predicted versus Residuals
+### Predicted versus Residuals
 
 We plot the predited values versus the residuals to get an idea if the
 
@@ -52,11 +54,28 @@ augment(lm_boston) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth
 
 We can see a U shape, indicating non-linearity in the data.
 
-## Leverage
+### Leverage
 
 ```{r medv_lstat_leverage}
 augment(lm_boston) %>% mutate(index = c(1:nrow(augment(lm_boston)))) %>% ggplot(aes(index, .hat)) + geom_point()
 ```
+
+## Multiple Linear Regression
+
+To perform a linear regression with multiple variables, add the predictors together with `+`:
+
+```{r boston_mult_lm}
+mult_lm_boston <- lm(medv ~ lstat + age, data = boston)
+summary(mult_lm_boston)
+```
+
+To perform a regression against all of the predictors, the `.` can be used:
+
+```{r boston_mult_all_lm}
+mult_lm_boston <- lm(medv ~ ., boston)
+summary(mult_lm_boston)
+```
+
 
 
 
