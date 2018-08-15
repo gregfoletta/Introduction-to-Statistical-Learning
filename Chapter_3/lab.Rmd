@@ -21,30 +21,44 @@ summary(lm_boston)
 confint(lm_boston)
 ```
 
-The `predict()` method is given the result of the linear regression and some predictors. It returns a data frame with the predicted response variable.
-
+We can extract some of the key variables of the regression using the `augment()` function:
 ```{r}
-predict(lm_boston, data.frame( lstat = c(1,20,40) ))
+augment(lm_boston)
 ```
 
-Note that the name of the predictor must match the name given in the linear regression.
+Using this, we can generate a plot with:
 
-Lets add the prediction and the residuals for each of our lstat observations:
+    * The fitted line using `geom_smooth()`.
+    * The (lstat, medv) x/y points.
+    * The predicted value of medv given the linear regression.
+    * Segments linking the actual and predicted values of medv.
 
-```{r}
-boston <- boston %>% mutate(medv_pred = predict(lm_boston))
-boston <- boston %>% mutate(medv_resid = residuals(lm_boston))
-```
-
-We now graph these:
 
 ```{r medv_lstat_plot}
-boston %>% ggplot(aes(lstat, medv)) + 
+augment(lm_boston) %>% ggplot(aes(lstat, medv)) + 
     geom_smooth(method = 'lm') + 
     geom_point(alpha = .4) + 
-    geom_point(aes(lstat, medv_pred), shape = 1) + 
-    geom_segment(aes(xend = lstat, yend = medv_pred), alpha = .5, colour = 'grey')
+    geom_point(aes(lstat, .fitted), shape = 1) + 
+    geom_segment(aes(xend = lstat, yend = .fitted), alpha = .5, colour = 'grey')
 ```
+
+## Predicted versus Residuals
+
+We plot the predited values versus the residuals to get an idea if the
+
+```{r medv_lstat_predict_versus_residuals}
+augment(lm_boston) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()
+```
+
+We can see a U shape, indicating non-linearity in the data.
+
+## Leverage
+
+```{r medv_lstat_leverage}
+augment(lm_boston) %>% mutate(index = c(1:nrow(augment(lm_boston)))) %>% ggplot(aes(index, .hat)) + geom_point()
+```
+
+
 
 
 
