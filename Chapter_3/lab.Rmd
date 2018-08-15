@@ -30,11 +30,10 @@ augment(lm_boston)
 
 Using this, we can generate a plot with:
 
-    * The fitted line using `geom_smooth()`.
-    * The (lstat, medv) x/y points.
-    * The predicted value of medv given the linear regression.
-    * Segments linking the actual and predicted values of medv.
-
+* The fitted line using `geom_smooth()`.
+* The (lstat, medv) x/y points.
+* The predicted value of medv given the linear regression.
+* Segments linking the actual and predicted values of medv.
 
 ```{r medv_lstat_plot}
 augment(lm_boston) %>% ggplot(aes(lstat, medv)) + 
@@ -49,7 +48,10 @@ augment(lm_boston) %>% ggplot(aes(lstat, medv)) +
 We plot the predited values versus the residuals to get an idea if the
 
 ```{r medv_lstat_predict_versus_residuals}
-augment(lm_boston) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()
+augment(lm_boston) %>% 
+    ggplot(aes(.fitted, .resid)) + 
+    geom_point() + 
+    geom_smooth()
 ```
 
 We can see a U shape, indicating non-linearity in the data.
@@ -57,7 +59,10 @@ We can see a U shape, indicating non-linearity in the data.
 ### Leverage
 
 ```{r medv_lstat_leverage}
-augment(lm_boston) %>% mutate(index = c(1:nrow(augment(lm_boston)))) %>% ggplot(aes(index, .hat)) + geom_point()
+augment(lm_boston) %>% 
+    mutate(index = c(1:nrow(augment(lm_boston)))) %>% 
+    ggplot(aes(index, .hat)) + 
+    geom_point()
 ```
 
 ## Multiple Linear Regression
@@ -78,7 +83,7 @@ summary(mult_lm_boston)
 
 ### Variance Inflation Factors
 
-```{r vif}
+```{r vif, message = FALSE}
 library(car)
 vif(mult_lm_boston) %>% 
     as.tibble() %>% 

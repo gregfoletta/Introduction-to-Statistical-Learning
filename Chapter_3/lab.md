@@ -92,11 +92,10 @@ augment(lm_boston)
 
 Using this, we can generate a plot with:
 
-    * The fitted line using `geom_smooth()`.
-    * The (lstat, medv) x/y points.
-    * The predicted value of medv given the linear regression.
-    * Segments linking the actual and predicted values of medv.
-
+* The fitted line using `geom_smooth()`.
+* The (lstat, medv) x/y points.
+* The predicted value of medv given the linear regression.
+* Segments linking the actual and predicted values of medv.
 
 
 ```r
@@ -115,7 +114,10 @@ We plot the predited values versus the residuals to get an idea if the
 
 
 ```r
-augment(lm_boston) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()
+augment(lm_boston) %>% 
+    ggplot(aes(.fitted, .resid)) + 
+    geom_point() + 
+    geom_smooth()
 ```
 
 ```
@@ -130,7 +132,10 @@ We can see a U shape, indicating non-linearity in the data.
 
 
 ```r
-augment(lm_boston) %>% mutate(index = c(1:nrow(augment(lm_boston)))) %>% ggplot(aes(index, .hat)) + geom_point()
+augment(lm_boston) %>% 
+    mutate(index = c(1:nrow(augment(lm_boston)))) %>% 
+    ggplot(aes(index, .hat)) + 
+    geom_point()
 ```
 
 ![plot of chunk medv_lstat_leverage](figure/medv_lstat_leverage-1.png)
@@ -213,30 +218,6 @@ summary(mult_lm_boston)
 
 ```r
 library(car)
-```
-
-```
-## Loading required package: carData
-```
-
-```
-## 
-## Attaching package: 'car'
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     recode
-```
-
-```
-## The following object is masked from 'package:purrr':
-## 
-##     some
-```
-
-```r
 vif(mult_lm_boston) %>% 
     as.tibble() %>% 
     mutate(var = names(vif(mult_lm_boston))) %>% 
