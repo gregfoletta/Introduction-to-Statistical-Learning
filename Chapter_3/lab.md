@@ -208,6 +208,45 @@ summary(mult_lm_boston)
 ## F-statistic: 108.1 on 13 and 492 DF,  p-value: < 2.2e-16
 ```
 
+### Variance Inflation Factors
+
+
+```r
+library(car)
+```
+
+```
+## Loading required package: carData
+```
+
+```
+## 
+## Attaching package: 'car'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     some
+```
+
+```r
+vif(mult_lm_boston) %>% 
+    as.tibble() %>% 
+    mutate(var = names(vif(mult_lm_boston))) %>% 
+    ggplot(aes(var, value)) + 
+    geom_bar(stat = "identity")
+```
+
+![plot of chunk vif](figure/vif-1.png)
+
+
 
 
 

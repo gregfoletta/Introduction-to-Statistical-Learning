@@ -76,6 +76,18 @@ mult_lm_boston <- lm(medv ~ ., boston)
 summary(mult_lm_boston)
 ```
 
+### Variance Inflation Factors
+
+```{r vif}
+library(car)
+vif(mult_lm_boston) %>% 
+    as.tibble() %>% 
+    mutate(var = names(vif(mult_lm_boston))) %>% 
+    ggplot(aes(var, value)) + 
+    geom_bar(stat = "identity")
+```
+
+
 
 
 
