@@ -7,7 +7,6 @@ Load the required libraries, and convert the the Boston data to a tibble:
 library(tidyverse)
 library(broom)
 library(MASS)
-library(ISLR)
 
 boston <- as.tibble(Boston)
 ```
@@ -81,6 +80,11 @@ mult_lm_boston <- lm(medv ~ ., boston)
 summary(mult_lm_boston)
 ```
 
+To perform a regression with all predictors except one:
+```{r boston_mult_lm_bar_one}
+mult_lm_boston <- lm(medv ~ .-age, boston)
+```
+
 ### Variance Inflation Factors
 
 ```{r vif, message = FALSE}
@@ -92,6 +96,36 @@ vif(mult_lm_boston) %>%
     geom_bar(stat = "identity")
 ```
 
+## Interaction Terms
+
+To include an interaction term in `lm()`, you can use `pred_1:pred_2`. To include the predictors and the interaction term you can use `pred_1*pred_2`, which is shorthand for `pred_1 + pred_2 + pred_1:pred2`.
+
+```{r boston_mult_interaction}
+mult_lm_boston <- lm(medv ~ lstat*age, boston)
+summary(mult_lm_boston)
+```
+
+## Non-linear Transformations of Predictors
+
+The `lm()` function can accommodate non-linear transformations of the predictors. For example to perform a polynomial regression of `lstat` on to `medv`:
+
+```{r boston_poly}
+poly_lm_boston <- lm(medv ~ lstat + poly(lstat,2), boston)
+```
+
+
+## Qualitative Predictors
+
+```{r carseats_loading}
+library(ISLR)
+carseats <- as.tibble(Carseats)
+```
+
+```{r carseats_regression}
+lm_carseats <- carseats %>% lm(data = ., Sales ~ . + Income:Advertising + Price:Age)
+
+tidy(lm_carseats)
+```
 
 
 
