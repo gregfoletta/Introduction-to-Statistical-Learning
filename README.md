@@ -3,6 +3,7 @@
 ## Conceptual Questions
 
 * [Chapter 2](Chapter_2/conceptual.md)
+* [Chapter 3](Chapter_3/conceptual.md)
 
 ## Applied Questions
 
