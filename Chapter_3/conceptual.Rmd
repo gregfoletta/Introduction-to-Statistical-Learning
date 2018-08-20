@@ -67,45 +67,13 @@ Given we don't know 'how far from linear' the data is, there isn't enough inform
 
 Out of interests sake, lets generate 100 points of training data where f(x) = 3x + E. We then fit both a linear and a cubic regression to it. We then calculate the RSS with `deviance()`.
 
-
-```r
+```{r random_linear}
 f_x <- tibble(x = c(1:100)) %>% rowwise() %>% mutate(y = 3*x + rnorm(1, 0, 10))
-```
-
-```
-## Error in tibble(x = c(1:100)) %>% rowwise() %>% mutate(y = 3 * x + rnorm(1, : could not find function "%>%"
-```
-
-```r
 linear <- lm(`y ~ x`, data = f_x)
-```
-
-```
-## Error in stats::model.frame(formula = `y ~ x`, data = f_x, drop.unused.levels = TRUE): object 'y ~ x' not found
-```
-
-```r
 cubic <- lm(`y ~ poly(x,3)`, data = f_x)
-```
 
-```
-## Error in stats::model.frame(formula = `y ~ poly(x,3)`, data = f_x, drop.unused.levels = TRUE): object 'y ~ poly(x,3)' not found
-```
-
-```r
 deviance(linear)
-```
-
-```
-## Error in deviance(linear): object 'linear' not found
-```
-
-```r
 deviance(cubic)
-```
-
-```
-## Error in deviance(cubic): object 'cubic' not found
 ```
 
 We can see that the cubic has a lower RSS.
