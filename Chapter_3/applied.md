@@ -94,12 +94,7 @@ predict(lm_auto, tibble(horsepower = 98), interval = 'predict')
 
 
 ```r
-auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm', formula = 'mpg ~ horsepower')
-```
-
-```
-## Warning: Computation failed in `stat_smooth()`:
-## object 'horsepower' not found
+auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm', formula = 'y ~ x')
 ```
 
 ![plot of chunk applied_auto_mpg_hp](figure/applied_auto_mpg_hp-1.png)

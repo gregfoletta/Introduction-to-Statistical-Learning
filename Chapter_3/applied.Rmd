@@ -55,7 +55,7 @@ predict(lm_auto, tibble(horsepower = 98), interval = 'predict')
 *Plot the response and the predictor. Display the least squares regression line.*
 
 ```{r applied_auto_mpg_hp}
-auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm', formula = 'mpg ~ horsepower')
+auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm', formula = 'y ~ x')
 ```
 
 ### c) 
