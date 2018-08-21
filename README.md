@@ -8,6 +8,7 @@
 ## Applied Questions
 
 * [Chapter 2](Chapter_2/applied.md)
+* [Chapter 3](Chapter_3/applied.md)
 
 ## Labs
 
