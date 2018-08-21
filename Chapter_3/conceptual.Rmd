@@ -65,16 +65,50 @@ Given we don't know 'how far from linear' the data is, there isn't enough inform
 
 ### Aside
 
-Out of interests sake, lets generate 100 points of training data where f(x) = 3x + E. We then fit both a linear and a cubic regression to it. We then calculate the RSS with `deviance()`.
+Out of interests sake, lets generate 100 points of training data where f(x) = 3x + E. We then fit both a linear and a cubic regression to it. 
 
-```{r random_linear}
+```{r setup, message = FALSE}
+library(tidyverse)
+
 f_x <- tibble(x = c(1:100)) %>% rowwise() %>% mutate(y = 3*x + rnorm(1, 0, 10))
-linear <- lm(`y ~ x`, data = f_x)
-cubic <- lm(`y ~ poly(x,3)`, data = f_x)
-
+linear <- lm(y ~ x, data = f_x)
+cubic <- lm(y ~ poly(x,3), data = f_x)
+```
+We then calculate the RSS with `deviance()`.
+```{r deviance}
 deviance(linear)
 deviance(cubic)
 ```
 
-We can see that the cubic has a lower RSS.
+We can see that the cubic (in this instance) has a lower RSS. But does this always hold true?
+
+We create a function which returns a tibble of n observations in s sets, based on a function passed to it:
+
+```{r generator_func}
+generate_observations <- function(observations, sets, func) {
+  a <- tibble(x = 1:(observations * sets)) %>% rowwise() %>% mutate(y = func(x), set = x %% sets)
+  return(a)
+}
+```
+
+We then group by each set and summarise on the RSS of a linear and cubic regression. When we graph this, we can see the linear RSS (denoted by the circle) looks to always be larger than the cubic RSS (denoted by the triangle).
+```{r linear_cubic_deviance, warning = FALSE}
+generate_observations(100, 100, function(x) 3 * x + rnorm(1,0,20)) %>% 
+    group_by(set) %>% 
+    summarise(linear = lm(y~x) %>% deviance(), cubic = lm(y~poly(x,3)) %>% deviance()) %>% 
+    ggplot + 
+    geom_point(aes(set, linear), shape = 'square') + 
+    geom_point(aes(set, cubic), shape = 'triangle') + 
+    geom_segment(aes(x = set, y = linear, xend = set, yend = cubic), lineend = 'butt')
+```
+
+Even generating 10,000 different sets of 100 observations, we don't see a linear RSS below that of a cubic RSS:
+
+```{r multiple_sets, warning = FALSE}
+generate_observations(100, 10000, function(x) 3 * x + rnorm(1,0,20)) %>% 
+    group_by(set) %>% 
+    summarise(linear = lm(y~x) %>% deviance(), cubic = lm(y~poly(x,3)) %>% deviance()) %>% 
+    mutate(rss_diff = linear - cubic) %>% 
+    arrange(rss_diff)
+```
 

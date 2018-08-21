@@ -65,39 +65,24 @@ Given we don't know 'how far from linear' the data is, there isn't enough inform
 
 ### Aside
 
-Out of interests sake, lets generate 100 points of training data where f(x) = 3x + E. We then fit both a linear and a cubic regression to it. We then calculate the RSS with `deviance()`.
+Out of interests sake, lets generate 100 points of training data where f(x) = 3x + E. We then fit both a linear and a cubic regression to it. 
 
 
 ```r
+library(tidyverse)
+
 f_x <- tibble(x = c(1:100)) %>% rowwise() %>% mutate(y = 3*x + rnorm(1, 0, 10))
+linear <- lm(y ~ x, data = f_x)
+cubic <- lm(y ~ poly(x,3), data = f_x)
 ```
-
-```
-## Error in tibble(x = c(1:100)) %>% rowwise() %>% mutate(y = 3 * x + rnorm(1, : could not find function "%>%"
-```
-
-```r
-linear <- lm(`y ~ x`, data = f_x)
-```
-
-```
-## Error in stats::model.frame(formula = `y ~ x`, data = f_x, drop.unused.levels = TRUE): object 'y ~ x' not found
-```
-
-```r
-cubic <- lm(`y ~ poly(x,3)`, data = f_x)
-```
-
-```
-## Error in stats::model.frame(formula = `y ~ poly(x,3)`, data = f_x, drop.unused.levels = TRUE): object 'y ~ poly(x,3)' not found
-```
+We then calculate the RSS with `deviance()`.
 
 ```r
 deviance(linear)
 ```
 
 ```
-## Error in deviance(linear): object 'linear' not found
+## [1] 11627.65
 ```
 
 ```r
@@ -105,8 +90,60 @@ deviance(cubic)
 ```
 
 ```
-## Error in deviance(cubic): object 'cubic' not found
+## [1] 11496.4
 ```
 
-We can see that the cubic has a lower RSS.
+We can see that the cubic (in this instance) has a lower RSS. But does this always hold true?
+
+We create a function which returns a tibble of n observations in s sets, based on a function passed to it:
+
+
+```r
+generate_observations <- function(observations, sets, func) {
+  a <- tibble(x = 1:(observations * sets)) %>% rowwise() %>% mutate(y = func(x), set = x %% sets)
+  return(a)
+}
+```
+
+We then group by each set and summarise on the RSS of a linear and cubic regression. When we graph this, we can see the linear RSS (denoted by the circle) looks to always be larger than the cubic RSS (denoted by the triangle).
+
+```r
+generate_observations(100, 100, function(x) 3 * x + rnorm(1,0,20)) %>% 
+    group_by(set) %>% 
+    summarise(linear = lm(y~x) %>% deviance(), cubic = lm(y~poly(x,3)) %>% deviance()) %>% 
+    ggplot + 
+    geom_point(aes(set, linear), shape = 'square') + 
+    geom_point(aes(set, cubic), shape = 'triangle') + 
+    geom_segment(aes(x = set, y = linear, xend = set, yend = cubic), lineend = 'butt')
+```
+
+![plot of chunk linear_cubic_deviance](figure/linear_cubic_deviance-1.png)
+
+Even generating 10,000 different sets of 100 observations, we don't see a linear RSS below that of a cubic RSS:
+
+
+```r
+generate_observations(100, 10000, function(x) 3 * x + rnorm(1,0,20)) %>% 
+    group_by(set) %>% 
+    summarise(linear = lm(y~x) %>% deviance(), cubic = lm(y~poly(x,3)) %>% deviance()) %>% 
+    mutate(rss_diff = linear - cubic) %>% 
+    arrange(rss_diff)
+```
+
+```
+## # A tibble: 10,000 x 4
+##      set linear  cubic rss_diff
+##    <dbl>  <dbl>  <dbl>    <dbl>
+##  1  6248 34357. 34357.   0.0225
+##  2  1955 36306. 36306.   0.0536
+##  3  1708 44853. 44853.   0.0590
+##  4  3553 26555. 26555.   0.206 
+##  5  8361 33537. 33537.   0.348 
+##  6  4182 32722. 32721.   0.449 
+##  7  4111 35779. 35778.   0.455 
+##  8  8028 40059. 40058.   0.483 
+##  9  4544 44004. 44004.   0.643 
+## 10  9073 35786. 35785.   0.654 
+## # ... with 9,990 more rows
+```
 
