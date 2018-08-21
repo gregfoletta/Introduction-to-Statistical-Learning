@@ -2,7 +2,7 @@
 
 ## 8) Auto data set
 
-```{r setup, echo = F, message = F}
+```{r applied_setup, echo = F, message = F}
 library(tidyverse)
 library(broom)
 library(ISLR)
@@ -11,11 +11,67 @@ library(ISLR)
 ### a)
 *Use the `lm()` function to perform a simple linear regression with `mpg` as the response and `horsepower` as the predictor. Print the results and comment on the output.*
 
-```{r auto_linear}
+```{r applied_auto_linear}
 auto <- as_tibble(Auto)
-auto %>% lm(mpg ~ horsepower, .) %>% tidy()
+lm_auto <- auto %>% lm(mpg ~ horsepower, .)
+lm_auto %>% tidy()
 ```
 
-#### i)
+#### i) 
+*Is there a relationship between the predictor and the response?*
+
+To determine if there is a relationship, we need to look at two items: the p-values for the coefficients, the F-statistic, and the p-value for the F-statistic:
+```{r applied_p_val_and_f_stat}
+lm_auto %>% tidy()
+lm_auto %>% glance()
+
+```
+
+We in the `tidy()` output we can see the p-value for the intercept and the coefficient is very small, indicating a very low probability for the null hypothesis.A
+
+In the `glance()` output, we see the `statistic` column (the F-statistic) is high at around 600, with a small p-value. This indicates that there is a relationship.
+
+#### ii)
+*How strong is the relationship*
+
+To test how string the relationship is, we can look at the residual standard error (RSE) and the R^2 value.
+
+We look at the `glance()` output again and see the R^2 value is .606. Recall that the R^2 is a value between 0 and 1 that is the 'proportion of the variance explained'. We can consider the relationship reasonably strong;
+
+#### iii)
+*Is the relationship positive or negative?*
+There is a negative relationship between `mpg` and `horsepower`, thus miles per gallon goes down as horsepower goes up. This aligns with our conceptual idea.
+
+#### iv) 
+*What is the predicted `mpg` associated with a `horsepower` of 98? What are the associated 95% confidence and prediction intervals?*
+
+We use the `interval` argument to the predict function. Note that the default `level` argument of `predict()` is 0.95 (95%).
+```{r applied_linear_prediction}
+predict(lm_auto, tibble(horsepower = 98), interval = 'confidence')
+predict(lm_auto, tibble(horsepower = 98), interval = 'predict')
+```
+
+### b)
+*Plot the response and the predictor. Display the least squares regression line.*
+
+```{r applied_auto_mpg_hp}
+auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm', formula = 'mpg ~ horsepower')
+```
+
+### c) 
+*Produce diagnostic plots (Resid v Leverage, Resid v Fitted, Fitted v Std Resid) and comment on any problems*
+
+First off, lets have a look at the residuals versus the leverage:
+```{r applied_auto_resid_v_fitted}
+augment(lm_auto) %>% ggplot(aes(.hat, .resid)) + geom_point()
+```
+
+Now we look at the fitted versus the residuals:
+```{r applied_auto_fitted_v_residuals}
+augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point()
+```
+
+
+
 
 
