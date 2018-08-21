@@ -1,0 +1,21 @@
+# Chapter 3 - Applied
+
+## 8) Auto data set
+
+```{r setup, echo = F, message = F}
+library(tidyverse)
+library(broom)
+library(ISLR)
+```
+
+### a)
+*Use the `lm()` function to perform a simple linear regression with `mpg` as the response and `horsepower` as the predictor. Print the results and comment on the output.*
+
+```{r auto_linear}
+auto <- as_tibble(Auto)
+auto %>% lm(mpg ~ horsepower, .) %>% tidy()
+```
+
+#### i)
+
+
