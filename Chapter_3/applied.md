@@ -108,15 +108,90 @@ First off, lets have a look at the residuals versus the leverage:
 augment(lm_auto) %>% ggplot(aes(.hat, .resid)) + geom_point()
 ```
 
-![plot of chunk applied_auto_resid_v_fitted](figure/applied_auto_resid_v_fitted-1.png)
+![plot of chunk applied_auto_leverage_v_fitted](figure/applied_auto_leverage_v_fitted-1.png)
 
-Now we look at the fitted versus the residuals:
+There are a few points up in the top right. We take a look at the Cook's distance for the observations.
+
 
 ```r
-augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point()
+augment(lm_auto) %>% mutate(i = 1:n()) %>% ggplot(aes(i, .cooksd)) + geom_bar(stat = 'identity')
+```
+
+![plot of chunk applied_auto_cooks_distance](figure/applied_auto_cooks_distance-1.png)
+
+A couple of high points but all below 1.
+
+Now we look at the fitted versus the residuals, and also fit a quadratic regression. We see a bit of a U shape, indicating potential non-linearity in the data.
+
+```r
+augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth(method = 'lm', formula = 'y ~ poly(x,2)')
 ```
 
 ![plot of chunk applied_auto_fitted_v_residuals](figure/applied_auto_fitted_v_residuals-1.png)
+
+## 9) Multiple Linear Regression - Auto Data Set
+
+
+```r
+library(GGally)
+library(corrplot)
+```
+
+### a)
+*Produce a scatterplot matrix which includes all the data in the data set*
+
+```r
+auto %>% select(-'name') %>% ggpairs()
+```
+
+![plot of chunk applied_mult_auto_pairs](figure/applied_mult_auto_pairs-1.png)
+
+### b)
+*Compute the matrix of correlations between the variables.*
+
+```r
+auto %>% select(-'name') %>% cor() %>% corrplot(method = 'color')
+```
+
+![plot of chunk applied_mult_auto_corr](figure/applied_mult_auto_corr-1.png)
+
+### c)
+*Perform a multiple linear regression with `mpg` as the response and all other variables except `name` as the predictors.*
+
+
+```r
+lin_reg_auto <- lm(mpg ~ . -name, auto)
+tidy(lin_reg_auto)
+```
+
+```
+## # A tibble: 8 x 5
+##   term          estimate std.error statistic  p.value
+##   <chr>            <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)  -17.2      4.64        -3.71  2.40e- 4
+## 2 cylinders     -0.493    0.323       -1.53  1.28e- 1
+## 3 displacement   0.0199   0.00752      2.65  8.44e- 3
+## 4 horsepower    -0.0170   0.0138      -1.23  2.20e- 1
+## 5 weight        -0.00647  0.000652    -9.93  7.87e-21
+## 6 acceleration   0.0806   0.0988       0.815 4.15e- 1
+## 7 year           0.751    0.0510      14.7   3.06e-39
+## 8 origin         1.43     0.278        5.13  4.67e- 7
+```
+
+```r
+glance(lin_reg_auto)
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC
+## *     <dbl>         <dbl> <dbl>     <dbl>     <dbl> <int>  <dbl> <dbl>
+## 1     0.821         0.818  3.33      252. 2.04e-139     8 -1023. 2065.
+## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+```
+
+
+
 
 
 

@@ -62,14 +62,53 @@ auto %>% ggplot(aes(mpg, horsepower)) + geom_point() + geom_smooth(method = 'lm'
 *Produce diagnostic plots (Resid v Leverage, Resid v Fitted, Fitted v Std Resid) and comment on any problems*
 
 First off, lets have a look at the residuals versus the leverage:
-```{r applied_auto_resid_v_fitted}
+```{r applied_auto_leverage_v_fitted}
 augment(lm_auto) %>% ggplot(aes(.hat, .resid)) + geom_point()
 ```
 
-Now we look at the fitted versus the residuals:
-```{r applied_auto_fitted_v_residuals}
-augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point()
+There are a few points up in the top right. We take a look at the Cook's distance for the observations.
+
+```{r applied_auto_cooks_distance}
+augment(lm_auto) %>% mutate(i = 1:n()) %>% ggplot(aes(i, .cooksd)) + geom_bar(stat = 'identity')
 ```
+
+A couple of high points but all below 1.
+
+Now we look at the fitted versus the residuals, and also fit a quadratic regression. We see a bit of a U shape, indicating potential non-linearity in the data.
+```{r applied_auto_fitted_v_residuals}
+augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth(method = 'lm', formula = 'y ~ poly(x,2)')
+```
+
+## 9) Multiple Linear Regression - Auto Data Set
+
+```{r applied_mult_auto_setup, message = F}
+library(GGally)
+library(corrplot)
+```
+
+### a)
+*Produce a scatterplot matrix which includes all the data in the data set*
+```{r applied_mult_auto_pairs, message = F}
+auto %>% select(-'name') %>% ggpairs()
+```
+
+### b)
+*Compute the matrix of correlations between the variables.*
+```{r applied_mult_auto_corr}
+auto %>% select(-'name') %>% cor() %>% corrplot(method = 'color')
+```
+
+### c)
+*Perform a multiple linear regression with `mpg` as the response and all other variables except `name` as the predictors.*
+
+```{r applied_mult_auto_lm}
+lin_reg_auto <- lm(mpg ~ . -name, auto)
+tidy(lin_reg_auto)
+glance(lin_reg_auto)
+```
+
+
+
 
 
 
