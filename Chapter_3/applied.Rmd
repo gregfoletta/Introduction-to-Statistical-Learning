@@ -106,7 +106,60 @@ lin_reg_auto <- lm(mpg ~ . -name, auto)
 tidy(lin_reg_auto)
 glance(lin_reg_auto)
 ```
+#### i)
+*Is there a relationship between the predictors and the response?*
+We test the null hypothesis of "are all of the regression coefficients zero?". The F-statistic 252 (far greater than 1) and has a p-value of 2e-139, indicating a low probability that this is just by chance. We can therefore say there is a relationship between the predictors and the response.
 
+#### ii)
+We look at the p-values for each of the predictors. The predictors which have a high probability of having an effect on the `mpg`, holding all others constant, appear to be `weight`, `year`, `displacement` and `origin`.
+
+#### iii)
+*What does the coefficient for the `year` variable suggest?*
+The year coefficient suggests that a cars `mpg` gets larger - and therefore better - the later a car was made.
+
+### d)
+*Plot the diagnostic plots of the regression and comment on any problems with the fit.*
+
+We go through our usual plots - first off is looking at the residuals versus the leverage:
+```{r applied_multi_auto_leverage}
+augment(lin_reg_auto) %>% mutate(i = 1:n()) %>% ggplot(aes(i, .cooksd)) + geom_bar(stat = 'identity')
+```
+
+We don't see values with a significant Cook's distance. We move on to the fitted versus the residuals:
+```{r applied_auto_fitted_resid}
+augment(lin_reg_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth(method = 'lm', formula = 'y~poly(x,2)')
+```
+There is some evidence of the non-linearity of the results.
+
+### e) 
+*Use the `*` and `:` symbols to fit linear regressions with interaction effects. Are any interactions statistically significant?*
+A `*` adds the predictors and the interaction term, whereas the `:` only adds the interaction term. I.e. `x\*y == x + y + x:y`.
+
+Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be an f,Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be and interaction between cylinders and displacement:
+
+```{r applied_auto_interaction}
+lm(mpg ~ weight*year + cylinders*displacement, auto) %>% tidy()
+```
+
+All of the values appear to be reasonably statistically significant. In fact, if we have a look at the fitted vs residuals, it looks much better than before:
+```{r applied_auto_interaction_fitted}
+lm(mpg ~ weight*year + cylinders*displacement, auto) %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()A
+```
+
+### f)
+*Try different transformations of the variables and comment ont the findings.*
+
+We try a few different transformations and pipe them through to the fitted versus residuals graph:
+
+```{r applied_auto_transformations}
+lm(mpg ~ sqrt(horsepower), auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
+lm(mpg ~ log(horsepower), auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
+lm(1/mpg ~ horsepower, auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
+lm(1/mpg ~ horsepower + weight*year, auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
+lm(1/mpg ~ horsepower + weight*year, auto) %>% glance()
+```
+
+The last one looks quite good.
 
 
 
