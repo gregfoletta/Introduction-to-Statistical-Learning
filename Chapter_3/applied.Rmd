@@ -170,7 +170,7 @@ The last one looks quite good.
 ```{r applied_carseats_10_a}
 carseats <- as_tibble(Carseats)
 cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
-cs_regress %> tidy()
+cs_regress %>% tidy()
 ```
 
 

@@ -310,14 +310,17 @@ The last one looks quite good.
 ```r
 carseats <- as_tibble(Carseats)
 cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
-cs_regress %> tidy()
+cs_regress %>% tidy()
 ```
 
 ```
-## Error: <text>:3:12: unexpected input
-## 2: cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
-## 3: cs_regress %> tidy()
-##               ^
+## # A tibble: 4 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)  13.0      0.651     20.0    3.63e-62
+## 2 Price        -0.0545   0.00524  -10.4    1.61e-22
+## 3 UrbanYes     -0.0219   0.272     -0.0807 9.36e- 1
+## 4 USYes         1.20     0.259      4.63   4.86e- 6
 ```
 
 
