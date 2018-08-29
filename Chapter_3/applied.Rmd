@@ -162,6 +162,17 @@ lm(1/mpg ~ horsepower + weight*year, auto) %>% glance()
 The last one looks quite good.
 
 
+## 10) Carseats Data Set
+
+### a) 
+*Fit a multiple regression model to predict `Sales` using `Price`, `Urban`, and `US`.*
+
+```{r applied_carseats_10_a}
+carseats <- as_tibble(Carseats)
+cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
+cs_regress %> tidy()
+```
+
 
 
 
