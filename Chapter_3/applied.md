@@ -323,7 +323,101 @@ cs_regress %>% tidy()
 ## 4 USYes         1.20     0.259      4.63   4.86e- 6
 ```
 
+### b)
+*Provide an interpretation of each coefficient in the model.*
+* (Intercept) - the average number of sales of carseats, ignoring all other factors. 
+* Price - the regression indicates a relationship between price and sales, given the low p-value of the t-statistic. An increase in price of a dollar results in a decrease of 54 carseats solds. 
+* UrbanYes - given the high p-value, there doesn't appear to be a relationship between sales and whether a store is urban.
+* USYes - given the low p-value, the store bein in the US results in 1200 more carseats being sold.
 
+### c)
+*Write out the model in equation form, being careful to handle the qualitative variables properly.*
+`Sales = x * Price + y * Urban + z * US, where [Urban = Yes => y = 1|Urban = No =>  y = 0] & [US = Yes => z = 1|US = No => z = 0]`
+
+### d)
+*For which of the predictors can you reject the null hypothesis H 0 : βj = 0?*
+The null hypothesis can be rejected for `Price` and `US`.
+
+### e)
+*On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.*
+
+```r
+cs_regress_reduced <- lm(Sales ~ Price + US, carseats)
+cs_regress_reduced %>% tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)  13.0      0.631       20.7  7.00e-65
+## 2 Price        -0.0545   0.00523    -10.4  1.27e-22
+## 3 USYes         1.20     0.258        4.64 4.71e- 6
+```
+
+### f)
+*How well do the models in (a) and (e) fit the data?*
+
+We look at the F-statistic and its assoicated p-value to determine how well the models fit:
+
+```r
+cs_regress %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.239         0.234  2.47      41.5 2.39e-23     4  -928. 1865. 1885.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+```r
+cs_regress_reduced %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.239         0.235  2.47      62.4 2.66e-24     3  -928. 1863. 1879.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+We see no increase in the R-sqaured value - but we do see an increase in the F-statistic, and a decrease in its p-value.
+
+### g)
+*Using the model from (e), obtain 95 % confidence intervals for the coefficient(s).*
+
+
+```r
+cs_regress_reduced %>% confint()
+```
+
+```
+##                   2.5 %      97.5 %
+## (Intercept) 11.79032020 14.27126531
+## Price       -0.06475984 -0.04419543
+## USYes        0.69151957  1.70776632
+```
+
+### h)
+*Is there evidence of outliers or high leverage observations in the model from (e)?*
+
+
+```r
+cs_regress_reduced %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point()
+```
+
+![plot of chunk applied_carseats_10_h](figure/applied_carseats_10_h-1.png)
+
+```r
+cs_regress_reduced %>% augment() %>% ggplot(aes(.hat, .resid)) + geom_point()
+```
+
+![plot of chunk applied_carseats_10_h](figure/applied_carseats_10_h-2.png)
+
+There doesn't appear to be any non-linearity in the daata, and the high leverage points don't appear to affect the data substantially.
 
 
 

@@ -173,7 +173,55 @@ cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
 cs_regress %>% tidy()
 ```
 
+### b)
+*Provide an interpretation of each coefficient in the model.*
+* (Intercept) - the average number of sales of carseats, ignoring all other factors. 
+* Price - the regression indicates a relationship between price and sales, given the low p-value of the t-statistic. An increase in price of a dollar results in a decrease of 54 carseats solds. 
+* UrbanYes - given the high p-value, there doesn't appear to be a relationship between sales and whether a store is urban.
+* USYes - given the low p-value, the store bein in the US results in 1200 more carseats being sold.
 
+### c)
+*Write out the model in equation form, being careful to handle the qualitative variables properly.*
+`Sales = x * Price + y * Urban + z * US, where [Urban = Yes => y = 1|Urban = No =>  y = 0] & [US = Yes => z = 1|US = No => z = 0]`
+
+### d)
+*For which of the predictors can you reject the null hypothesis H 0 : βj = 0?*
+The null hypothesis can be rejected for `Price` and `US`.
+
+### e)
+*On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.*
+```{r applied_carseats_10_e}
+cs_regress_reduced <- lm(Sales ~ Price + US, carseats)
+cs_regress_reduced %>% tidy()
+```
+
+### f)
+*How well do the models in (a) and (e) fit the data?*
+
+We look at the F-statistic and its assoicated p-value to determine how well the models fit:
+```{r applied_carseats_10_f}
+cs_regress %>% glance()
+cs_regress_reduced %>% glance()
+```
+
+We see no increase in the R-sqaured value - but we do see an increase in the F-statistic, and a decrease in its p-value.
+
+### g)
+*Using the model from (e), obtain 95 % confidence intervals for the coefficient(s).*
+
+```{r applied_carseats_10_g}
+cs_regress_reduced %>% confint()
+```
+
+### h)
+*Is there evidence of outliers or high leverage observations in the model from (e)?*
+
+```{r applied_carseats_10_h}
+cs_regress_reduced %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point()
+cs_regress_reduced %>% augment() %>% ggplot(aes(.hat, .resid)) + geom_point()
+```
+
+There doesn't appear to be any non-linearity in the daata, and the high leverage points don't appear to affect the data substantially.
 
 
 
