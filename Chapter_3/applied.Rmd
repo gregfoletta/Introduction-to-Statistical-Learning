@@ -223,6 +223,41 @@ cs_regress_reduced %>% augment() %>% ggplot(aes(.hat, .resid)) + geom_point()
 
 There doesn't appear to be any non-linearity in the daata, and the high leverage points don't appear to affect the data substantially.
 
+## 11) T-statistic and null-hypothesis
+*In this problem we will investigate the t-statistic for the null hypothesis H 0 : β = 0 in simple linear regression without an intercept. To begin, we generate a predictor x and a response y*
 
+```{r applied_11}
+linear_response <- tibble(x = rnorm(100), y = 2 * x + rnorm(100))
+linear_response %>% ggplot(aes(x,y)) + geom_point()
+```
 
+### a) 
+* Perform a simple linear regression of y onto x , without an intercept. Report the coefficient estimate β̂, the standard error of this coefficient estimate, and the t-statistic and p-value associated with the null hypothesis H 0 : β = 0. Comment on these results.*
+
+```{r applied_11_a}
+set.seed(1)
+lr_reg <- lm(y ~ x + 0)
+lr_reg %>% tidy()
+```
+
+The coefficient estimate is 1.99 - very close to the 2 that we used to generate the points. The standard error is .106, the t-statistic is 18.7 and the p-value is 2.64e-34. The t-statistic tells us how many standard deviations the coefficient is away from 0. The p-value gives us the probability that the null hypothesis - that the coefficient is 0 - is true.
+
+### b) 
+*Now perform a simple linear regression of x onto y without an intercept, and report on the same metrics as a)*
+
+```{r applied_11_b}
+lr_reg_reverse <- lm(x ~ y + 0)
+lr_reg_reverse %>% tidy()
+```
+
+The coefficient estimate and the standard error have changed, which is as expected. The t-statistic and p-value remain the same.
+
+### c)
+*What is the relationship between the results obtained in (a) and (b)?*
+
+It's the same line, thus the overall results obtained are the same.
+
+### d)
+For the regression of Y onto X without an intercept, the t-
+statistic for H 0 : β = 0 takes the form β̂/SE( β̂).
 
