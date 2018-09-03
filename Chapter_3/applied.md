@@ -247,14 +247,14 @@ lm(mpg ~ weight*year + cylinders*displacement, auto) %>% tidy()
 All of the values appear to be reasonably statistically significant. In fact, if we have a look at the fitted vs residuals, it looks much better than before:
 
 ```r
-lm(mpg ~ weight*year + cylinders*displacement, auto) %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()A
+lm(mpg ~ weight*year + cylinders*displacement, auto) %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()
 ```
 
 ```
-## Error: <text>:1:131: unexpected symbol
-## 1: lm(mpg ~ weight*year + cylinders*displacement, auto) %>% augment() %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth()A
-##                                                                                                                                       ^
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
+
+![plot of chunk applied_auto_interaction_fitted](figure/applied_auto_interaction_fitted-1.png)
 
 ### f)
 *Try different transformations of the variables and comment ont the findings.*
@@ -424,6 +424,7 @@ There doesn't appear to be any non-linearity in the daata, and the high leverage
 
 
 ```r
+set.seed(1)
 linear_response <- tibble(x = rnorm(100), y = 2 * x + rnorm(100))
 linear_response %>% ggplot(aes(x,y)) + geom_point()
 ```
@@ -435,20 +436,15 @@ linear_response %>% ggplot(aes(x,y)) + geom_point()
 
 
 ```r
-set.seed(1)
-lr_reg <- lm(y ~ x + 0)
-```
-
-```
-## Error in eval(predvars, data, env): object 'y' not found
-```
-
-```r
+lr_reg <- lm(y ~ x + 0, linear_response)
 lr_reg %>% tidy()
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'lr_reg' not found
+## # A tibble: 1 x 5
+##   term  estimate std.error statistic  p.value
+##   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
+## 1 x         1.99     0.106      18.7 2.64e-34
 ```
 
 The coefficient estimate is 1.99 - very close to the 2 that we used to generate the points. The standard error is .106, the t-statistic is 18.7 and the p-value is 2.64e-34. The t-statistic tells us how many standard deviations the coefficient is away from 0. The p-value gives us the probability that the null hypothesis - that the coefficient is 0 - is true.
@@ -458,19 +454,15 @@ The coefficient estimate is 1.99 - very close to the 2 that we used to generate 
 
 
 ```r
-lr_reg_reverse <- lm(x ~ y + 0)
-```
-
-```
-## Error in eval(predvars, data, env): object 'x' not found
-```
-
-```r
+lr_reg_reverse <- lm(x ~ y + 0, linear_response)
 lr_reg_reverse %>% tidy()
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'lr_reg_reverse' not found
+## # A tibble: 1 x 5
+##   term  estimate std.error statistic  p.value
+##   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
+## 1 y        0.391    0.0209      18.7 2.64e-34
 ```
 
 The coefficient estimate and the standard error have changed, which is as expected. The t-statistic and p-value remain the same.
@@ -480,7 +472,62 @@ The coefficient estimate and the standard error have changed, which is as expect
 
 It's the same line, thus the overall results obtained are the same.
 
-### d)
-For the regression of Y onto X without an intercept, the t-
-statistic for H 0 : β = 0 takes the form β̂/SE( β̂).
+## 12) Simple Linear Regression
+
+### a) 
+*Recall that the coefficient estimate β̂ for the linear regression of Y onto X without an intercept is given by (3.38). Under what circumstance is the coefficient estimate for the regression of X onto Y the same as the coefficient estimate for the regression of Y onto X?*
+
+When the sum of the squares of the y observations is the same as the sum or the squares of the x observations.
+
+### b)
+Generate an example in R with n = 100 observations in which the coefficient estimate for the regression of X onto Y is different from the coefficient estimate for the regression of Y onto X.
+
+
+```r
+set.seed(1)
+tibble(x = rnorm(100), y = 4*x) %>% lm(y ~ x, .) %>% tidy()
+set.seed(1)
+tibble(x = rnorm(100), y = 4*x) %>% mutate(y = sample(
+```
+
+```
+## Error: <text>:5:0: unexpected end of input
+## 3: set.seed(1)
+## 4: tibble(x = rnorm(100), y = 4*x) %>% mutate(y = sample(
+##   ^
+```
+
+### c)
+*Generate an example in R with n = 100 observations in which the coefficient estimate for the regression of X onto Y is the Asame as the coefficient estimate for the regression of Y onto X.*
+
+To have the same coefficients, we need the sum of the squares to be the same. To do this, we generate 100 random values for `X`, and we use the same values for `Y`. However we re-order the values so we don't simply get a `y = x` function. We can use the `sample_n()` function for this:
+
+
+```r
+set.seed(1)
+sample_data <- tibble(x = rnorm(100)) %>% 
+    mutate(y = (sample_n(., 100) %>% .[['x']]))
+lm(y ~ x, sample_data) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+## 1 (Intercept)  0.108      0.0909    1.19     0.237
+## 2 x            0.00695    0.101     0.0688   0.945
+```
+
+```r
+lm(x ~ y, sample_data) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+## 1 (Intercept)  0.108      0.0909    1.19     0.237
+## 2 y            0.00695    0.101     0.0688   0.945
+```
+
 

@@ -1,15 +1,19 @@
 # Introduction to Statistical Learning
 
-## Conceptual Questions
+## Chapter 2
 
-* [Chapter 2](Chapter_2/conceptual.md)
-* [Chapter 3](Chapter_3/conceptual.md)
+* [Key Terms](Chapter_2/terms.md)
 
-## Applied Questions
+### Exercises 
 
-* [Chapter 2](Chapter_2/applied.md)
-* [Chapter 3](Chapter_3/applied.md)
+* [Conceptual](Chapter_2/conceptual.md)
+* [Applied](Chapter_2/applied.md)
 
-## Labs
+## Chapter 3
 
-* [Chapter 3](Chapter_3/lab.md)
+### Exercises
+* [Lab](Chapter_3/lab.md)
+* [Conceptual](Chapter_3/conceptual.md)
+* [Applied](Chapter_3/applied.md)
+
+
