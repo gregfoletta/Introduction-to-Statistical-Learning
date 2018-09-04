@@ -486,15 +486,37 @@ Generate an example in R with n = 100 observations in which the coefficient esti
 ```r
 set.seed(1)
 tibble(x = rnorm(100), y = 4*x) %>% lm(y ~ x, .) %>% tidy()
-set.seed(1)
-tibble(x = rnorm(100), y = 4*x) %>% mutate(y = sample(
 ```
 
 ```
-## Error: <text>:5:0: unexpected end of input
-## 3: set.seed(1)
-## 4: tibble(x = rnorm(100), y = 4*x) %>% mutate(y = sample(
-##   ^
+## Warning in summary.lm(x): essentially perfect fit: summary may be
+## unreliable
+```
+
+```
+## # A tibble: 2 x 5
+##   term         estimate std.error statistic   p.value
+##   <chr>           <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept) -8.88e-17  2.19e-17  -4.06e 0 0.0000999
+## 2 x            4.00e+ 0  2.43e-17   1.64e17 0
+```
+
+```r
+set.seed(1)
+tibble(x = rnorm(100), y = 4*x) %>% lm(x ~ y, .) %>% tidy()
+```
+
+```
+## Warning in summary.lm(x): essentially perfect fit: summary may be
+## unreliable
+```
+
+```
+## # A tibble: 2 x 5
+##   term         estimate std.error statistic   p.value
+##   <chr>           <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept) -2.22e-17  5.47e-18  -4.06e 0 0.0000999
+## 2 y            2.50e- 1  1.52e-18   1.64e17 0
 ```
 
 ### c)
@@ -529,5 +551,79 @@ lm(x ~ y, sample_data) %>% tidy()
 ## 1 (Intercept)  0.108      0.0909    1.19     0.237
 ## 2 y            0.00695    0.101     0.0688   0.945
 ```
+
+## 13) Simulated Linear Regressions
+
+### a)
+* Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
+
+
+```r
+x <- rnorm(100)
+```
+
+### b) 
+*Using the rnorm() function, create a vector, eps , containing 100 observations drawn from a N (0, 0.25) distribution*
+
+
+```r
+eps <- rnorm(100, 0, .25)
+```
+
+### c) 
+* Using x and eps , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
+
+
+```r
+y <- -1 + .5 * x + eps
+```
+
+The beta_0 is -1, and the beta_1 is .5
+
+### d)
+*Create a scatterplot displaying the relationship between x and y . Comment on what you observe.
+
+
+```r
+simulated <- tibble(x = x, y = y) 
+simulated %>% ggplot(aes(x,y)) + geom_point()
+```
+
+![plot of chunk applied_13_d](figure/applied_13_d-1.png)
+
+We can see an approximate linear relationship between x and y.
+
+### e)
+*Fit a least squares linear model to predict y using x . Comment on the model obtained. How do β̂ 0 and β̂ 1 compare to β 0 and β 1 ?*
+
+
+```r
+lm(y ~ x, simulated) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   -0.975    0.0245     -39.8 2.73e-62
+## 2 x              0.495    0.0235      21.1 3.21e-38
+```
+
+We see a `beta_0` of -0.988, and a `beta_1` of 0.527 - very close to the actual values of the function. The standard error is low at 0.0248 and 0.0241 respectively.
+
+### f)
+*Display the least squares line on the scatterplot obtained in (d). Draw the population regression line on the plot, in a different color. Create a legend.
+
+
+```r
+simulated %>% ggplot(aes(x,y)) + 
+    geom_point() + 
+    geom_smooth(aes(colour = 'Regression'), method = 'lm', formula = 'y ~ x') + 
+    geom_abline(aes(slope = .5, intercept = -1, colour = 'Population Mean'), size = 1) +
+    labs(colour = "Lines")
+```
+
+![plot of chunk applied_13_f](figure/applied_13_f-1.png)
+
 
 

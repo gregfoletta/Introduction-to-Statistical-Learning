@@ -271,7 +271,7 @@ Generate an example in R with n = 100 observations in which the coefficient esti
 set.seed(1)
 tibble(x = rnorm(100), y = 4*x) %>% lm(y ~ x, .) %>% tidy()
 set.seed(1)
-tibble(x = rnorm(100), y = 4*x) %>% mutate(y = sample(
+tibble(x = rnorm(100), y = 4*x) %>% lm(x ~ y, .) %>% tidy()
 ```
 
 ### c)
@@ -286,5 +286,62 @@ sample_data <- tibble(x = rnorm(100)) %>%
 lm(y ~ x, sample_data) %>% tidy()
 lm(x ~ y, sample_data) %>% tidy()
 ```
+
+## 13) Simulated Linear Regressions
+
+### a)
+* Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
+
+```{r applied_13_a}
+x <- rnorm(100)
+```
+
+### b) 
+*Using the rnorm() function, create a vector, eps , containing 100 observations drawn from a N (0, 0.25) distribution*
+
+```{r applied_13_b}
+eps <- rnorm(100, 0, .25)
+```
+
+### c) 
+* Using x and eps , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
+
+```{r applied_13_c}
+y <- -1 + .5 * x + eps
+```
+
+The beta_0 is -1, and the beta_1 is .5
+
+### d)
+*Create a scatterplot displaying the relationship between x and y . Comment on what you observe.
+
+```{r applied_13_d}
+simulated <- tibble(x = x, y = y) 
+simulated %>% ggplot(aes(x,y)) + geom_point()
+```
+
+We can see an approximate linear relationship between x and y.
+
+### e)
+*Fit a least squares linear model to predict y using x . Comment on the model obtained. How do β̂ 0 and β̂ 1 compare to β 0 and β 1 ?*
+
+```{r appled_13_e}
+lm(y ~ x, simulated) %>% tidy()
+```
+
+We see a `beta_0` of -0.988, and a `beta_1` of 0.527 - very close to the actual values of the function. The standard error is low at 0.0248 and 0.0241 respectively.
+
+### f)
+*Display the least squares line on the scatterplot obtained in (d). Draw the population regression line on the plot, in a different color. Create a legend.
+
+```{r applied_13_f}
+simulated %>% ggplot(aes(x,y)) + 
+    geom_point() + 
+    geom_smooth(aes(colour = 'Regression'), method = 'lm', formula = 'y ~ x') + 
+    geom_abline(aes(slope = .5, intercept = -1, colour = 'Population Mean'), size = 1) +
+    labs(colour = "Lines")
+
+```
+
 
 
