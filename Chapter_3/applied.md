@@ -332,14 +332,19 @@ cs_regress %>% tidy()
 
 ### c)
 *Write out the model in equation form, being careful to handle the qualitative variables properly.*
-`Sales = x * Price + y * Urban + z * US, where [Urban = Yes => y = 1|Urban = No =>  y = 0] & [US = Yes => z = 1|US = No => z = 0]`
+
+`Sales = x * Price + y * Urban + z * US`, where 
+`[Urban = Yes => y = 1|Urban = No =>  y = 0]` & 
+`[US = Yes => z = 1|US = No => z = 0]`
 
 ### d)
 *For which of the predictors can you reject the null hypothesis H 0 : βj = 0?*
+
 The null hypothesis can be rejected for `Price` and `US`.
 
 ### e)
 *On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.*
+
 
 ```r
 cs_regress_reduced <- lm(Sales ~ Price + US, carseats)
@@ -432,7 +437,7 @@ linear_response %>% ggplot(aes(x,y)) + geom_point()
 ![plot of chunk applied_11](figure/applied_11-1.png)
 
 ### a) 
-* Perform a simple linear regression of y onto x , without an intercept. Report the coefficient estimate β̂, the standard error of this coefficient estimate, and the t-statistic and p-value associated with the null hypothesis H 0 : β = 0. Comment on these results.*
+*Perform a simple linear regression of y onto x , without an intercept. Report the coefficient estimate β̂, the standard error of this coefficient estimate, and the t-statistic and p-value associated with the null hypothesis H 0 : β = 0. Comment on these results.*
 
 
 ```r
@@ -555,7 +560,7 @@ lm(x ~ y, sample_data) %>% tidy()
 ## 13) Simulated Linear Regressions
 
 ### a)
-* Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
+*Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
 
 
 ```r
@@ -563,7 +568,7 @@ x <- rnorm(100)
 ```
 
 ### b) 
-*Using the rnorm() function, create a vector, eps , containing 100 observations drawn from a N (0, 0.25) distribution*
+*Using the `rnorm()` function, create a vector, `eps` , containing 100 observations drawn from a N (0, 0.25) distribution*
 
 
 ```r
@@ -571,7 +576,7 @@ eps <- rnorm(100, 0, .25)
 ```
 
 ### c) 
-* Using x and eps , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
+*Using `x` and `eps` , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
 
 
 ```r
@@ -625,5 +630,134 @@ simulated %>% ggplot(aes(x,y)) +
 
 ![plot of chunk applied_13_f](figure/applied_13_f-1.png)
 
+### g) 
+*Now fit a polynomial regression model that predicts `y` using `x` and `x^2` . Is there evidence that the quadratic term improves the model fit? Explain your answer.*
 
 
+```r
+lm(y ~ poly(x,2), simulated) %>% tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)  -0.964     0.0246  -39.1    3.21e-61
+## 2 poly(x, 2)1   5.17      0.246    21.0    7.58e-38
+## 3 poly(x, 2)2  -0.0167    0.246    -0.0677 9.46e- 1
+```
+
+```r
+lm(y ~ poly(x,2), simulated) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.820         0.816 0.246      220. 8.51e-37     3 -0.220  8.44  18.9
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+We can see that the R^2 has not changed, and the RSE has increased slightly with the x^2 regression. However the F-statistic has decreased significantly with the x^2 regression, indicating a decrease in the significance of the model.
+
+### h) & i)
+*Repeat (a)–(f) after modifying the data generation process in such a way that there is less noise in the data.*
+
+Lets create a function to do this, with the variable being how much noise is in the data.
+
+
+
+```r
+simulated_linear <- function(observations, mean, noise) {
+    x <- rnorm(observations)
+    eps <- rnorm(observations, mean, noise)
+    y <- -1 + .5 * x + eps
+    return(tibble(x = x, y = y))
+}
+
+set.seed(1)
+low_and_high_noise <- low_and_high_noise <- bind_cols( simulated_linear(100, 0, .01), simulated_linear(100, 0, 20))
+lm(y ~ x, low_and_high_noise) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared   sigma statistic   p.value    df logLik   AIC
+## *     <dbl>         <dbl>   <dbl>     <dbl>     <dbl> <int>  <dbl> <dbl>
+## 1     1.000         1.000 0.00963   215413. 1.37e-165     2   323. -641.
+## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+```
+
+```r
+lm(y1 ~ x1, low_and_high_noise) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+## 1    0.0186       0.00859  19.8      1.86   0.176     2  -440.  885.  893.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+```r
+low_noise_reg %>% glance()
+```
+
+```
+## Error in eval(lhs, parent, parent): object 'low_noise_reg' not found
+```
+
+```r
+high_noise_reg %>% glance()
+```
+
+```
+## Error in eval(lhs, parent, parent): object 'high_noise_reg' not found
+```
+
+```r
+low_and_high_noise %>% 
+    ggplot() + 
+    geom_point(aes(x, y), colour = 'red') + 
+    geom_point(aes(x1, y1), colour = 'blue') + 
+    geom_smooth(aes(x, y), method = 'lm', formula = 'y ~ x', colour = 'red') + 
+    geom_smooth(aes(x1, y1), method = 'lm', formula = 'y ~ x', colour = 'blue')
+```
+
+![plot of chunk applied_13_h](figure/applied_13_h-1.png)
+
+### j)
+* What are the confidence intervals of the data sets? Comment on the results*
+
+
+```r
+lm(y ~ x, simulated) %>% confint()
+```
+
+```
+##                 2.5 %     97.5 %
+## (Intercept) -1.023503 -0.9262522
+## x            0.448743  0.5419217
+```
+
+```r
+lm(y ~ x, low_and_high_noise) %>% confint()
+```
+
+```
+##                  2.5 %     97.5 %
+## (Intercept) -1.0023016 -0.9984522
+## x            0.4978516  0.5021272
+```
+
+```r
+lm(y1 ~ x1, low_and_high_noise) %>% confint()
+```
+
+```
+##                 2.5 %   97.5 %
+## (Intercept) -3.964210 3.902209
+## x1          -1.196102 6.444841
+```

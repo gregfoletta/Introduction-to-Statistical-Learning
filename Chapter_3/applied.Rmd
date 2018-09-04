@@ -182,14 +182,19 @@ cs_regress %>% tidy()
 
 ### c)
 *Write out the model in equation form, being careful to handle the qualitative variables properly.*
-`Sales = x * Price + y * Urban + z * US, where [Urban = Yes => y = 1|Urban = No =>  y = 0] & [US = Yes => z = 1|US = No => z = 0]`
+
+`Sales = x * Price + y * Urban + z * US`, where 
+`[Urban = Yes => y = 1|Urban = No =>  y = 0]` & 
+`[US = Yes => z = 1|US = No => z = 0]`
 
 ### d)
 *For which of the predictors can you reject the null hypothesis H 0 : βj = 0?*
+
 The null hypothesis can be rejected for `Price` and `US`.
 
 ### e)
 *On the basis of your response to the previous question, fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.*
+
 ```{r applied_carseats_10_e}
 cs_regress_reduced <- lm(Sales ~ Price + US, carseats)
 cs_regress_reduced %>% tidy()
@@ -233,7 +238,7 @@ linear_response %>% ggplot(aes(x,y)) + geom_point()
 ```
 
 ### a) 
-* Perform a simple linear regression of y onto x , without an intercept. Report the coefficient estimate β̂, the standard error of this coefficient estimate, and the t-statistic and p-value associated with the null hypothesis H 0 : β = 0. Comment on these results.*
+*Perform a simple linear regression of y onto x , without an intercept. Report the coefficient estimate β̂, the standard error of this coefficient estimate, and the t-statistic and p-value associated with the null hypothesis H 0 : β = 0. Comment on these results.*
 
 ```{r applied_11_a}
 lr_reg <- lm(y ~ x + 0, linear_response)
@@ -290,21 +295,21 @@ lm(x ~ y, sample_data) %>% tidy()
 ## 13) Simulated Linear Regressions
 
 ### a)
-* Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
+*Using the rnorm() function, create a vector, x , containing 100 observations drawn from a N (0, 1) distribution. This represents a feature, X.*
 
 ```{r applied_13_a}
 x <- rnorm(100)
 ```
 
 ### b) 
-*Using the rnorm() function, create a vector, eps , containing 100 observations drawn from a N (0, 0.25) distribution*
+*Using the `rnorm()` function, create a vector, `eps` , containing 100 observations drawn from a N (0, 0.25) distribution*
 
 ```{r applied_13_b}
 eps <- rnorm(100, 0, .25)
 ```
 
 ### c) 
-* Using x and eps , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
+*Using `x` and `eps` , generate a vector y according to the model `Y = −1 + 0.5X + e`. What is the length of the vector y ? What are the values of β 0 and β 1 in this linear model?*
 
 ```{r applied_13_c}
 y <- -1 + .5 * x + eps
@@ -340,8 +345,53 @@ simulated %>% ggplot(aes(x,y)) +
     geom_smooth(aes(colour = 'Regression'), method = 'lm', formula = 'y ~ x') + 
     geom_abline(aes(slope = .5, intercept = -1, colour = 'Population Mean'), size = 1) +
     labs(colour = "Lines")
-
 ```
 
+### g) 
+*Now fit a polynomial regression model that predicts `y` using `x` and `x^2` . Is there evidence that the quadratic term improves the model fit? Explain your answer.*
+
+```{r applied_13_g}
+lm(y ~ poly(x,2), simulated) %>% tidy()
+lm(y ~ poly(x,2), simulated) %>% glance()
+```
+
+We can see that the R^2 has not changed, and the RSE has increased slightly with the x^2 regression. However the F-statistic has decreased significantly with the x^2 regression, indicating a decrease in the significance of the model.
+
+### h) & i)
+*Repeat (a)–(f) after modifying the data generation process in such a way that there is less noise in the data.*
+
+Lets create a function to do this, with the variable being how much noise is in the data.
 
 
+```{r applied_13_h}
+simulated_linear <- function(observations, mean, noise) {
+    x <- rnorm(observations)
+    eps <- rnorm(observations, mean, noise)
+    y <- -1 + .5 * x + eps
+    return(tibble(x = x, y = y))
+}
+
+set.seed(1)
+low_and_high_noise <- low_and_high_noise <- bind_cols( simulated_linear(100, 0, .01), simulated_linear(100, 0, 20))
+lm(y ~ x, low_and_high_noise) %>% glance()
+lm(y1 ~ x1, low_and_high_noise) %>% glance()
+
+low_noise_reg %>% glance()
+high_noise_reg %>% glance()
+
+low_and_high_noise %>% 
+    ggplot() + 
+    geom_point(aes(x, y), colour = 'red') + 
+    geom_point(aes(x1, y1), colour = 'blue') + 
+    geom_smooth(aes(x, y), method = 'lm', formula = 'y ~ x', colour = 'red') + 
+    geom_smooth(aes(x1, y1), method = 'lm', formula = 'y ~ x', colour = 'blue')
+```
+
+### j)
+* What are the confidence intervals of the data sets? Comment on the results*
+
+```{r applied_13_j}
+lm(y ~ x, simulated) %>% confint()
+lm(y ~ x, low_and_high_noise) %>% confint()
+lm(y1 ~ x1, low_and_high_noise) %>% confint()
+```
