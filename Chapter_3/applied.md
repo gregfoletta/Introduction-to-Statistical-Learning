@@ -667,7 +667,6 @@ We can see that the R^2 has not changed, and the RSE has increased slightly with
 Lets create a function to do this, with the variable being how much noise is in the data.
 
 
-
 ```r
 simulated_linear <- function(observations, mean, noise) {
     x <- rnorm(observations)
@@ -677,16 +676,40 @@ simulated_linear <- function(observations, mean, noise) {
 }
 
 set.seed(1)
-low_and_high_noise <- low_and_high_noise <- bind_cols( simulated_linear(100, 0, .01), simulated_linear(100, 0, 20))
+low_and_high_noise <- bind_cols( simulated_linear(100, 0, .1), simulated_linear(100, 0, .5))
 lm(y ~ x, low_and_high_noise) %>% glance()
 ```
 
 ```
 ## # A tibble: 1 x 11
-##   r.squared adj.r.squared   sigma statistic   p.value    df logLik   AIC
-## *     <dbl>         <dbl>   <dbl>     <dbl>     <dbl> <int>  <dbl> <dbl>
-## 1     1.000         1.000 0.00963   215413. 1.37e-165     2   323. -641.
+##   r.squared adj.r.squared  sigma statistic  p.value    df logLik   AIC
+## *     <dbl>         <dbl>  <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl>
+## 1     0.956         0.956 0.0963     2153. 1.64e-68     2   93.2 -180.
 ## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+```
+
+```r
+lm(y ~ x, low_and_high_noise) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   -1.00    0.00970    -103.  6.63e-102
+## 2 x              0.500   0.0108       46.4 1.64e- 68
+```
+
+```r
+lm(y1 ~ x1, low_and_high_noise) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   -0.976    0.0495     -19.7 7.70e-36
+## 2 x1             0.553    0.0481      11.5 7.27e-20
 ```
 
 ```r
@@ -695,27 +718,16 @@ lm(y1 ~ x1, low_and_high_noise) %>% glance()
 
 ```
 ## # A tibble: 1 x 11
-##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
-## 1    0.0186       0.00859  19.8      1.86   0.176     2  -440.  885.  893.
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.574         0.570 0.495      132. 7.27e-20     2  -70.6  147.  155.
 ## # ... with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
-```r
-low_noise_reg %>% glance()
-```
+Looking at the values, the low noise regression picks the exact coefficients that were used in the function. The R^2 is near 1 with a high F-statistic.
 
-```
-## Error in eval(lhs, parent, parent): object 'low_noise_reg' not found
-```
+The higher noise, as expected, has low F-statistic and high p-values for the coefficients. The R^2 value is very low.
 
-```r
-high_noise_reg %>% glance()
-```
-
-```
-## Error in eval(lhs, parent, parent): object 'high_noise_reg' not found
-```
 
 ```r
 low_and_high_noise %>% 
@@ -726,7 +738,7 @@ low_and_high_noise %>%
     geom_smooth(aes(x1, y1), method = 'lm', formula = 'y ~ x', colour = 'blue')
 ```
 
-![plot of chunk applied_13_h](figure/applied_13_h-1.png)
+![plot of chunk applied_13_h_2](figure/applied_13_h_2-1.png)
 
 ### j)
 * What are the confidence intervals of the data sets? Comment on the results*
@@ -748,8 +760,8 @@ lm(y ~ x, low_and_high_noise) %>% confint()
 
 ```
 ##                  2.5 %     97.5 %
-## (Intercept) -1.0023016 -0.9984522
-## x            0.4978516  0.5021272
+## (Intercept) -1.0230161 -0.9845224
+## x            0.4785159  0.5212720
 ```
 
 ```r
@@ -757,7 +769,112 @@ lm(y1 ~ x1, low_and_high_noise) %>% confint()
 ```
 
 ```
-##                 2.5 %   97.5 %
-## (Intercept) -3.964210 3.902209
-## x1          -1.196102 6.444841
+##                  2.5 %     97.5 %
+## (Intercept) -1.0741052 -0.8774448
+## x1           0.4575975  0.6486210
 ```
+
+## 14) Collinearity Problem
+
+### a) 
+*Set up the data*
+
+```r
+set.seed(1)
+colin_data <- tibble(
+    x1 = runif(100), 
+    x2 = 0.5 * x1 + rnorm(100)/10, 
+    y = 2 + 2*x1 + 0.3*x2 + rnorm(100)
+)
+```
+
+The beta_{0,1,2} coefficients of the model are (2,2,0.3) respectively.
+
+### b) 
+*What is the correlation between x1 and x2 ? Create a scatterplot displaying the relationship between the variables.*
+
+
+```r
+colin_data %>% select(x1, x2) %>% cor()
+```
+
+```
+##           x1        x2
+## x1 1.0000000 0.8351212
+## x2 0.8351212 1.0000000
+```
+
+```r
+colin_data %>% ggplot(aes(x1, x2)) + geom_point()
+```
+
+![plot of chunk applied_14_b](figure/applied_14_b-1.png)
+
+### c) 
+*Using this data, fit a least squares regression to predict y using `x1` and `x2`*
+
+
+```r
+colin_data_reg <- lm(y ~ x1 + x2, colin_data)
+colin_data_reg %>% tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)     2.13     0.232     9.19  7.61e-15
+## 2 x1              1.44     0.721     2.00  4.87e- 2
+## 3 x2              1.01     1.13      0.891 3.75e- 1
+```
+
+```r
+colin_data_reg %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.209         0.193  1.06      12.8 1.16e-5     3  -146.  300.  310.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+*Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*
+
+
+### d) and e)
+*Now fit a least squares regression to predict y using only x1, with only x2. Can we reject the null hypothesis for either of these?*
+
+
+```r
+colin_data_reg_x1 <- lm(y ~ x1, colin_data)
+colin_data_reg_x2 <- lm(y ~ x2, colin_data)
+colin_data_reg_x1 %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)     2.11     0.231      9.15 8.27e-15
+## 2 x1              1.98     0.396      4.99 2.66e- 6
+```
+
+```r
+colin_data_reg_x2 %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)     2.39     0.195     12.3  1.68e-21
+## 2 x2              2.90     0.633      4.58 1.37e- 5
+```
+
+Again, in both instances, the F-statistic is not very large for each of the coefficients.
+
+
+
+

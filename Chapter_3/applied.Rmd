@@ -362,8 +362,7 @@ We can see that the R^2 has not changed, and the RSE has increased slightly with
 
 Lets create a function to do this, with the variable being how much noise is in the data.
 
-
-```{r applied_13_h}
+```{r applied_13_h_1}
 simulated_linear <- function(observations, mean, noise) {
     x <- rnorm(observations)
     eps <- rnorm(observations, mean, noise)
@@ -372,13 +371,18 @@ simulated_linear <- function(observations, mean, noise) {
 }
 
 set.seed(1)
-low_and_high_noise <- low_and_high_noise <- bind_cols( simulated_linear(100, 0, .01), simulated_linear(100, 0, 20))
+low_and_high_noise <- bind_cols( simulated_linear(100, 0, .1), simulated_linear(100, 0, .5))
 lm(y ~ x, low_and_high_noise) %>% glance()
+lm(y ~ x, low_and_high_noise) %>% tidy()
+lm(y1 ~ x1, low_and_high_noise) %>% tidy()
 lm(y1 ~ x1, low_and_high_noise) %>% glance()
+```
 
-low_noise_reg %>% glance()
-high_noise_reg %>% glance()
+Looking at the values, the low noise regression picks the exact coefficients that were used in the function. The R^2 is near 1 with a high F-statistic.
 
+The higher noise, as expected, has low F-statistic and high p-values for the coefficients. The R^2 value is very low.
+
+```{r applied_13_h_2}
 low_and_high_noise %>% 
     ggplot() + 
     geom_point(aes(x, y), colour = 'red') + 
@@ -395,3 +399,55 @@ lm(y ~ x, simulated) %>% confint()
 lm(y ~ x, low_and_high_noise) %>% confint()
 lm(y1 ~ x1, low_and_high_noise) %>% confint()
 ```
+
+## 14) Collinearity Problem
+
+### a) 
+*Set up the data*
+```{r applied_14_a}
+set.seed(1)
+colin_data <- tibble(
+    x1 = runif(100), 
+    x2 = 0.5 * x1 + rnorm(100)/10, 
+    y = 2 + 2*x1 + 0.3*x2 + rnorm(100)
+)
+```
+
+The beta_{0,1,2} coefficients of the model are (2,2,0.3) respectively.
+
+### b) 
+*What is the correlation between x1 and x2 ? Create a scatterplot displaying the relationship between the variables.*
+
+```{r applied_14_b}
+colin_data %>% select(x1, x2) %>% cor()
+
+colin_data %>% ggplot(aes(x1, x2)) + geom_point()
+```
+
+### c) 
+*Using this data, fit a least squares regression to predict y using `x1` and `x2`*
+
+```{r applied_14_c}
+colin_data_reg <- lm(y ~ x1 + x2, colin_data)
+colin_data_reg %>% tidy()
+colin_data_reg %>% glance()
+```
+
+*Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*
+
+
+### d) and e)
+*Now fit a least squares regression to predict y using only x1, with only x2. Can we reject the null hypothesis for either of these?*
+
+```{r applied_14_d_e}
+colin_data_reg_x1 <- lm(y ~ x1, colin_data)
+colin_data_reg_x2 <- lm(y ~ x2, colin_data)
+colin_data_reg_x1 %>% tidy()
+colin_data_reg_x2 %>% tidy()
+```
+
+Again, in both instances, the F-statistic is not very large for each of the coefficients.
+
+
+
+
