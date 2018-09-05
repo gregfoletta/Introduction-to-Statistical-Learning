@@ -842,6 +842,8 @@ colin_data_reg %>% glance()
 
 *Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*
 
+Let's take the general view that a p-value of 0.05 is statistically significant. With this in mind, we can reject the null hypothesis for `x1`, but not for `x2`.
+
 
 ### d) and e)
 *Now fit a least squares regression to predict y using only x1, with only x2. Can we reject the null hypothesis for either of these?*
@@ -873,8 +875,88 @@ colin_data_reg_x2 %>% tidy()
 ## 2 x2              2.90     0.633      4.58 1.37e- 5
 ```
 
-Again, in both instances, the F-statistic is not very large for each of the coefficients.
+I both instances we have a p-value below 0.05, and thus we can rejct the null hypothesis in both instances.
+
+### f) 
+*Do the results obtained in (c)–(e) contradict each other? Explain your answer.*
+
+The results don't contradict each other. When regressing using both predictors that a colinear, it can be difficult to separate out the individual effects on the response, and the power of the hypothesi stest is reduced. (see ISL 3.36).
+
+### g) 
+*Now suppose we obtain one additional observation, which was unfortunately mismeasured. Re-fit the linear models from (c) to (e) using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers*
 
 
+```r
+colin_data_add <- colin_data %>% add_row(x1 = 0.1, x2 = 0.8, y = 6)
 
+lm(y ~ x1 + x2, colin_data_add) %>% tidy()
+```
 
+```
+## # A tibble: 3 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)    2.23      0.231     9.62  7.91e-16
+## 2 x1             0.539     0.592     0.911 3.65e- 1
+## 3 x2             2.51      0.898     2.80  6.14e- 3
+```
+
+```r
+lm(y ~ x1, colin_data_add) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)     2.26     0.239      9.44 1.78e-15
+## 2 x1              1.77     0.412      4.28 4.29e- 5
+```
+
+```r
+lm(y ~ x2, colin_data_add) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)     2.35     0.191     12.3  1.40e-21
+## 2 x2              3.12     0.604      5.16 1.25e- 6
+```
+
+```r
+lm(y ~ x1 + x2, colin_data_add) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.219         0.203  1.07      13.7 5.56e-6     3  -149.  306.  317.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+```r
+lm(y ~ x1, colin_data_add) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.156         0.148  1.11      18.3 4.29e-5     2  -153.  312.  320.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```
+
+```r
+lm(y ~ x2, colin_data_add) %>% glance()
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+## 1     0.212         0.204  1.07      26.7 1.25e-6     2  -149.  305.  313.
+## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+```

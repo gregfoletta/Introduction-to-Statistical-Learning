@@ -435,6 +435,8 @@ colin_data_reg %>% glance()
 
 *Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*
 
+Let's take the general view that a p-value of 0.05 is statistically significant. With this in mind, we can reject the null hypothesis for `x1`, but not for `x2`.
+
 
 ### d) and e)
 *Now fit a least squares regression to predict y using only x1, with only x2. Can we reject the null hypothesis for either of these?*
@@ -446,8 +448,24 @@ colin_data_reg_x1 %>% tidy()
 colin_data_reg_x2 %>% tidy()
 ```
 
-Again, in both instances, the F-statistic is not very large for each of the coefficients.
+I both instances we have a p-value below 0.05, and thus we can rejct the null hypothesis in both instances.
 
+### f) 
+*Do the results obtained in (c)–(e) contradict each other? Explain your answer.*
 
+The results don't contradict each other. When regressing using both predictors that a colinear, it can be difficult to separate out the individual effects on the response, and the power of the hypothesi stest is reduced. (see ISL 3.36).
 
+### g) 
+*Now suppose we obtain one additional observation, which was unfortunately mismeasured. Re-fit the linear models from (c) to (e) using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers*
 
+```{r applied_14_g_a}
+colin_data_add <- colin_data %>% add_row(x1 = 0.1, x2 = 0.8, y = 6)
+
+lm(y ~ x1 + x2, colin_data_add) %>% tidy()
+lm(y ~ x1, colin_data_add) %>% tidy()
+lm(y ~ x2, colin_data_add) %>% tidy()
+
+lm(y ~ x1 + x2, colin_data_add) %>% glance()
+lm(y ~ x1, colin_data_add) %>% glance()
+lm(y ~ x2, colin_data_add) %>% glance()
+```
