@@ -458,14 +458,32 @@ The results don't contradict each other. When regressing using both predictors t
 ### g) 
 *Now suppose we obtain one additional observation, which was unfortunately mismeasured. Re-fit the linear models from (c) to (e) using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers*
 
-```{r applied_14_g_a}
+We add the new observation and calculate the mew regressions.
+
+```{r applied_14_g_a_1}
 colin_data_add <- colin_data %>% add_row(x1 = 0.1, x2 = 0.8, y = 6)
 
-lm(y ~ x1 + x2, colin_data_add) %>% tidy()
-lm(y ~ x1, colin_data_add) %>% tidy()
-lm(y ~ x2, colin_data_add) %>% tidy()
-
-lm(y ~ x1 + x2, colin_data_add) %>% glance()
-lm(y ~ x1, colin_data_add) %>% glance()
-lm(y ~ x2, colin_data_add) %>% glance()
+colin_data_reg_both <- lm(y ~ x1 + x2, colin_data_add)
+colin_data_reg_x1 <- lm(y ~ x1, colin_data_add)
+colin_data_reg_x2 <- lm(y ~ x2, colin_data_add)
 ```
+
+We recall from 3.4 that an outlier is a point far from the value predicted by the model. We can look at residuals, but it can be difficult to decide how large a residual needs to be before it's classified as an outlier. This is where *studentised residuals* are used, where each residual is divided by e_i - its estimated standard error. Points with standardised residuals greater than 3 are possible outliers.
+
+```{r_applied_14_g_a_2}
+colin_data_reg_both %>% augment() %>% filter(y == 6)
+colin_data_reg_x1 %>% augment() %>% filter(y == 6)
+colin_data_reg_x2 %>% augment() %>% filter(y == 6)
+```
+Only in the regression with `x1` as the predictor could the response be considered an outlier.
+
+Points with high leverage have an unusual x_i value, which tend to have significant impacts on the estimated regression lines. The *leverage statistic* is used to quantify leverage. We look at the `.hat` column which gives us the leverage statistic. We plot the `.hat` versus the `.std.resid`. When both `x1`, and `x2` are used in the regression, this point appears to be a high leverage point. In the `x1` regression it's not a high leverage point, and in the `x2` regression it has a bit of leverage.
+
+```{r_applied_14_g_a_3}
+colin_data_reg_both %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
+colin_data_reg_x1 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
+colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
+```
+
+
+
