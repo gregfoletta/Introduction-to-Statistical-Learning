@@ -885,78 +885,50 @@ The results don't contradict each other. When regressing using both predictors t
 ### g) 
 *Now suppose we obtain one additional observation, which was unfortunately mismeasured. Re-fit the linear models from (c) to (e) using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers*
 
+We add the new observation and calculate the mew regressions.
+
 
 ```r
 colin_data_add <- colin_data %>% add_row(x1 = 0.1, x2 = 0.8, y = 6)
 
-lm(y ~ x1 + x2, colin_data_add) %>% tidy()
+colin_data_reg_both <- lm(y ~ x1 + x2, colin_data_add)
+colin_data_reg_x1 <- lm(y ~ x1, colin_data_add)
+colin_data_reg_x2 <- lm(y ~ x2, colin_data_add)
 ```
 
+We recall from 3.4 that an outlier is a point far from the value predicted by the model. We can look at residuals, but it can be difficult to decide how large a residual needs to be before it's classified as an outlier. This is where *studentised residuals* are used, where each residual is divided by e_i - its estimated standard error. Points with standardised residuals greater than 3 are possible outliers.
+
+
+```r_applied_14_g_a_2
+colin_data_reg_both %>% augment() %>% filter(y == 6)
+colin_data_reg_x1 %>% augment() %>% filter(y == 6)
+colin_data_reg_x2 %>% augment() %>% filter(y == 6)
 ```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)    2.23      0.231     9.62  7.91e-16
-## 2 x1             0.539     0.592     0.911 3.65e- 1
-## 3 x2             2.51      0.898     2.80  6.14e- 3
+Only in the regression with `x1` as the predictor could the response be considered an outlier.
+
+Points with high leverage have an unusual x_i value, which tend to have significant impacts on the estimated regression lines. The *leverage statistic* is used to quantify leverage. We look at the `.hat` column which gives us the leverage statistic. We plot the `.hat` versus the `.std.resid`. When both `x1`, and `x2` are used in the regression, this point appears to be a high leverage point. In the `x1` regression it's not a high leverage point, and in the `x2` regression it has a bit of leverage.
+
+
+```r_applied_14_g_a_3
+colin_data_reg_both %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
+colin_data_reg_x1 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
+colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 ```
 
-```r
-lm(y ~ x1, colin_data_add) %>% tidy()
+## 15) Boston Data Set
+*We will now try to predict per capita crime rate using the other variables in this data set.*
+
+### a)
+*For each predictor, fit a simple linear regression model to predict the response. Describe your results. In which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.*
+
+
+```r_applied_15_a
+library(MASS)
+boston <- as_tibble(Boston)
+
+tibble(
+    predictor = names(boston)[-1]) %>% mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
+    ) %>% unnest() %>% print(n = 26)
 ```
 
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)     2.26     0.239      9.44 1.78e-15
-## 2 x1              1.77     0.412      4.28 4.29e- 5
-```
 
-```r
-lm(y ~ x2, colin_data_add) %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)     2.35     0.191     12.3  1.40e-21
-## 2 x2              3.12     0.604      5.16 1.25e- 6
-```
-
-```r
-lm(y ~ x1 + x2, colin_data_add) %>% glance()
-```
-
-```
-## # A tibble: 1 x 11
-##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
-## 1     0.219         0.203  1.07      13.7 5.56e-6     3  -149.  306.  317.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
-```
-
-```r
-lm(y ~ x1, colin_data_add) %>% glance()
-```
-
-```
-## # A tibble: 1 x 11
-##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
-## 1     0.156         0.148  1.11      18.3 4.29e-5     2  -153.  312.  320.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
-```
-
-```r
-lm(y ~ x2, colin_data_add) %>% glance()
-```
-
-```
-## # A tibble: 1 x 11
-##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
-## 1     0.212         0.204  1.07      26.7 1.25e-6     2  -149.  305.  313.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
-```

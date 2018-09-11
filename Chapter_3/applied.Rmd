@@ -485,5 +485,19 @@ colin_data_reg_x1 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 ```
 
+## 15) Boston Data Set
+*We will now try to predict per capita crime rate using the other variables in this data set.*
+
+### a)
+*For each predictor, fit a simple linear regression model to predict the response. Describe your results. In which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.*
+
+```{r_applied_15_a}
+library(MASS)
+boston <- as_tibble(Boston)
+
+tibble(
+    predictor = names(boston)[-1]) %>% mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
+    ) %>% unnest() %>% print(n = 26)
+```
 
 
