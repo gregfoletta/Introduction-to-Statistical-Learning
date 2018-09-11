@@ -496,8 +496,9 @@ library(MASS)
 boston <- as_tibble(Boston)
 
 tibble(
-    predictor = names(boston)[-1]) %>% mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
-    ) %>% unnest() %>% print(n = 26)
+    predictor = names(boston)[-1]) %>% 
+        mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
+) %>% unnest() %>% print(n = 26)
 ```
 
 
