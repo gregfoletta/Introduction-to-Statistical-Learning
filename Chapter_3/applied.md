@@ -221,8 +221,9 @@ augment(lin_reg_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smo
 There is some evidence of the non-linearity of the results.
 
 ### e) 
-*Use the `*` and `:` symbols to fit linear regressions with interaction effects. Are any interactions statistically significant?*
-A `*` adds the predictors and the interaction term, whereas the `:` only adds the interaction term. I.e. `x\*y == x + y + x:y`.
+*Use the '*' and ':' symbols to fit linear regressions with interaction effects. Are any interactions statistically significant?*
+
+A '*' adds the predictors and the interaction term, whereas the `:` only adds the interaction term. I.e. `x\*y == x + y + x:y`.
 
 Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be an f,Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be and interaction between cylinders and displacement:
 
@@ -940,42 +941,46 @@ library(MASS)
 ```r
 boston <- as_tibble(Boston)
 
-tibble(
-    predictor = names(boston)[-1]) %>% 
-        mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
-) %>% unnest() %>% print(n = 26)
+boston_regress <- tibble(predictor = names(boston)[-1]) %>% 
+        mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())) %>% unnest() %>% filter(term != '(Intercept)')
+boston_regress %>% print(n = 26)
 ```
 
 ```
-## # A tibble: 26 x 6
-##    predictor term        estimate std.error statistic  p.value
-##    <chr>     <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-##  1 zn        (Intercept)   4.45     0.417       10.7  4.04e-24
-##  2 zn        zn           -0.0739   0.0161      -4.59 5.51e- 6
-##  3 indus     (Intercept)  -2.06     0.667       -3.09 2.09e- 3
-##  4 indus     indus         0.510    0.0510       9.99 1.45e-21
-##  5 chas      (Intercept)   3.74     0.396        9.45 1.24e-19
-##  6 chas      chas         -1.89     1.51        -1.26 2.09e- 1
-##  7 nox       (Intercept) -13.7      1.70        -8.07 5.08e-15
-##  8 nox       nox          31.2      3.00        10.4  3.75e-23
-##  9 rm        (Intercept)  20.5      3.36         6.09 2.27e- 9
-## 10 rm        rm           -2.68     0.532       -5.04 6.35e- 7
-## 11 age       (Intercept)  -3.78     0.944       -4.00 7.22e- 5
-## 12 age       age           0.108    0.0127       8.46 2.85e-16
-## 13 dis       (Intercept)   9.50     0.730       13.0  1.50e-33
-## 14 dis       dis          -1.55     0.168       -9.21 8.52e-19
-## 15 rad       (Intercept)  -2.29     0.443       -5.16 3.61e- 7
-## 16 rad       rad           0.618    0.0343      18.0  2.69e-56
-## 17 tax       (Intercept)  -8.53     0.816      -10.5  2.77e-23
-## 18 tax       tax           0.0297   0.00185     16.1  2.36e-47
-## 19 ptratio   (Intercept) -17.6      3.15        -5.61 3.40e- 8
-## 20 ptratio   ptratio       1.15     0.169        6.80 2.94e-11
-## 21 black     (Intercept)  16.6      1.43        11.6  8.92e-28
-## 22 black     black        -0.0363   0.00387     -9.37 2.49e-19
-## 23 lstat     (Intercept)  -3.33     0.694       -4.80 2.09e- 6
-## 24 lstat     lstat         0.549    0.0478      11.5  2.65e-27
-## 25 medv      (Intercept)  11.8      0.934       12.6  5.93e-32
-## 26 medv      medv         -0.363    0.0384      -9.46 1.17e-19
+## # A tibble: 13 x 6
+##    predictor term    estimate std.error statistic  p.value
+##    <chr>     <chr>      <dbl>     <dbl>     <dbl>    <dbl>
+##  1 zn        zn       -0.0739   0.0161      -4.59 5.51e- 6
+##  2 indus     indus     0.510    0.0510       9.99 1.45e-21
+##  3 chas      chas     -1.89     1.51        -1.26 2.09e- 1
+##  4 nox       nox      31.2      3.00        10.4  3.75e-23
+##  5 rm        rm       -2.68     0.532       -5.04 6.35e- 7
+##  6 age       age       0.108    0.0127       8.46 2.85e-16
+##  7 dis       dis      -1.55     0.168       -9.21 8.52e-19
+##  8 rad       rad       0.618    0.0343      18.0  2.69e-56
+##  9 tax       tax       0.0297   0.00185     16.1  2.36e-47
+## 10 ptratio   ptratio   1.15     0.169        6.80 2.94e-11
+## 11 black     black    -0.0363   0.00387     -9.37 2.49e-19
+## 12 lstat     lstat     0.549    0.0478      11.5  2.65e-27
+## 13 medv      medv     -0.363    0.0384      -9.46 1.17e-19
 ```
 
+### b)
+*Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H 0 : β j = 0?*
 
+
+```r
+boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value)
+```
+
+From the results of the regression with all predictors, taking < 5e-2 to be statistically significant, `rad` (index of accessibility to radial highways.), `dis` (weighted mean of distances to five Boston employment centres.), `medv` (median value of owner-occupied homes in $1000s), `zn` (proportion of residential land zoned for lots over 25,000 sq.ft), and `black` (1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town) appear to have statistical significance.
+
+### c) 
+How do your results from (a) compare to your results from (b)? Create a plot displaying the univariate regression coefficients from (a) on the x-axis, and the multiple regression coefficients from (b) on the y-axis. That is, each predictor is displayed as a single point in the plot. Its coefficient in a simple linear regression model is shown on the x-axis, and its coefficient estimate in the multiple linear regression model is shown on the y-axis.*
+
+
+```r
+boston_regress %>% inner_join(boston_mult_regress, by = 'term') %>% ggplot(aes(estimate.x, estimate.y)) + geom_point()
+```
+
+![plot of chunk applied_15_c](figure/applied_15_c-1.png)
