@@ -156,12 +156,26 @@ We'll now create a 'confusion' matrix. In base R this is done using `table()`. b
 
 ```r
 smarket %>% group_by(Direction, Pred) %>% tally()
-smarket %>% summarise(mean(Direction == Pred)
 ```
 
 ```
-## Error: <text>:3:0: unexpected end of input
-## 1: smarket %>% group_by(Direction, Pred) %>% tally()
-## 2: smarket %>% summarise(mean(Direction == Pred)
-##   ^
+## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Pred      n
+##   <fct>     <chr> <int>
+## 1 Down      Down    145
+## 2 Down      Up      457
+## 3 Up        Down    141
+## 4 Up        Up      507
+```
+
+```r
+smarket %>% summarise(mean(Direction == Pred))
+```
+
+```
+## # A tibble: 1 x 1
+##   `mean(Direction == Pred)`
+##                       <dbl>
+## 1                     0.522
 ```

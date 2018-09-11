@@ -52,5 +52,5 @@ We add another column with the probabilities converted into class labels `Up` an
 We'll now create a 'confusion' matrix. In base R this is done using `table()`. but we'll use dplyr functions. We also compute the fraction of days for which the prediction was correct.
 ```{r lab_4.6.2_4}
 smarket %>% group_by(Direction, Pred) %>% tally()
-smarket %>% summarise(mean(Direction == Pred)
+smarket %>% summarise(mean(Direction == Pred))
 ```
