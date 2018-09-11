@@ -4,10 +4,13 @@
 
 We examine some numerical and graphical summaries of the `Smarket` data. We first   
 
-```{r lab_4.6.1_1}
+```{r lab_4.6.1_setup, message = FALSE}
 library(tidyverse)
 library(broom)
 library(ISLR)
+```
+
+```{r lab_4.6.1_1}
 (smarket <- as_tibble(Smarket))
  ```
 
