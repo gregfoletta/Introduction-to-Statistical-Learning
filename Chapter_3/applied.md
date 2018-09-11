@@ -922,13 +922,59 @@ colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 *For each predictor, fit a simple linear regression model to predict the response. Describe your results. In which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.*
 
 
-```r_applied_15_a
+```r
 library(MASS)
+```
+
+```
+## 
+## Attaching package: 'MASS'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+```
+
+```r
 boston <- as_tibble(Boston)
 
 tibble(
     predictor = names(boston)[-1]) %>% mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())
     ) %>% unnest() %>% print(n = 26)
+```
+
+```
+## # A tibble: 26 x 6
+##    predictor term        estimate std.error statistic  p.value
+##    <chr>     <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+##  1 zn        (Intercept)   4.45     0.417       10.7  4.04e-24
+##  2 zn        zn           -0.0739   0.0161      -4.59 5.51e- 6
+##  3 indus     (Intercept)  -2.06     0.667       -3.09 2.09e- 3
+##  4 indus     indus         0.510    0.0510       9.99 1.45e-21
+##  5 chas      (Intercept)   3.74     0.396        9.45 1.24e-19
+##  6 chas      chas         -1.89     1.51        -1.26 2.09e- 1
+##  7 nox       (Intercept) -13.7      1.70        -8.07 5.08e-15
+##  8 nox       nox          31.2      3.00        10.4  3.75e-23
+##  9 rm        (Intercept)  20.5      3.36         6.09 2.27e- 9
+## 10 rm        rm           -2.68     0.532       -5.04 6.35e- 7
+## 11 age       (Intercept)  -3.78     0.944       -4.00 7.22e- 5
+## 12 age       age           0.108    0.0127       8.46 2.85e-16
+## 13 dis       (Intercept)   9.50     0.730       13.0  1.50e-33
+## 14 dis       dis          -1.55     0.168       -9.21 8.52e-19
+## 15 rad       (Intercept)  -2.29     0.443       -5.16 3.61e- 7
+## 16 rad       rad           0.618    0.0343      18.0  2.69e-56
+## 17 tax       (Intercept)  -8.53     0.816      -10.5  2.77e-23
+## 18 tax       tax           0.0297   0.00185     16.1  2.36e-47
+## 19 ptratio   (Intercept) -17.6      3.15        -5.61 3.40e- 8
+## 20 ptratio   ptratio       1.15     0.169        6.80 2.94e-11
+## 21 black     (Intercept)  16.6      1.43        11.6  8.92e-28
+## 22 black     black        -0.0363   0.00387     -9.37 2.49e-19
+## 23 lstat     (Intercept)  -3.33     0.694       -4.80 2.09e- 6
+## 24 lstat     lstat         0.549    0.0478      11.5  2.65e-27
+## 25 medv      (Intercept)  11.8      0.934       12.6  5.93e-32
+## 26 medv      medv         -0.363    0.0384      -9.46 1.17e-19
 ```
 
 

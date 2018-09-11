@@ -491,7 +491,7 @@ colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 ### a)
 *For each predictor, fit a simple linear regression model to predict the response. Describe your results. In which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.*
 
-```{r_applied_15_a}
+```{r applied_15_a}
 library(MASS)
 boston <- as_tibble(Boston)
 
