@@ -505,7 +505,7 @@ boston_regress %>% print(n = 26)
 *Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H 0 : β j = 0?*
 
 ```{r applied_15_b}
-boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value)
+(boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value))
 ```
 
 From the results of the regression with all predictors, taking < 5e-2 to be statistically significant, `rad` (index of accessibility to radial highways.), `dis` (weighted mean of distances to five Boston employment centres.), `medv` (median value of owner-occupied homes in $1000s), `zn` (proportion of residential land zoned for lots over 25,000 sq.ft), and `black` (1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town) appear to have statistical significance.
@@ -514,5 +514,7 @@ From the results of the regression with all predictors, taking < 5e-2 to be stat
 How do your results from (a) compare to your results from (b)? Create a plot displaying the univariate regression coefficients from (a) on the x-axis, and the multiple regression coefficients from (b) on the y-axis. That is, each predictor is displayed as a single point in the plot. Its coefficient in a simple linear regression model is shown on the x-axis, and its coefficient estimate in the multiple linear regression model is shown on the y-axis.*
 
 ```{r applied_15_c}
-boston_regress %>% inner_join(boston_mult_regress, by = 'term') %>% ggplot(aes(estimate.x, estimate.y)) + geom_point()
+boston_regress %>% 
+    inner_join(boston_mult_regress, by = 'term') %>% 
+    ggplot(aes(estimate.x, estimate.y)) + geom_point()
 ```

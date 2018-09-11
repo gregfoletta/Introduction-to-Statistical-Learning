@@ -16,4 +16,9 @@
 * [Conceptual](Chapter_3/conceptual.md)
 * [Applied](Chapter_3/applied.md)
 
+## Chapter 4 - Classification
+
+### Exercises
+* [Lab](Chapter_4/lab.md)
+
 

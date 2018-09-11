@@ -1,0 +1,31 @@
+# Chapter 4 - Lab - Logistic Regression, LDA, QDA, and KNN
+
+## 4.6.1 - Stock Market Data
+
+We examine some numerical and graphical summaries of the `Smarket` data. We first   
+
+```{r lab_4.6.1_1}
+library(ISLR)
+(smarket <- as_tibble(Smarket))
+ ```
+
+We take a look at the pairwise correlations between the predictors in the set, removing `Direction` because it is quantative.
+```{r lab_4.6.1_2}
+smarket %>% select(-Direction) %>% cor() %>% tidy()
+```
+
+The correlations are all close to zero, with the only larger correlation being between `Year` and `Volume`, as the amount of trades have increased over time:
+```{r lab_4.6.1_3}
+smarket %>% group_by(Year) %>% summarise(sum(Volume))
+```
+
+## 4.6.2 - Logistic Regression
+
+We now use a logistic regression model in order to predict `Direction` using `Lag1 .. Lag5` and `Volume`. We use the `glm()`, or *generalised linear models* function to achieve this.
+
+```{r lab_4.6.2_1}
+smarket.glm <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, smarket, family = binomial)
+smarket.glm %>% tidy() %>% arrange(p.value)
+```
+
+Looking at the p-values for the predictors 

@@ -970,7 +970,27 @@ boston_regress %>% print(n = 26)
 
 
 ```r
-boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value)
+(boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value))
+```
+
+```
+## # A tibble: 14 x 5
+##    term         estimate std.error statistic  p.value
+##    <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+##  1 rad           0.588     0.0880     6.68   6.46e-11
+##  2 dis          -0.987     0.282     -3.50   5.02e- 4
+##  3 medv         -0.199     0.0605    -3.29   1.09e- 3
+##  4 zn            0.0449    0.0187     2.39   1.70e- 2
+##  5 (Intercept)  17.0       7.23       2.35   1.89e- 2
+##  6 black        -0.00754   0.00367   -2.05   4.07e- 2
+##  7 nox         -10.3       5.28      -1.95   5.12e- 2
+##  8 lstat         0.126     0.0757     1.67   9.62e- 2
+##  9 ptratio      -0.271     0.186     -1.45   1.47e- 1
+## 10 indus        -0.0639    0.0834    -0.766  4.44e- 1
+## 11 tax          -0.00378   0.00516   -0.733  4.64e- 1
+## 12 rm            0.430     0.613      0.702  4.83e- 1
+## 13 chas         -0.749     1.18      -0.635  5.26e- 1
+## 14 age           0.00145   0.0179     0.0810 9.35e- 1
 ```
 
 From the results of the regression with all predictors, taking < 5e-2 to be statistically significant, `rad` (index of accessibility to radial highways.), `dis` (weighted mean of distances to five Boston employment centres.), `medv` (median value of owner-occupied homes in $1000s), `zn` (proportion of residential land zoned for lots over 25,000 sq.ft), and `black` (1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town) appear to have statistical significance.
@@ -980,7 +1000,9 @@ How do your results from (a) compare to your results from (b)? Create a plot dis
 
 
 ```r
-boston_regress %>% inner_join(boston_mult_regress, by = 'term') %>% ggplot(aes(estimate.x, estimate.y)) + geom_point()
+boston_regress %>% 
+    inner_join(boston_mult_regress, by = 'term') %>% 
+    ggplot(aes(estimate.x, estimate.y)) + geom_point()
 ```
 
 ![plot of chunk applied_15_c](figure/applied_15_c-1.png)
