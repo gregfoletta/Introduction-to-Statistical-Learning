@@ -26,7 +26,13 @@ smarket %>% group_by(Year) %>% summarise(sum(Volume))
 
 ## 4.6.2 - Logistic Regression
 
-We now use a logistic regression model in order to predict `Direction` using `Lag1 .. Lag5` and `Volume`. We use the `glm()`, or *generalised linear models* function to achieve this.
+We now use a logistic regression model in order to predict `Direction` using `Lag1 .. Lag5` and `Volume`. 
+
+We recall that trying to use a straight line to fit a binary response that is coded 0|1, there are always p(X) < 0 for some values of X. To avoid this, we must model p(X) with a functon that gives us outputs between 0 and 1. The logistic regression uses the [logistic function](https://en.wikipedia.org/wiki/Logistic_function).
+
+We use the `glm()`, or *generalised linear models* function to achieve this.
+
+Le
 
 ```{r lab_4.6.2_1}
 smarket.glm <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, smarket, family = binomial)
@@ -54,3 +60,61 @@ We'll now create a 'confusion' matrix. In base R this is done using `table()`. b
 smarket %>% group_by(Direction, Pred) %>% tally()
 smarket %>% summarise(mean(Direction == Pred))
 ```
+
+This 0.522, or 52%, means the training error rate is 48%. Training error rates tend to underestimate the test error rate. In order to better assess the model, we'll *hold out* some of the data. We'll train our model on the years 2001 - 2004, and test it against 2005.
+
+```{r lab_4.6.2_5}
+smarket_training <- smarket %>% 
+    filter(Year < 2005) %>% 
+    glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, ., family = binomial)
+
+smarket_test <- smarket %>% 
+    filter(Year == 2005) %>% 
+    mutate(Prob = predict(smarket_training, ., type = 'response'), Pred = ifelse(Prob < .5, 'Down', 'Up'))
+
+smarket_test %>% group_by(Direction, Pred) %>% tally()
+smarket_test %>% summarise(mean(Direction == Pred))
+```
+
+We can see that we're now at a mean of 0.48, or 48%, which means our error rate is 52%. This is worse that just guessing.
+
+Let's reduce the regression to only using `Lag1` and `Lag2`, which had the lowest p-values.
+
+```{r lab_4.6.2_6}
+smarket_training <- smarket %>% 
+    filter(Year < 2005) %>% 
+    glm(Direction ~ Lag1 + Lag2, ., family = binomial)
+
+smarket_test <- smarket %>% 
+    filter(Year == 2005) %>% 
+    mutate(Prob = predict(smarket_training, ., type = 'response'), Pred = ifelse(Prob < .5, 'Down', 'Up'))
+
+smarket_test %>% group_by(Direction, Pred) %>% tally()
+smarket_test %>% summarise(mean(Direction == Pred))
+```
+
+Slightly better, with 56% of the daily movements predicted. Let's see what the predictions are for certain values of `Lag1` and `Lag2`:
+```{r lab_4.6.2_7}
+predict(smarket_training, tibble(Lag1 = c(1.2, 1.5), Lag2 = c(1.1, -0.8)), type = 'response')
+```
+
+## 4.6.3 - Linear Discriminant Analysis
+
+Now we perform linear discriminant analysis on the data. Logistic regression involves directly modeling Pr(Y = k|X = x) using the logistic function for the case of two response classes.
+
+In the LDA approach, the conditional distribution of the predictors X is modeled in each of the response classes Y, and then use Bayes' theorem to flip these around into estimates for Pr(Y = X|X=x).
+
+```{r lab_4.6.3_setup, message = FALSE}
+library(MASS)A
+```
+
+There doesn't appear to be any broom tidyers for this, so we'll have to do it in a semi base R way.
+
+```{r lab_4.6.3_1}
+(smarket_lda_fit <- smarket %>% filter(Year < 2005) %>% lda(Direction ~ Lag1 + Lag2, .))
+plot(smarket_lda_fit)
+```
+
+We see the prior probabilities of the groups, and the group means which are the average of each predictor within each class. We also see a plot of the linear dicriminants by computing the function with the coefficients over the training data.
+
+
