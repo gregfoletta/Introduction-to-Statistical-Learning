@@ -117,4 +117,24 @@ plot(smarket_lda_fit)
 
 We see the prior probabilities of the groups, and the group means which are the average of each predictor within each class. We also see a plot of the linear dicriminants by computing the function with the coefficients over the training data.
 
+```{r lab_4.6.3_2}
+(smarket_test <- smarket_test %>% mutate(lda.pred = predict(smarket_lda_fit, .)$class))
+smarket_test %>% group_by(Direction, lda.pred) %>% tally()
+smarket_test %>% summarise(mean(Direction != lda.pred))
+```
 
+
+### 4.6.4 - Quadratic Discriminant Analysis
+
+We now apply QDA to the stock market data in the same manner.
+
+```{R lab_4.6.4_1}
+(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qdada(Direction ~ Lag1 + Lag2, .))
+(smarket_test <- smarket_test %>% mutate(qda.pred = predict(smarket_qda_fit, .)$class))
+smarket_test %>% group_by(Direction, qda.pred) %>% tally()
+smarket_test %>% summarise(mean(Direction != qda.pred))
+```
+
+We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.
+
+### 4.6.5 - K-nearest Neighbours

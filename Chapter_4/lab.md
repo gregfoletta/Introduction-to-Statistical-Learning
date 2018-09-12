@@ -319,3 +319,92 @@ plot(smarket_lda_fit)
 We see the prior probabilities of the groups, and the group means which are the average of each predictor within each class. We also see a plot of the linear dicriminants by computing the function with the coefficients over the training data.
 
 
+```r
+(smarket_test <- smarket_test %>% mutate(lda.pred = predict(smarket_lda_fit, .)$class))
+```
+
+```
+## # A tibble: 252 x 13
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl> <fct>    
+##  1  2005 -0.134  0.008 -0.007  0.715 -0.431  0.787 -0.812 Down     
+##  2  2005 -0.812 -0.134  0.008 -0.007  0.715  1.51  -1.17  Down     
+##  3  2005 -1.17  -0.812 -0.134  0.008 -0.007  1.72  -0.363 Down     
+##  4  2005 -0.363 -1.17  -0.812 -0.134  0.008  1.74   0.351 Up       
+##  5  2005  0.351 -0.363 -1.17  -0.812 -0.134  1.57  -0.143 Down     
+##  6  2005 -0.143  0.351 -0.363 -1.17  -0.812  1.48   0.342 Up       
+##  7  2005  0.342 -0.143  0.351 -0.363 -1.17   1.49  -0.61  Down     
+##  8  2005 -0.61   0.342 -0.143  0.351 -0.363  1.49   0.398 Up       
+##  9  2005  0.398 -0.61   0.342 -0.143  0.351  1.56  -0.863 Down     
+## 10  2005 -0.863  0.398 -0.61   0.342 -0.143  1.51   0.6   Up       
+## # ... with 242 more rows, and 4 more variables: glm.pred <dbl>,
+## #   Pred <chr>, Prob <dbl>, lda.pred <fct>
+```
+
+```r
+smarket_test %>% group_by(Direction, lda.pred) %>% tally()
+```
+
+```
+## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction lda.pred     n
+##   <fct>     <fct>    <int>
+## 1 Down      Down        35
+## 2 Down      Up          76
+## 3 Up        Down        35
+## 4 Up        Up         106
+```
+
+```r
+smarket_test %>% summarise(mean(Direction != lda.pred))
+```
+
+```
+## # A tibble: 1 x 1
+##   `mean(Direction != lda.pred)`
+##                           <dbl>
+## 1                         0.440
+```
+
+
+### 4.6.4 - Quadratic Discriminant Analysis
+
+We now apply QDA to the stock market data in the same manner.
+
+
+```r
+(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qdada(Direction ~ Lag1 + Lag2, .))
+```
+
+```
+## Error in qdada(Direction ~ Lag1 + Lag2, .): could not find function "qdada"
+```
+
+```r
+(smarket_test <- smarket_test %>% mutate(qda.pred = predict(smarket_qda_fit, .)$class))
+```
+
+```
+## Error in mutate_impl(.data, dots): Evaluation error: object 'smarket_qda_fit' not found.
+```
+
+```r
+smarket_test %>% group_by(Direction, qda.pred) %>% tally()
+```
+
+```
+## Error in grouped_df_impl(data, unname(vars), drop): Column `qda.pred` is unknown
+```
+
+```r
+smarket_test %>% summarise(mean(Direction != qda.pred))
+```
+
+```
+## Error in summarise_impl(.data, dots): Evaluation error: object 'qda.pred' not found.
+```
+
+We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.
+
+### 4.6.5 - K-nearest Neighbours
