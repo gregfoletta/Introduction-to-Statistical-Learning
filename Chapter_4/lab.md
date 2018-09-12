@@ -374,11 +374,21 @@ We now apply QDA to the stock market data in the same manner.
 
 
 ```r
-(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qdada(Direction ~ Lag1 + Lag2, .))
+(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qda(Direction ~ Lag1 + Lag2, .))
 ```
 
 ```
-## Error in qdada(Direction ~ Lag1 + Lag2, .): could not find function "qdada"
+## Call:
+## qda(Direction ~ Lag1 + Lag2, data = .)
+## 
+## Prior probabilities of groups:
+##     Down       Up 
+## 0.491984 0.508016 
+## 
+## Group means:
+##             Lag1        Lag2
+## Down  0.04279022  0.03389409
+## Up   -0.03954635 -0.03132544
 ```
 
 ```r
@@ -386,7 +396,21 @@ We now apply QDA to the stock market data in the same manner.
 ```
 
 ```
-## Error in mutate_impl(.data, dots): Evaluation error: object 'smarket_qda_fit' not found.
+## # A tibble: 252 x 14
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl> <fct>    
+##  1  2005 -0.134  0.008 -0.007  0.715 -0.431  0.787 -0.812 Down     
+##  2  2005 -0.812 -0.134  0.008 -0.007  0.715  1.51  -1.17  Down     
+##  3  2005 -1.17  -0.812 -0.134  0.008 -0.007  1.72  -0.363 Down     
+##  4  2005 -0.363 -1.17  -0.812 -0.134  0.008  1.74   0.351 Up       
+##  5  2005  0.351 -0.363 -1.17  -0.812 -0.134  1.57  -0.143 Down     
+##  6  2005 -0.143  0.351 -0.363 -1.17  -0.812  1.48   0.342 Up       
+##  7  2005  0.342 -0.143  0.351 -0.363 -1.17   1.49  -0.61  Down     
+##  8  2005 -0.61   0.342 -0.143  0.351 -0.363  1.49   0.398 Up       
+##  9  2005  0.398 -0.61   0.342 -0.143  0.351  1.56  -0.863 Down     
+## 10  2005 -0.863  0.398 -0.61   0.342 -0.143  1.51   0.6   Up       
+## # ... with 242 more rows, and 5 more variables: glm.pred <dbl>,
+## #   Pred <chr>, Prob <dbl>, lda.pred <fct>, qda.pred <fct>
 ```
 
 ```r
@@ -394,7 +418,14 @@ smarket_test %>% group_by(Direction, qda.pred) %>% tally()
 ```
 
 ```
-## Error in grouped_df_impl(data, unname(vars), drop): Column `qda.pred` is unknown
+## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction qda.pred     n
+##   <fct>     <fct>    <int>
+## 1 Down      Down        30
+## 2 Down      Up          81
+## 3 Up        Down        20
+## 4 Up        Up         121
 ```
 
 ```r
@@ -402,7 +433,10 @@ smarket_test %>% summarise(mean(Direction != qda.pred))
 ```
 
 ```
-## Error in summarise_impl(.data, dots): Evaluation error: object 'qda.pred' not found.
+## # A tibble: 1 x 1
+##   `mean(Direction != qda.pred)`
+##                           <dbl>
+## 1                         0.401
 ```
 
 We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.

@@ -128,8 +128,8 @@ smarket_test %>% summarise(mean(Direction != lda.pred))
 
 We now apply QDA to the stock market data in the same manner.
 
-```{R lab_4.6.4_1}
-(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qdada(Direction ~ Lag1 + Lag2, .))
+```{r lab_4.6.4_1}
+(smarket_qda_fit <- smarket %>% filter(Year < 2005) %>% qda(Direction ~ Lag1 + Lag2, .))
 (smarket_test <- smarket_test %>% mutate(qda.pred = predict(smarket_qda_fit, .)$class))
 smarket_test %>% group_by(Direction, qda.pred) %>% tally()
 smarket_test %>% summarise(mean(Direction != qda.pred))
