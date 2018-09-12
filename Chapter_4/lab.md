@@ -281,13 +281,7 @@ In the LDA approach, the conditional distribution of the predictors X is modeled
 
 
 ```r
-library(MASS)A
-```
-
-```
-## Error: <text>:1:14: unexpected symbol
-## 1: library(MASS)A
-##                  ^
+library(MASS)
 ```
 
 There doesn't appear to be any broom tidyers for this, so we'll have to do it in a semi base R way.
@@ -298,16 +292,29 @@ There doesn't appear to be any broom tidyers for this, so we'll have to do it in
 ```
 
 ```
-## Error in lda(Direction ~ Lag1 + Lag2, .): could not find function "lda"
+## Call:
+## lda(Direction ~ Lag1 + Lag2, data = .)
+## 
+## Prior probabilities of groups:
+##     Down       Up 
+## 0.491984 0.508016 
+## 
+## Group means:
+##             Lag1        Lag2
+## Down  0.04279022  0.03389409
+## Up   -0.03954635 -0.03132544
+## 
+## Coefficients of linear discriminants:
+##             LD1
+## Lag1 -0.6420190
+## Lag2 -0.5135293
 ```
 
 ```r
 plot(smarket_lda_fit)
 ```
 
-```
-## Error in plot(smarket_lda_fit): object 'smarket_lda_fit' not found
-```
+![plot of chunk lab_4.6.3_1](figure/lab_4.6.3_1-1.png)
 
 We see the prior probabilities of the groups, and the group means which are the average of each predictor within each class. We also see a plot of the linear dicriminants by computing the function with the coefficients over the training data.
 
