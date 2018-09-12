@@ -105,7 +105,7 @@ Now we perform linear discriminant analysis on the data. Logistic regression inv
 In the LDA approach, the conditional distribution of the predictors X is modeled in each of the response classes Y, and then use Bayes' theorem to flip these around into estimates for Pr(Y = X|X=x).
 
 ```{r lab_4.6.3_setup, message = FALSE}
-library(MASS)A
+library(MASS)
 ```
 
 There doesn't appear to be any broom tidyers for this, so we'll have to do it in a semi base R way.
