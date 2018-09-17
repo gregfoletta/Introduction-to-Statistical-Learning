@@ -124,7 +124,7 @@ smarket_test %>% summarise(mean(Direction != lda.pred))
 ```
 
 
-### 4.6.4 - Quadratic Discriminant Analysis
+## 4.6.4 - Quadratic Discriminant Analysis
 
 We now apply QDA to the stock market data in the same manner.
 
@@ -137,4 +137,72 @@ smarket_test %>% summarise(mean(Direction != qda.pred))
 
 We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.
 
-### 4.6.5 - K-nearest Neighbours
+## 4.6.5 - K-nearest Neighbours
+
+We now perform KNN analysis with the `knn()` function. It's slightly different than the others in that in that rather than a train/test two step, it forms predictions from a single command.
+
+It requires four inputs:
+
+1. A matrix with the predictors of the training data.
+1. A matrix with the predictors of the test data.A
+1. A vector containing class labels for the training observations.
+1. A value for K, the number of nearest neighbours.
+
+```{r 4.6.5_setup, messages = F}
+library(class)
+```
+
+```{r 4.6.5_1}
+(smarket_train <- smarket %>% filter(Year < 2005) %>% select(Lag1, Lag2))
+(smarket_test <- smarket %>% filter(Year == 2005) %>% select(Lag1, Lag2))
+smarket_K <- smarket %>% filter(Year < 2005) %>% .[['Direction']]
+smarket_knn_pred <- knn(smarket_train, smarket_test, smarket_K, k = 1)
+```
+
+## 4.6.6 - Caravan Insurance Data
+
+We apply the KNN approach to the `Caravan` data set. It contains 85 predictors for the 5,822 individuals. The response variable is `Purchase`, which indicates whether or not a given individial purchases a caravan insurance policy. The KNN classifier predicts the class of a given test by identifying observations that are nearest to it. Thus the scale of the data matters.
+
+We can standardise the data so that all the data has a mean of 0 and a standard deviation of 1. We do this using the `scale()` function.
+
+```{r 4.6.6_1}
+caravan <- as_tibble(Caravan)
+std_caravan <- caravan %>% select(-Purchase) %>% scale() %>% as_tibble()
+```
+
+We split the observations into training and test sets.
+
+```{r 4.6.6_2}
+std_caravan_test <- std_caravan %>% slice(1:1000)
+std_caravan_train <- std_caravan %>% slice(1001:nrow(.))
+caravan_test_Y <- caravan %>% slice(1:1000) %>% .[['Purchase']]
+caravan_train_Y <- caravan %>% slice(1001:nrow(.)) %>% .[['Purchase']]
+
+caravan_knn_pred <- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 1)
+
+mean(caravan_knn_pred != caravan_test_Y)
+```
+
+The KNN error rate is just udner 12%. This appears to be good, but since only 6% of the customers purchased insurance, we could get the error rate down to 6% by always predicting `No`.
+
+Perhaps the company would like to sell insurance to only those customers who are likely to purchase it. We don't look at the overall error rate, but the error rate for those who are predicted to buy.
+
+
+```{r 4.6.6_3}
+tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %>% 
+    group_by(pred_Y, test_Y) %>% 
+    tally()
+```
+In this instance, we have `10/(67+10) = 13%`
+
+Let's change K = 5.
+
+```{r 4.6.6_4}
+caravan_knn_pred <- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 4)
+
+tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %>% 
+    group_by(pred_Y, test_Y) %>% 
+    tally()
+```
+
+This gives us `4/(11+4) = 26%`

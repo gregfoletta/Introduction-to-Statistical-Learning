@@ -368,7 +368,7 @@ smarket_test %>% summarise(mean(Direction != lda.pred))
 ```
 
 
-### 4.6.4 - Quadratic Discriminant Analysis
+## 4.6.4 - Quadratic Discriminant Analysis
 
 We now apply QDA to the stock market data in the same manner.
 
@@ -441,4 +441,138 @@ smarket_test %>% summarise(mean(Direction != qda.pred))
 
 We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.
 
-### 4.6.5 - K-nearest Neighbours
+## 4.6.5 - K-nearest Neighbours
+
+We now perform KNN analysis with the `knn()` function. It's slightly different than the others in that in that rather than a train/test two step, it forms predictions from a single command.
+
+It requires four inputs:
+
+1. A matrix with the predictors of the training data.
+1. A matrix with the predictors of the test data.A
+1. A vector containing class labels for the training observations.
+1. A value for K, the number of nearest neighbours.
+
+
+```r
+library(class)
+```
+
+
+```r
+(smarket_train <- smarket %>% filter(Year < 2005) %>% select(Lag1, Lag2))
+```
+
+```
+## Error in select(., Lag1, Lag2): unused arguments (Lag1, Lag2)
+```
+
+```r
+(smarket_test <- smarket %>% filter(Year == 2005) %>% select(Lag1, Lag2))
+```
+
+```
+## Error in select(., Lag1, Lag2): unused arguments (Lag1, Lag2)
+```
+
+```r
+smarket_K <- smarket %>% filter(Year < 2005) %>% .[['Direction']]
+smarket_knn_pred <- knn(smarket_train, smarket_test, smarket_K, k = 1)
+```
+
+```
+## Error in as.matrix(train): object 'smarket_train' not found
+```
+
+## 4.6.6 - Caravan Insurance Data
+
+We apply the KNN approach to the `Caravan` data set. It contains 85 predictors for the 5,822 individuals. The response variable is `Purchase`, which indicates whether or not a given individial purchases a caravan insurance policy. The KNN classifier predicts the class of a given test by identifying observations that are nearest to it. Thus the scale of the data matters.
+
+We can standardise the data so that all the data has a mean of 0 and a standard deviation of 1. We do this using the `scale()` function.
+
+
+```r
+caravan <- as_tibble(Caravan)
+std_caravan <- caravan %>% select(-Purchase) %>% scale() %>% as_tibble()
+```
+
+```
+## Error in select(., -Purchase): unused argument (-Purchase)
+```
+
+We split the observations into training and test sets.
+
+
+```r
+std_caravan_test <- std_caravan %>% slice(1:1000)
+```
+
+```
+## Error in eval(lhs, parent, parent): object 'std_caravan' not found
+```
+
+```r
+std_caravan_train <- std_caravan %>% slice(1001:nrow(.))
+```
+
+```
+## Error in eval(lhs, parent, parent): object 'std_caravan' not found
+```
+
+```r
+caravan_test_Y <- caravan %>% slice(1:1000) %>% .[['Purchase']]
+caravan_train_Y <- caravan %>% slice(1001:nrow(.)) %>% .[['Purchase']]
+
+caravan_knn_pred <- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 1)
+```
+
+```
+## Error in as.matrix(train): object 'std_caravan_train' not found
+```
+
+```r
+mean(caravan_knn_pred != caravan_test_Y)
+```
+
+```
+## Error in mean(caravan_knn_pred != caravan_test_Y): object 'caravan_knn_pred' not found
+```
+
+The KNN error rate is just udner 12%. This appears to be good, but since only 6% of the customers purchased insurance, we could get the error rate down to 6% by always predicting `No`.
+
+Perhaps the company would like to sell insurance to only those customers who are likely to purchase it. We don't look at the overall error rate, but the error rate for those who are predicted to buy.
+
+
+
+```r
+tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %>% 
+    group_by(pred_Y, test_Y) %>% 
+    tally()
+```
+
+```
+## Error in eval_tidy(xs[[i]], unique_output): object 'caravan_knn_pred' not found
+```
+In this instance, we have `10/(67+10) = 13%`
+
+Let's change K = 5.
+
+
+```r
+caravan_knn_pred <- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 4)
+```
+
+```
+## Error in as.matrix(train): object 'std_caravan_train' not found
+```
+
+```r
+tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %>% 
+    group_by(pred_Y, test_Y) %>% 
+    tally()
+```
+
+```
+## Error in eval_tidy(xs[[i]], unique_output): object 'caravan_knn_pred' not found
+```
+
+This gives us `4/(11+4) = 26%`
