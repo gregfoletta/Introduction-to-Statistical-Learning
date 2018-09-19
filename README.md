@@ -11,6 +11,8 @@
 
 ## Chapter 3
 
+* [Notes](Chapter_3/notes.md)
+
 ### Exercises
 * [Lab](Chapter_3/lab.md)
 * [Conceptual](Chapter_3/conceptual.md)
