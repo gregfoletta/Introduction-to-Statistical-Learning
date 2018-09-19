@@ -58,11 +58,11 @@ For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 pr
 set.seed(1)
 y_i <- rnorm(5)
 f_hat_of_x <- rnorm(5)
-sum((y_i - f_hat_of_x)^2)/length(x)
+sum((y_i - f_hat_of_x)^2)/length(y_i)
 ```
 
 ```
-## Error in eval(expr, envir, enclos): object 'x' not found
+## [1] 0.8099457
 ```
 
 We don't usually care about the *training MSE*, but moreso in the *test MSE*.
