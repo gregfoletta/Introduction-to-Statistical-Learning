@@ -4,8 +4,6 @@
 
 **Statistical Learning** - a set of approaches for estimating a function f(X) from a set of data.
 
-
-
 ### 2.1.1 - Why estimate `f`? 
 
 Either for prediction or inference.
@@ -53,6 +51,9 @@ To quantify the extent to which a model's predictions match the observed data, w
 The MSE is small if the predicted responses are very close to the true responses.
 
 For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 predictions given by our model (`f_hat_of_x`).
+```{r setup, message = F}
+library(tidyverse)A
+```
 ```{r 2.2.1_2}
 set.seed(1)
 y_i <- rnorm(5)
@@ -87,11 +88,10 @@ We see that our training error rate in this instance is 0.66, or 66%.
 
 #### The Bayes Classifier
 
-The **test error rate** is minimised, on average, by a simple classifier that *assigned each observation to the most likely class, given its predictor values**.
+The **test error rate** is minimised, on average, by a simple classifier that *assigns each observation to the most likely class, given its predictor values*. Thus we should assign a test observation with a predictor vector `x_0` to the class `j` for which `Pr(Y = k|X = x_0)`. This is the probability that Y = j given the observed vector x_0. This very simple classifier is called the *Bayes classifer*.
 
+#### K-nearest Neighbours 
 
+In theory we would always like to predict qualitative responses using the Bayes classifier, but for real data we don't know the conditional distribution of `Y` given `X`. Therefore the Bayes classifier is an unattainable gold standard.
 
-
-
-
-
+The KNN classifier takes a positive integer `K` and a test observation `x_0`. It identifies `K` points in the training data that are closest to `x_0`, represented by `N_0`. It then estimates the conditional probability for class `j` as the fraction of points in `N_0` whose responses equal `j`.
