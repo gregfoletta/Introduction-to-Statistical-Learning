@@ -48,7 +48,7 @@ There is no free lunch in statistics - one method may work on one data set, but 
 
 ### 2.2.1 Measuring the Quality of Fit
 
-To quantify the extent to which a model's predictions match the observed data, we use the *mean squared error*, or **MSE**. It is the sum of the square of the difference between the actual value and the observed value.
+To quantify the extent to which a model's predictions match the observed data, we use the *mean squared error*, or **MSE**. It is the sum of the square of the difference between the actual values and the observed values, divided by the number of observations.
 
 The MSE is small if the predicted responses are very close to the true responses.
 
@@ -67,13 +67,52 @@ sum((y_i - f_hat_of_x)^2)/length(y_i)
 
 We don't usually care about the *training MSE*, but moreso in the *test MSE*.
 
-### Bias / Variance Trade-off
+### 2.2.2 - Bias / Variance Trade-off
 
 **Variance** refers to the amount by which `f_hat` would change if we estimated it using a different set of training data. In general, more flexible statistical methods have higher variance.
 
 **Bias** refers to the error that is introduced by approximating a real life problem with a simpler model. More flexible methds result in less bias.
 
 As a general rule, as we use more flexible methods, the variance will increase and the bias will decrease. The relative rate of change of these two quantities determines whether the test MSE increases or decreases.
+
+### 2.2.3 - The Classification Setting
+
+The **training error rate** is the most common approach for quantifying the accuracy of `f_hat` when `y_i` is no longer quantitative but qualitative. It is the sum of the *indicator variable* `I(y_i != f_hat_of_x)` divided by the number of observations. The indicator variable is 1 when `y_i != f_hat_of_x`, and 0 when it does. If the indicator variable is 0, our classifier correctly classified the response. 
+
+We can show this in R:
+
+```r
+set.seed(1)
+y_i <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
+```
+
+```
+## Error in c(rep("a", 100), rep("b", 100), rep("c", 100)) %>% sample(100): could not find function "%>%"
+```
+
+```r
+f_hat_of_x <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
+```
+
+```
+## Error in c(rep("a", 100), rep("b", 100), rep("c", 100)) %>% sample(100): could not find function "%>%"
+```
+
+```r
+sum(y_i != f_hat_of_x) / length(y_i)
+```
+
+```
+## [1] 1
+```
+
+We see that our training error rate in this instance is 0.66, or 66%. 
+
+#### The Bayes Classifier
+
+The **test error rate** is minimised, on average, by a simple classifier that *assigned each observation to the most likely class, given its predictor values**.
+
+
 
 
 
