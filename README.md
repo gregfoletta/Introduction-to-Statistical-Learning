@@ -2,7 +2,7 @@
 
 ## Chapter 2
 
-* [Key Terms](Chapter_2/terms.md)
+* [Notes](Chapter_2/notes.md)
 
 ### Exercises 
 
