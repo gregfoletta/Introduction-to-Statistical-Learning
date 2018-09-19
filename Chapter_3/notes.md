@@ -12,4 +12,28 @@ Once we have training data to produce estimates for the coefficients, we can pre
 ŷ = β̂ 0 + β̂ 1 x
 ```
 
+### 3.1.1 - Estimating Coefficients
+
+The goal is to obtain coefficients such that the linear model fits the data well - i.e. as close as possible to the data points. The most common approach involves minimising the **least squares** criterion.
+
+We let `e_i = y_i − ŷ_i`, which represents the *i*th **residual**. The **residual sum of squares** or **RSS** is the sum of the squares of each of these residuals.
+
+An example in R - we generate some data and calculate the residual sum of squares.
+
+
+```r
+library(tidyverse)
+```
+
+```r
+set.seed(1)
+y_i <- rnorm(10)
+y_hat_i <- rnorm(10)
+(RSS = sum((y_i - y_hat_i)^2))
+```
+
+```
+## [1] 21.57546
+```
+
 
