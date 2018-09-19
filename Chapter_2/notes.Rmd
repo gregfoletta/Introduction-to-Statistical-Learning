@@ -53,16 +53,11 @@ To quantify the extent to which a model's predictions match the observed data, w
 The MSE is small if the predicted responses are very close to the true responses.
 
 For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 predictions given by our model (`f_hat_of_x`).
-
-```r
+```{r 2.2.1}
 set.seed(1)
 y_i <- rnorm(5)
 f_hat_of_x <- rnorm(5)
 sum((y_i - f_hat_of_x)^2)/length(x)
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'x' not found
 ```
 
 We don't usually care about the *training MSE*, but moreso in the *test MSE*.
