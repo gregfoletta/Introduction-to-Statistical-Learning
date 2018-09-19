@@ -94,4 +94,12 @@ The **test error rate** is minimised, on average, by a simple classifier that *a
 
 In theory we would always like to predict qualitative responses using the Bayes classifier, but for real data we don't know the conditional distribution of `Y` given `X`. Therefore the Bayes classifier is an unattainable gold standard.
 
-The KNN classifier takes a positive integer `K` and a test observation `x_0`. It identifies `K` points in the training data that are closest to `x_0`, represented by `N_0`. It then estimates the conditional probability for class `j` as the fraction of points in `N_0` whose responses equal `j`.
+The KNN classifier takes a positive integer `K` and a test observation `x_0`. It identifies `K` points in the training data that are closest to `x_0`, represented by `N_0`. It then estimates the conditional probability for class `j` as the fraction of points in `N_0` whose responses equal `j`. 
+```
+Pr(Y = j|X = x_0) = 1/K * sum(I(y_i = j))
+```
+It then applies the Bayes rule and classifies the test observation `x_0` to the class with the largest probability.
+
+The value of `K` determines the flexibility of the classifier. A lower `K` is more flexible with low bias and high variance, higher `K` is less flexible with higher bias and lower variance.
+
+
