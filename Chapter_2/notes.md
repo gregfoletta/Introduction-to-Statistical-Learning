@@ -53,13 +53,7 @@ The MSE is small if the predicted responses are very close to the true responses
 For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 predictions given by our model (`f_hat_of_x`).
 
 ```r
-library(tidyverse)A
-```
-
-```
-## Error: <text>:1:19: unexpected symbol
-## 1: library(tidyverse)A
-##                       ^
+library(tidyverse)
 ```
 
 ```r
@@ -92,26 +86,13 @@ We can show this in R:
 ```r
 set.seed(1)
 y_i <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
-```
-
-```
-## Error in c(rep("a", 100), rep("b", 100), rep("c", 100)) %>% sample(100): could not find function "%>%"
-```
-
-```r
 f_hat_of_x <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
-```
 
-```
-## Error in c(rep("a", 100), rep("b", 100), rep("c", 100)) %>% sample(100): could not find function "%>%"
-```
-
-```r
 sum(y_i != f_hat_of_x) / length(y_i)
 ```
 
 ```
-## [1] 1
+## [1] 0.66
 ```
 
 We see that our training error rate in this instance is 0.66, or 66%. 

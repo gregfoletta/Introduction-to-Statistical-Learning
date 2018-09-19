@@ -52,7 +52,7 @@ The MSE is small if the predicted responses are very close to the true responses
 
 For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 predictions given by our model (`f_hat_of_x`).
 ```{r setup, message = F}
-library(tidyverse)A
+library(tidyverse)
 ```
 ```{r 2.2.1_2}
 set.seed(1)
