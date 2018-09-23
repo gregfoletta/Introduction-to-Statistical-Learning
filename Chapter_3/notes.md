@@ -107,4 +107,21 @@ The standard error can be used to calculate confidence intervals. A 95% confiden
 
 #### Hypothesis Tests
 
-The standard errors are used to perform hypothesis tests. The most common is the null hypothesis `H_0` - 'there is no relationship between `X` and `Y`' (H_0: β_1 = 0) versus the *alternative hypthesis* `H_a` - 'there is some relationship between `X` and `Y`' (H_a : β_1  = 0). 
+The standard errors are used to perform hypothesis tests. The most common is the null hypothesis `H_0` - 'there is no relationship between `X` and `Y` versus the *alternative hypthesis* - there is some relationship between `X` and `Y`' (H_a : β_1  = 0). 
+
+To test the null hypothesis, we need to derermine with the coefficient estimate is sufficiently far from zero that we can be confident that it's non-zero. How far is far enough? This depends on the accuracy of the coefficient.
+
+* If the standard error is small, then even small values of the coefficient may be strong evidence against the null hypothesis.
+* If the stanard error is large, the coefficient must be large  in absolute value in order for us to reject the null hypothesis.
+
+In practice, a **t-statistic** is calculated, where `t = β̂_1- 0 / SE(β̂_1)`
+
+This measures how many standard deviations the coefficient is away from 0. If there is no relationship, then we expect that the formula will have a **t-distribution** with n - 2 degrees of freedom.
+
+Consequently it is simple to compute the probability of observing any value equal to |t| or larger, assuming β̂_1 = 0. We call this probability the **p-value**. Roughtly speaking, we interpret the p-value as follows: *a small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance.
+
+If we see a small p-value, then we can infer ther is an association between the predictor and the response. We *reject the null hypothesis*. Typical p-value cutoffs for rejecting the null hypothesis are 5% or 1%. When n = 30, these correspond to t-statistics of around 2 and 2.75 respectively.
+
+### 3.1.3 - Assessing the Accuracy of the Model
+
+The quality of the model
