@@ -213,5 +213,62 @@ The linear model assumes that there is a straight line relationship between the 
 
 #### Correlation of Error Terms
 
-An important 
+An important assumption of the linear regression model is that the error terms `e_1 .. e_n` are uncorrelated. If the error terms are correlated, the estimated *standard errors* will tend to underestimate the true standard errors. Thus p-values will be lower than they should be.
+
+These correlations frequently occur in time series data, where observations obtained at adjacent time points will have positively correlated errors.
+
+The residuals can be plotted against the time, and we can discern if there is **tracking** - i.e. adjacent rediduals with similar values.
+
+#### Non-constant Variance of Error Terms
+
+Another important assumption is that the error terms have a constant variance. This is called **heteroscedasticity**. In our examples above, we've been using the `rnorm()` function to generate the error term. Let's take a look at the variance:
+
+```{r 3.3.3_1}
+map_dbl(1:100, ~var(rnorm(100000, 20, 20)))
+```
+
+We see that the values are all ~400, which is 20^2, so we're confident it's generating random values with constant variance.
+
+One can identify non-constant variances from the presence of a *funnel shape* in the residual plot (x = fitted, y = residuals).
+
+When faced with this issue, transforming the response with a concave function such as `sqrt(Y)` or `log(Y)` results in a greater amount of shrinkage of the larger values, leading to a reduction in heteroscedasticity.
+
+#### Outliers
+
+An outlier is a point for which `y_i` is far from the value predicted by the model. An outlier typically does not effect on the least squares fit, but it can have an impact on the RSE, and therefore the confidence intervals and p-values.
+
+Compute the studentised residuals, which are each residual `e_i` by its estimated standard error. Observations whose studentised residuals are greater than 3 in absolute value are possible outliers.
+
+If it's an error in data collection, the observation may be removed. However care must be taken since it may be a deficiency with the model.
+
+#### High Leverage Points
+
+Observations with **high leverage** have an unusual value for `x_i`. These observations have a large impact on the least squares line.
+
+In order to quantify an observations leverage, a **leverage statistic** for each observation is computed. For a simple linear regression it's `x_i` minus the mean of `x`, all squared, then divided by the TSS, then all divided by `n`. Let's generate some random data, then add an additional point with high leverage, then calculate its leverage statistic.
+
+```{r 3.3.3_2}
+set.seed(1)
+x_lev <- c(rnorm(100), 30)
+lev_stat <- (1/length(x_lev)) + ( (x_lev - mean(x_lev))^2 )/ ( sum((x_lev - mean(x_lev))^2) )
+lev_stat
+```
+
+The average leverage for all the observations is `(p + 1) / n`, so if a given observation has a leverage statistic that greatly exceeds this, we may suspect the coressponding point has high leverage.
+
+#### Collinearity
+
+**Collinearity** refers to the situation where two or more predictor values are closely related to one another. It can be difficult to separate the individual effects of collinear variables on the response.
+
+Collinearity reduces the accuracy of the coefficient estimates, and causes the standard error of `beta_j` to grow. The *t-statistic* is the coefficient divided by the standard error, therefore collinearity results in a decline in the *t-statistic*.
+
+Looking at the correlation matrix is a way to see if there is collinearity. However with *multicollinearity* it could exist between 3 or 4 variables. The **variance inflation factor** calculates the ratio of the variance of `beta_j` with the full model to `beta_j` fit on its own. The smallest **VIF** is 1. In general a VIF over 5 or 10 indicates a problematic amount of collinearity.
+
+## 3.5 - Linear Regression with K-Nearest Neighbours
+
+The KNN regression is closely related to the KNN classifier. Given a value for `K` and a prediction point `x_0`, KNN regression identifies `K` training observations that are closest to `x_0`, represented by `N_0`. It then estimates `f(x_0)` using the average of all the training responses.
+
+As the number of dimensions increases (`p` gets bigger) it is typical for the MSE of KNN to increase. This results from the fact that in higher dimensions there is effectively a reduction in sample sizse. This is called the **curse of dimensionality**: The `K` observations nearest to `x_0` may be far away in p-dimensional space when p is large. 
+
+As a general rule, parametric methods outperform non-parametric methods when p is high.
 

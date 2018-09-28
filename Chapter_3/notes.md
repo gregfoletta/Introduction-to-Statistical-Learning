@@ -266,5 +266,106 @@ The linear model assumes that there is a straight line relationship between the 
 
 #### Correlation of Error Terms
 
-An important 
+An important assumption of the linear regression model is that the error terms `e_1 .. e_n` are uncorrelated. If the error terms are correlated, the estimated *standard errors* will tend to underestimate the true standard errors. Thus p-values will be lower than they should be.
+
+These correlations frequently occur in time series data, where observations obtained at adjacent time points will have positively correlated errors.
+
+The residuals can be plotted against the time, and we can discern if there is **tracking** - i.e. adjacent rediduals with similar values.
+
+#### Non-constant Variance of Error Terms
+
+Another important assumption is that the error terms have a constant variance. This is called **heteroscedasticity**. In our examples above, we've been using the `rnorm()` function to generate the error term. Let's take a look at the variance:
+
+
+```r
+map_dbl(1:100, ~var(rnorm(100000, 20, 20)))
+```
+
+```
+##   [1] 400.5794 401.7843 403.3706 401.0913 402.4892 399.4287 399.2752
+##   [8] 400.8022 398.8561 397.8668 401.2790 402.5496 400.1726 401.0600
+##  [15] 401.7985 398.8445 400.0047 399.2310 399.1589 400.3971 401.1763
+##  [22] 402.0269 401.0191 398.0338 400.9628 401.6388 399.3431 400.0818
+##  [29] 401.3423 400.9218 401.4045 403.5387 401.8456 399.7226 400.8080
+##  [36] 401.7852 399.6263 399.5969 402.1547 397.1904 399.9148 399.9557
+##  [43] 398.0415 403.0375 400.9467 402.3612 397.6241 400.0097 400.3207
+##  [50] 399.7602 399.0926 401.8214 396.8288 398.3107 396.1450 399.3080
+##  [57] 398.3512 401.4667 402.5210 399.0898 400.3633 399.6700 401.2397
+##  [64] 403.1933 399.9618 398.8730 401.4576 396.2424 399.1265 400.0040
+##  [71] 401.0410 401.1684 398.2647 401.3029 402.7823 400.3731 397.5561
+##  [78] 401.5841 400.4863 400.1814 398.5447 395.4242 400.2118 402.0072
+##  [85] 399.9087 401.5930 397.7700 401.2935 397.2999 399.7651 401.2909
+##  [92] 398.7801 398.4166 397.1909 399.8581 402.5306 397.3928 398.9701
+##  [99] 398.9821 402.4000
+```
+
+We see that the values are all ~400, which is 20^2, so we're confident it's generating random values with constant variance.
+
+One can identify non-constant variances from the presence of a *funnel shape* in the residual plot (x = fitted, y = residuals).
+
+When faced with this issue, transforming the response with a concave function such as `sqrt(Y)` or `log(Y)` results in a greater amount of shrinkage of the larger values, leading to a reduction in heteroscedasticity.
+
+#### Outliers
+
+An outlier is a point for which `y_i` is far from the value predicted by the model. An outlier typically does not effect on the least squares fit, but it can have an impact on the RSE, and therefore the confidence intervals and p-values.
+
+Compute the studentised residuals, which are each residual `e_i` by its estimated standard error. Observations whose studentised residuals are greater than 3 in absolute value are possible outliers.
+
+If it's an error in data collection, the observation may be removed. However care must be taken since it may be a deficiency with the model.
+
+#### High Leverage Points
+
+Observations with **high leverage** have an unusual value for `x_i`. These observations have a large impact on the least squares line.
+
+In order to quantify an observations leverage, a **leverage statistic** for each observation is computed. For a simple linear regression it's `x_i` minus the mean of `x`, all squared, then divided by the TSS, then all divided by `n`. Let's generate some random data, then add an additional point with high leverage, then calculate its leverage statistic.
+
+
+```r
+set.seed(1)
+x_lev <- c(rnorm(100), 30)
+lev_stat <- (1/length(x_lev)) + ( (x_lev - mean(x_lev))^2 )/ ( sum((x_lev - mean(x_lev))^2) )
+lev_stat
+```
+
+```
+##   [1] 0.011003699 0.009951718 0.011496384 0.011370300 0.009906874
+##   [6] 0.011457626 0.009908062 0.010016296 0.009931287 0.010423978
+##  [11] 0.011171409 0.009901223 0.010992579 0.017015528 0.010438607
+##  [16] 0.010110731 0.010084780 0.010202201 0.010080745 0.009938050
+##  [21] 0.010175057 0.010048583 0.010014086 0.015844109 0.009948911
+##  [26] 0.010121302 0.010226869 0.013548306 0.010709355 0.009901168
+##  [31] 0.010844287 0.010168159 0.009901296 0.010119086 0.013193014
+##  [36] 0.010597855 0.010563101 0.010124357 0.010402061 0.010034121
+##  [41] 0.010237095 0.010350163 0.009989468 0.009924889 0.011140956
+##  [46] 0.011183815 0.009902670 0.010038132 0.010178315 0.010136171
+##  [51] 0.009901037 0.010973062 0.009905200 0.012341396 0.010997063
+##  [56] 0.012474746 0.010519006 0.012077787 0.009929176 0.010203203
+##  [61] 0.014034861 0.010105454 0.009985146 0.010048223 0.011267666
+##  [66] 0.009949384 0.014963921 0.011067518 0.009966615 0.013141026
+##  [71] 0.009906168 0.011189476 0.009944940 0.011759723 0.012752753
+##  [76] 0.009914321 0.010646791 0.010069990 0.010014239 0.010926133
+##  [81] 0.010883588 0.010203342 0.010520909 0.013756607 0.009938068
+##  [86] 0.009906348 0.010350245 0.010422206 0.009902247 0.009920661
+##  [91] 0.010831511 0.010569579 0.010492877 0.009991447 0.011349521
+##  [96] 0.009925467 0.012832256 0.010892889 0.012653823 0.010700683
+## [101] 0.918010868
+```
+
+The average leverage for all the observations is `(p + 1) / n`, so if a given observation has a leverage statistic that greatly exceeds this, we may suspect the coressponding point has high leverage.
+
+#### Collinearity
+
+**Collinearity** refers to the situation where two or more predictor values are closely related to one another. It can be difficult to separate the individual effects of collinear variables on the response.
+
+Collinearity reduces the accuracy of the coefficient estimates, and causes the standard error of `beta_j` to grow. The *t-statistic* is the coefficient divided by the standard error, therefore collinearity results in a decline in the *t-statistic*.
+
+Looking at the correlation matrix is a way to see if there is collinearity. However with *multicollinearity* it could exist between 3 or 4 variables. The **variance inflation factor** calculates the ratio of the variance of `beta_j` with the full model to `beta_j` fit on its own. The smallest **VIF** is 1. In general a VIF over 5 or 10 indicates a problematic amount of collinearity.
+
+## 3.5 - Linear Regression with K-Nearest Neighbours
+
+The KNN regression is closely related to the KNN classifier. Given a value for `K` and a prediction point `x_0`, KNN regression identifies `K` training observations that are closest to `x_0`, represented by `N_0`. It then estimates `f(x_0)` using the average of all the training responses.
+
+As the number of dimensions increases (`p` gets bigger) it is typical for the MSE of KNN to increase. This results from the fact that in higher dimensions there is effectively a reduction in sample sizse. This is called the **curse of dimensionality**: The `K` observations nearest to `x_0` may be far away in p-dimensional space when p is large. 
+
+As a general rule, parametric methods outperform non-parametric methods when p is high.
 
