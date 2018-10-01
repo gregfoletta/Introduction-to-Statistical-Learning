@@ -6,39 +6,27 @@ The process for predicting categorical variables is called **classification**.
 
 We'll be using the `Default` data set, which has annual incomes and monthly credit card balances, with a categorical variable indicating whether an individual defaulted in that month.
 
-
-```r
+```{r setup, message = F}
 library(tidyverse)
 library(broom)
 library(ISLR)
 ```
 
-
-```r
+```{r 4_1}
 default <- as_tibble(Default)
 default %>% ggplot() + 
     geom_point(aes(balance, income, colour = default, shape = default), alpha = .5) + 
     scale_shape_manual(values = c(1,4)) + 
     scale_color_manual(values = c('red', 'blue'))
-```
 
-![plot of chunk 4_1](figure/4_1-1.png)
-
-```r
 default %>% ggplot() + 
     geom_boxplot(aes(default, balance, fill = default)) + 
     scale_fill_brewer(palette="Dark2")
-```
 
-![plot of chunk 4_1](figure/4_1-2.png)
-
-```r
 default %>% ggplot() + 
     geom_boxplot(aes(default, income, fill = default)) + 
     scale_fill_brewer(palette="Dark2")
 ```
-
-![plot of chunk 4_1](figure/4_1-3.png)
 
 ## 4.2 - Why Not Linear?
 
@@ -57,14 +45,11 @@ We wish to model `p(X) = Pr(Y = 1|X)`. We use a function that gives outputs betw
 p(X) = e^β_0+β_1X / (1 + e^β_0+β_1X)
 ```
 
-
-```r
+```{r 4.3.1_1}
 tibble(x = -50:50, y = exp(.1* x) / (1 + exp(.1*x))) %>% 
     ggplot(aes(x,y)) + 
     geom_point()
 ```
-
-![plot of chunk 4.3.1_1](figure/4.3.1_1-1.png)
 
 To fit the model, a method called **maximum likelyhood** is used. After some manipulation, `p(X) / (1 - p(x) = e^β_0+β_1X`. The quantity on the left is called the *odds*, and it takeson values between 0 and infinity. By taking the log of each side, we have the **log-odds** or **logit** on the left, and that it is linear in X. In a logistic regression model, increasing `X` by one unit changes the log odds by `beta_1`.
 
@@ -74,17 +59,8 @@ Maximum likelyhood seeks estimates for the coefficients such that the predictice
 
 Let's run the model against the default data:
 
-
-```r
+```{r 4.3.1_2}
 glm(default ~ balance, family = binomial, default) %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term         estimate std.error statistic   p.value
-##   <chr>           <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept) -10.7      0.361        -29.5 3.62e-191
-## 2 balance       0.00550  0.000220      25.0 1.98e-137
 ```
 
 We see the `beta_1` is 0.0055, meaning an increase in balance is associated with an increase in the probability of default. It increases the log-odds of default by 0.0055. The **z-statistic** plays the same role as the **t-statistic** in a linear regression.
@@ -127,18 +103,13 @@ Estimating `pi_k` is easy if we have a random sample - we calculate the fraction
 ### 4.4.2 - LDA with p = 1
 
 We would like an estimate for `f_k(x)` that we can use in the formula to calculate `p_k(x)`. We assume the function is normal or **Gaussian**:
-
-```r
+```{r 4.4.2_1}
 norm_mean <- 0
 std_dev <- 20 
 tibble(
     x = -100:100, 
     y = (1 / (sqrt(2) * std_dev)) * exp((-1 / (2 * std_dev^2)) * (x - mean)^2)
 ) %>% ggplot(aes(x,y)) + geom_point()
-```
-
-```
-## Error in x - mean: non-numeric argument to binary operator
 ```
 
 We further assume that $\sigma^2$ is that same amongst all classes. We can plug the Gaussian `f_k(x)` into the `p_l(x)` to get our formula.
