@@ -20,6 +20,8 @@
 
 ## Chapter 4 - Classification
 
+* [Notes](Chapter_4/notes.md)
+
 ### Exercises
 * [Lab](Chapter_4/lab.md)
 
