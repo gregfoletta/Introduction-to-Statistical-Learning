@@ -4,6 +4,8 @@
 
 We examine some numerical and graphical summaries of the `Smarket` data. We first   
 
+$$ \sum_{i=1}^k $$
+
 
 ```r
 library(tidyverse)
