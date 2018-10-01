@@ -69,7 +69,7 @@ for my $file_r (@rmd_files) {
     my @R_commands = (
         qq{ library(knitr) },
         qq{ getwd() },
-        qq{ knit('$file_r->[FILE]') }
+        qq{ knit2html('$file_r->[FILE]') }
     );
 
     say "Executing the following commands:";
