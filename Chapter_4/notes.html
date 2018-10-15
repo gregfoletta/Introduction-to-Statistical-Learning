@@ -253,10 +253,9 @@ default %&gt;% ggplot() +
 
 <h3>4.3.1 - The Logistic Model</h3>
 
-<p>We wish to model <code>p(X) = Pr(Y = 1|X)</code>. We use a function that gives outputs between 0 and 1 for all values of X. In logistic regression, we use the <strong>logistic function</strong></p>
+<p>We wish to model \(p(X) = Pr(Y = 1|X)\). We use a function that gives outputs between 0 and 1 for all values of X. In logistic regression, we use the <strong>logistic function</strong></p>
 
-<pre><code>p(X) = e^β_0+β_1X / (1 + e^β_0+β_1X)
-</code></pre>
+<p>\[ p(X) = \frac{e^{\beta_0+\beta_1X}}{1 + e^{\beta_0+\beta_1X}} \]</p>
 
 <pre><code class="r">tibble(x = -50:50, y = exp(.1* x) / (1 + exp(.1*x))) %&gt;% 
     ggplot(aes(x,y)) + 
@@ -265,11 +264,11 @@ default %&gt;% ggplot() +
 
 <p><img src="data:image/png;base64,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" alt="plot of chunk 4.3.1_1"/></p>
 
-<p>To fit the model, a method called <strong>maximum likelyhood</strong> is used. After some manipulation, <code>p(X) / (1 - p(x) = e^β_0+β_1X</code>. The quantity on the left is called the <em>odds</em>, and it takeson values between 0 and infinity. By taking the log of each side, we have the <strong>log-odds</strong> or <strong>logit</strong> on the left, and that it is linear in X. In a logistic regression model, increasing <code>X</code> by one unit changes the log odds by <code>beta_1</code>.</p>
+<p>To fit the model, a method called <strong>maximum likelyhood</strong> is used. After some manipulation we have \(\frac{p(X)}{1 - p(x)} = e^{β_0+β_1X}\). The quantity on the left is called the <em>odds</em>, and it takeson values between 0 and infinity. By taking the log of each side, we have the <strong>log-odds</strong> or <strong>logit</strong> on the left, and that it is linear in X. In a logistic regression model, increasing \(X\) by one unit changes the log odds by \(\beta_1\).</p>
 
 <h3>4.3.2 - Estimating the Regression Coefficients</h3>
 
-<p>Maximum likelyhood seeks estimates for the coefficients such that the predicticed probability <code>p_hat(x_i)</code> corresponds as closely as possible to the observed status. </p>
+<p>Maximum likelyhood seeks estimates for the coefficients such that the predicticed probability \(\hat{p}(x_i)\) corresponds as closely as possible to the observed status. </p>
 
 <p>Let&#39;s run the model against the default data:</p>
 
@@ -283,7 +282,7 @@ default %&gt;% ggplot() +
 ## 2 balance       0.00550  0.000220      25.0 1.98e-137
 </code></pre>
 
-<p>We see the <code>beta_1</code> is 0.0055, meaning an increase in balance is associated with an increase in the probability of default. It increases the log-odds of default by 0.0055. The <strong>z-statistic</strong> plays the same role as the <strong>t-statistic</strong> in a linear regression.</p>
+<p>We see the \(\beta_1\) is 0.0055, meaning an increase in balance is associated with an increase in the probability of default. It increases the log-odds of default by 0.0055. The <strong>z-statistic</strong> plays the same role as the <strong>t-statistic</strong> in a linear regression.</p>
 
 <h3>4.3.3 - Making Predictions</h3>
 
@@ -297,7 +296,7 @@ default %&gt;% ggplot() +
 
 <h2>4.4 - Linear Discriminant Analysis</h2>
 
-<p>In the logistic regression, the conditional probability of the response <code>Y</code> is modelled given the predictor(s) <code>X</code>. In <strong>linear disriminant analysis</strong> we moel the distribution of the predictors <code>X</code> separately in each of the response classes <code>Y</code>, the use <strong>Bayes&#39; Theorem</strong> to flip these round to estimates for <code>Pr(Y = k|X = x)</code>.</p>
+<p>In the logistic regression, the conditional probability of the response \(Y\) is modelled given the predictor(s) \(X\). In <strong>linear disriminant analysis</strong> we model the distribution of the predictors \(X\) separately in each of the response classes \(Y\), the use <strong>Bayes&#39; Theorem</strong> to flip these round to estimates for \(Pr(Y = k|X = x)\).</p>
 
 <p>Why?</p>
 
@@ -310,55 +309,107 @@ default %&gt;% ggplot() +
 <h3>4.4.1 - Using Bayes&#39; Theorem</h3>
 
 <ul>
-<li><code>K</code> classes</li>
-<li>Let <code>pi_k</code> represent the <strong>prior probability</strong> than a randomly chosen observation comes from the <code>k</code>th class.</li>
-<li>Let <code>f_k(X) = Pr(X = x|Y=k)</code> denote the <strong>density function</strong> of <code>X</code> for an observation that comes from the <code>k</code>th class.</li>
+<li>\(K\) classes</li>
+<li>Let \(\pi_k\) represent the <strong>prior probability</strong> than a randomly chosen observation comes from the *k*th class.</li>
+<li>Let \(f_k(X) = Pr(X = x|Y=k)\) denote the <strong>density function</strong> of <em>X</em> for an observation that comes from the *k*th class.</li>
 <li>Bayes&#39; theorem states that:</li>
 </ul>
 
-<pre><code>p_k(X) = Pr(Y = k|X = x) = pi_k * f_k(x) / sum[l = 1 -&gt; K](pi_l * f_l(x)
-</code></pre>
+<p>\[ p_k(X) = Pr(Y = k|X = x) = \frac{\pi_kf_k(x)}{\sum_{l=1}^K\pi_lf_l(x)} \]</p>
 
-<p>Estimating <code>pi_k</code> is easy if we have a random sample - we calculate the fraction of training observations that belong to the <code>k</code>th class. Estimating <code>f_k(X)</code> is more challenging. If we can estimate this function, we can develop a classifier that approximates the Bayes classifier.</p>
+<p>Estimating \(\pi_k\) is easy if we have a random sample - we calculate the fraction of training observations that belong to the kth class. Estimating \(f_k(X)\) is more challenging. If we can estimate this function, we can develop a classifier that approximates the Bayes classifier.</p>
 
-<p><code>p_k(X)</code> is the <strong>posterior probability</strong> that <code>X = x</code> is in class <code>k</code>. </p>
+<p>\(p_k(X)\) is the <strong>posterior probability</strong> that \(X = x\) is in class k. </p>
 
 <h3>4.4.2 - LDA with p = 1</h3>
 
-<p>We would like an estimate for <code>f_k(x)</code> that we can use in the formula to calculate <code>p_k(x)</code>. We assume the function is normal or <strong>Gaussian</strong>:</p>
+<p>We would like an estimate for \(f_k(x)\) that we can use in the formula to calculate \(p_k(x)\). We assume the function is normal or <strong>Gaussian</strong>. In the one dimensional setting the Gaussian density takes the form:</p>
+
+<p>\[ f_k(x) = -\frac{1}{\sqrt{2\pi}\sigma_k}exp\Bigg(-\frac{1}{2\sigma^2_k}(x - \mu_k)^2\Bigg) \]</p>
 
 <pre><code class="r">norm_mean &lt;- 0
 std_dev &lt;- 20 
 tibble(
     x = -100:100, 
-    y = (1 / (sqrt(2) * std_dev)) * exp((-1 / (2 * std_dev^2)) * (x - mean)^2)
+    y = (1 / (sqrt(2) * std_dev)) * exp((-1 / (2 * std_dev^2)) * (x - norm_mean)^2)
 ) %&gt;% ggplot(aes(x,y)) + geom_point()
 </code></pre>
 
-<pre><code>## Error in x - mean: non-numeric argument to binary operator
-</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk 4.4.2_1"/></p>
 
-<p>We further assume that \(\sigma^2\) is that same amongst all classes. We can plug the Gaussian <code>f_k(x)</code> into the <code>p_l(x)</code> to get our formula.</p>
+<p>We further assume that \(\sigma^2\) is that same amongst all classes. We can plug the Gaussian \(f_k(x)\) into the \(p_l(x)\) to get our formula.</p>
 
-<p>Even if we are certain that <code>X</code> is Gaussian, we still have to estimate the means, standard deviations and variance. The LDA classifier estimates:</p>
-
-<ul>
-<li><strong>Mean</strong>: by summing the <code>x_i</code> for the training observation in class <code>k</code> and divding by the number of <code>k</code> observations.
+<p>Even if we are certain that \(X\) is Gaussian, we still have to estimate the means, standard deviations and variance. The LDA classifier estimates:</p>
 
 <ul>
-<li>The average of all the training observations in the <code>k</code>th class</li>
+<li><strong>Mean</strong>: \(\hat{\mu}_k = \frac{1}{n_k}\sum_{i:yi = k}x_i\)
+
+<ul>
+<li>The average of all the training observations in the $k$th class</li>
 </ul></li>
-<li><strong>Variance</strong>: is the TSS of the training observations in <code>k</code>th class, then summed for each <code>k</code> class, divided by the number of training observations minus the number of <code>K</code> classes.
+<li><strong>Variance</strong>: \(\hat{\sigma}^2 = \frac{1}{n - K}\sum_{k=1}^K\sum_{i:y_i=k}(x_i - \hat{\mu_k})^2\)
 
 <ul>
 <li>The weighted average of the sample variances for each of the <code>K</code> classes.A</li>
 </ul></li>
-<li><strong>Prior Probability</strong>: number of training observations in the <code>k</code>th class divided by the total number of observations.</li>
+<li><strong>Prior Probability</strong>: \(\hat{\pi}_k = n_k / n\)</li>
 </ul>
 
-<p>\[ \sum_{i=1}^k \]</p>
+<p>The LDA classifier plugs in these estimates and assigns an observations \(X = x\) to the class for which the following formula is largest:</p>
 
-<p>This</p>
+<p>\[ \hat{\delta}_k(x) = x \cdot \frac{\hat{\mu}_k}{\hat{\sigma}^2} - \frac{\hat{\mu}^2_k}{2\hat{\sigma}^2} + log(\hat{\pi}_k) \]</p>
+
+<h3>4.4.3 - LDA with p &gt; 1</h3>
+
+<p>We assume \(X = (X_1, X_2, \ldots, X_p)\) is drawn from a <em>multivariate Gaussian</em> distribution, with a class specific mean vector and a common covariance matrix.</p>
+
+<p>To indicate that a <em>p</em>-dimensional random variable $ X $ has a multi-variate Gaussian distribution, we wrtie \(X \sim N(\mu, \sigma)\). Here \(E(X) = \mu\) is the mean of \(X\) (a vector with <em>p</em> components, and \(Cov(X) = \sigma\) is the <em>p</em> x <em>p</em> covariance matrix of X</p>
+
+<p>Formally the multivariate Gaussian density is defined as:</p>
+
+<p>\[ f(x) = \frac{1}{(2\pi)^{p/2}|\Sigma|^{&frac12;}}exp\Bigg(-\frac{1}{2}(x - \mu)^{T}\Sigma^{-1}(x - \mu)\Bigg) \]</p>
+
+<p>In the case of p &gt; 1 predictors, the LDA classifier assumes that the observations in the kth class are drawn a multivariate Gaussian distribution \(N(\mu_k,\sigma)\), where \(\mu_k\) is a class-specific mean vector, and \(\sigma\) is a covariance matrix.</p>
+
+<p>The Bayes classifier assigns an observation \(X = x\) to the class for which the following formula is largest - the vector/matrix form of the p = 1 formula.</p>
+
+<p>\[ \delta_k(x) = x^T\Sigma^{-1}\mu_k - \frac{1}{2}\mu_k^T\Sigma^{-1}\mu_k+log\pi_k \]</p>
+
+<h4>Sensitivity &amp; Specificity</h4>
+
+<p>Used in medicine and biology:</p>
+
+<ul>
+<li><strong>Sensitivity</strong>: true positives</li>
+<li><strong>Specificity</strong>: true negatives</li>
+</ul>
+
+<p>The LDA is appoximating a Bayes classifier, which has the lowest <strong>total</strong> error rate, irrespective of the class (false positive, false negative) that they come from. The Bayes, and the LDA, use a 50% threshold for the posterior probability in order to assign an observation to a class. This threshold can be altered to get better class specific results, while potentially increasing the overall error rate.</p>
+
+<h3>4.4.4 - Quadratic Discriminant Analysis</h3>
+
+<p>LDA assumes that the observations have</p>
+
+<ul>
+<li>Multivariate gaussian distribution</li>
+<li>Class specific mean vector</li>
+<li>Covariance matrix common to all K classes.</li>
+</ul>
+
+<p>QDA provides an alternative approach - it&#39;s still assuming a Gaussian distribution, however it assumes that each class has its own covariance matrix, i.e. \(X \sim N(\mu_k,\Sigma_k)\).</p>
+
+<p>Why does it matter whether or not we assume that the K classes share a common covariance matrix? The answer is the bias-variance trade-off. Estimating a covariance matrix for each class is Kp(p+1)/2 parameters. By assuming a common covariance matrix, there are Kp linear coefficients. The LDA is much less flexible than the QDA, and has lower variance. 
+Generally, LDA tends to be better than QDA if there are relatively fewer training observations and so reducing variance is cruicial.</p>
+
+<h2>4.5 - A Comparison of Classification Methods</h2>
+
+<p>Both the logistic regression and LDA produce linear decision boundaries. The difference is that the logistic coefficients are estimated using <strong>maximum likelyhood</strong> and the LDA coefficients are computed using the estimated mean and variance from a normal distribution.</p>
+
+<p>LDA assumes a Gaussian distribution with a common covariance matrix in each class, and can provide improvements over logistic regression when this holds. Logistic regression can perform better than LDA if the assumptions do not hold.</p>
+
+<p>KNN is a completely non-parameteric approach, so this can dominate logistic and LDA when the decision boundary is highly non-linear. However it doesn&#39;t tell us which predictors are important, as we don&#39;t get a table of coefficients.</p>
+
+<p>QDA servers as compromise between the non-parametric KNN and the linear LDA and logistic regression.</p>
 
 </body>
 
