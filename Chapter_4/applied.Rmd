@@ -1,0 +1,61 @@
+# Chapter 4 - Applied
+
+```{r setup, message = F, echo = F}
+library{tidyverse}
+library{broom}
+library{ISLR}
+```
+
+## 10) 'Weekly' Data Set
+
+### a)
+*Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?*
+
+```{r 10_a_1}
+weekly <- as_tibble(Weekly)
+weekly %>% ggplot() + geom_bar(aes(Direction))
+```
+
+
+### b)
+*Use the full data set to perform a logistic regression with Direction as the response and the five lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically significant? If so, which ones?*
+
+```{r 10_b_1}
+glm_weekly <- weekly %>% 
+    select(-Year, -Today, -Volume) %>% 
+    glm(Direction ~ ., ., family = binomial)
+
+glm_weekly %>% tidy()
+```
+
+The Lag2 variable is the only variable with a statistically significant p-value (0.025).
+
+### c)
+*Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.*
+
+```{r 10_c_1}
+weekly %>% 
+    mutate(Prediction = ifelse(predict(glm_weekly, type = 'response') < .5, 'Down', 'Up')) %>% 
+    group_by(Direction, Prediction) %>% 
+    tally() 
+```
+
+We can see that the logistic regression does well to predict when the market goes up, but not when the market goes down.
+
+### d)
+*Now fit the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).*
+
+```{r 10_d_1}
+glm_weekly_90_08 <- weekly %>% 
+    dplyr::filter(Year >= 1990 && Year <= 2008) %>% 
+    select(Direction, Lag2) %>% 
+    glm(Direction~Lag2,., family = 'binomial')
+
+weekly %>% 
+    dplyr::filter(Year > 2008) %>% 
+    mutate(Prediction = ifelse(predict(glm_weekly_90_08, ., type = 'response') < .5, "Down", "Up")) %>% 
+    group_by(Direction, Prediction) %>% 
+    tally()
+```
+
+

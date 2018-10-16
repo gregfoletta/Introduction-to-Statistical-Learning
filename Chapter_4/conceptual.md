@@ -12,7 +12,6 @@ The 4.3 equation is the odds:
 
 $$ \frac{p(X)}{1 - p(X)} = e^{\beta_0 + \beta_1X} $$
 
-If we divide both sides by $1 - p(x)$, we get 
 
 ## 2) Logistic 
 
@@ -138,10 +137,3 @@ Using the odds formula we get $\frac{p(x)}{1 - p(x)} = 0.37$. If we multiply bot
 *Suppose that an individual has a 16 % chance of defaulting on her credit card payment. What are the odds that she will default?*
 
 Plugging in to the odds formula, we get .16 / (1 - .16) = .19.
-
-
-
-
-
-
-
