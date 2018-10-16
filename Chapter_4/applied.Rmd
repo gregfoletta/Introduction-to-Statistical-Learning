@@ -1,9 +1,9 @@
 # Chapter 4 - Applied
 
 ```{r setup, message = F, echo = F}
-library{tidyverse}
-library{broom}
-library{ISLR}
+library(tidyverse)
+library(broom)
+library(ISLR)
 ```
 
 ## 10) 'Weekly' Data Set
@@ -57,5 +57,3 @@ weekly %>%
     group_by(Direction, Prediction) %>% 
     tally()
 ```
-
-

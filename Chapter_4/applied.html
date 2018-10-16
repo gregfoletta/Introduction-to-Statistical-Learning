@@ -203,11 +203,6 @@ hr {
 <body>
 <h1>Chapter 4 - Applied</h1>
 
-<pre><code>## Error: &lt;text&gt;:1:8: unexpected &#39;{&#39;
-## 1: library{
-##            ^
-</code></pre>
-
 <h2>10) &#39;Weekly&#39; Data Set</h2>
 
 <h3>a)</h3>
@@ -215,16 +210,10 @@ hr {
 <p><em>Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?</em></p>
 
 <pre><code class="r">weekly &lt;- as_tibble(Weekly)
+weekly %&gt;% ggplot() + geom_bar(aes(Direction))
 </code></pre>
 
-<pre><code>## Error in as_tibble(Weekly): could not find function &quot;as_tibble&quot;
-</code></pre>
-
-<pre><code class="r">weekly %&gt;% ggplot() + geom_bar(aes(Direction))
-</code></pre>
-
-<pre><code>## Error in weekly %&gt;% ggplot(): could not find function &quot;%&gt;%&quot;
-</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk 10_a_1"/></p>
 
 <h3>b)</h3>
 
@@ -233,15 +222,19 @@ hr {
 <pre><code class="r">glm_weekly &lt;- weekly %&gt;% 
     select(-Year, -Today, -Volume) %&gt;% 
     glm(Direction ~ ., ., family = binomial)
+
+glm_weekly %&gt;% tidy()
 </code></pre>
 
-<pre><code>## Error in weekly %&gt;% select(-Year, -Today, -Volume) %&gt;% glm(Direction ~ : could not find function &quot;%&gt;%&quot;
-</code></pre>
-
-<pre><code class="r">glm_weekly %&gt;% tidy()
-</code></pre>
-
-<pre><code>## Error in glm_weekly %&gt;% tidy(): could not find function &quot;%&gt;%&quot;
+<pre><code>## # A tibble: 6 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   0.230     0.0620     3.71  0.000205
+## 2 Lag1         -0.0401    0.0264    -1.52  0.128   
+## 3 Lag2          0.0602    0.0267     2.25  0.0245  
+## 4 Lag3         -0.0151    0.0266    -0.566 0.571   
+## 5 Lag4         -0.0268    0.0264    -1.01  0.311   
+## 6 Lag5         -0.0135    0.0264    -0.512 0.609
 </code></pre>
 
 <p>The Lag2 variable is the only variable with a statistically significant p-value (0.025).</p>
@@ -256,7 +249,14 @@ hr {
     tally() 
 </code></pre>
 
-<pre><code>## Error in weekly %&gt;% mutate(Prediction = ifelse(predict(glm_weekly, type = &quot;response&quot;) &lt; : could not find function &quot;%&gt;%&quot;
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Prediction     n
+##   &lt;fct&gt;     &lt;chr&gt;      &lt;int&gt;
+## 1 Down      Down          49
+## 2 Down      Up           435
+## 3 Up        Down          41
+## 4 Up        Up           564
 </code></pre>
 
 <p>We can see that the logistic regression does well to predict when the market goes up, but not when the market goes down.</p>
@@ -269,19 +269,22 @@ hr {
     dplyr::filter(Year &gt;= 1990 &amp;&amp; Year &lt;= 2008) %&gt;% 
     select(Direction, Lag2) %&gt;% 
     glm(Direction~Lag2,., family = &#39;binomial&#39;)
-</code></pre>
 
-<pre><code>## Error in weekly %&gt;% dplyr::filter(Year &gt;= 1990 &amp;&amp; Year &lt;= 2008) %&gt;% select(Direction, : could not find function &quot;%&gt;%&quot;
-</code></pre>
-
-<pre><code class="r">weekly %&gt;% 
+weekly %&gt;% 
     dplyr::filter(Year &gt; 2008) %&gt;% 
     mutate(Prediction = ifelse(predict(glm_weekly_90_08, ., type = &#39;response&#39;) &lt; .5, &quot;Down&quot;, &quot;Up&quot;)) %&gt;% 
     group_by(Direction, Prediction) %&gt;% 
     tally()
 </code></pre>
 
-<pre><code>## Error in weekly %&gt;% dplyr::filter(Year &gt; 2008) %&gt;% mutate(Prediction = ifelse(predict(glm_weekly_90_08, : could not find function &quot;%&gt;%&quot;
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Prediction     n
+##   &lt;fct&gt;     &lt;chr&gt;      &lt;int&gt;
+## 1 Down      Down           9
+## 2 Down      Up            34
+## 3 Up        Down           5
+## 4 Up        Up            56
 </code></pre>
 
 </body>
