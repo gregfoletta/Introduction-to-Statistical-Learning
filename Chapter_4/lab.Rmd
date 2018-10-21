@@ -153,9 +153,19 @@ library(class)
 ```
 
 ```{r 4.6.5_1}
-(smarket_train <- smarket %>% filter(Year < 2005) %>% select(Lag1, Lag2))
-(smarket_test <- smarket %>% filter(Year == 2005) %>% select(Lag1, Lag2))
-smarket_K <- smarket %>% filter(Year < 2005) %>% .[['Direction']]
+smarket_train <- smarket %>% 
+    dplyr::filter(Year < 2005) %>% 
+    dplyr::select(Lag1, Lag2)
+
+smarket_test <- smarket %>% 
+    dplyr::filter(Year == 2005) %>% 
+    dplyr::select(Lag1, Lag2)
+
+smarket_K <- smarket %>% 
+    dplyr::filter(Year < 2005) %>% 
+    dplyr::select(Direction) %>%
+    as_vector()
+
 smarket_knn_pred <- knn(smarket_train, smarket_test, smarket_K, k = 1)
 ```
 

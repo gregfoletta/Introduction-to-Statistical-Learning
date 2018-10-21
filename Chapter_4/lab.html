@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Chapter 4 - Lab - Logistic Regression, LDA, QDA, and KNN</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Chapter 4 - Lab - Logistic Regression, LDA, QDA, and KNN</h1>
+
+<h2>4.6.1 - Stock Market Data</h2>
+
+<p>We examine some numerical and graphical summaries of the <code>Smarket</code> data. We first   </p>
+
+<pre><code class="r">library(tidyverse)
+library(broom)
+library(ISLR)
+</code></pre>
+
+<pre><code class="r">(smarket &lt;- as_tibble(Smarket))
+</code></pre>
+
+<pre><code>## # A tibble: 1,250 x 9
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##  * &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;    
+##  1  2001  0.381 -0.192 -2.62  -1.06   5.01    1.19  0.959 Up       
+##  2  2001  0.959  0.381 -0.192 -2.62  -1.06    1.30  1.03  Up       
+##  3  2001  1.03   0.959  0.381 -0.192 -2.62    1.41 -0.623 Down     
+##  4  2001 -0.623  1.03   0.959  0.381 -0.192   1.28  0.614 Up       
+##  5  2001  0.614 -0.623  1.03   0.959  0.381   1.21  0.213 Up       
+##  6  2001  0.213  0.614 -0.623  1.03   0.959   1.35  1.39  Up       
+##  7  2001  1.39   0.213  0.614 -0.623  1.03    1.44 -0.403 Down     
+##  8  2001 -0.403  1.39   0.213  0.614 -0.623   1.41  0.027 Up       
+##  9  2001  0.027 -0.403  1.39   0.213  0.614   1.16  1.30  Up       
+## 10  2001  1.30   0.027 -0.403  1.39   0.213   1.23  0.287 Up       
+## # ... with 1,240 more rows
+</code></pre>
+
+<p>We take a look at the pairwise correlations between the predictors in the set, removing <code>Direction</code> because it is quantative.</p>
+
+<pre><code class="r">smarket %&gt;% select(-Direction) %&gt;% cor() %&gt;% tidy()
+</code></pre>
+
+<pre><code>## Warning: &#39;tidy.matrix&#39; is deprecated.
+## See help(&quot;Deprecated&quot;)
+</code></pre>
+
+<pre><code>## # A tibble: 8 x 9
+##   .rownames   Year     Lag1     Lag2     Lag3     Lag4     Lag5  Volume
+##   &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Year      1       0.0297   0.0306   0.0332   0.0357   0.0298   0.539 
+## 2 Lag1      0.0297  1       -0.0263  -0.0108  -0.00299 -0.00567  0.0409
+## 3 Lag2      0.0306 -0.0263   1       -0.0259  -0.0109  -0.00356 -0.0434
+## 4 Lag3      0.0332 -0.0108  -0.0259   1       -0.0241  -0.0188  -0.0418
+## 5 Lag4      0.0357 -0.00299 -0.0109  -0.0241   1       -0.0271  -0.0484
+## 6 Lag5      0.0298 -0.00567 -0.00356 -0.0188  -0.0271   1       -0.0220
+## 7 Volume    0.539   0.0409  -0.0434  -0.0418  -0.0484  -0.0220   1     
+## 8 Today     0.0301 -0.0262  -0.0103  -0.00245 -0.00690 -0.0349   0.0146
+## # ... with 1 more variable: Today &lt;dbl&gt;
+</code></pre>
+
+<p>The correlations are all close to zero, with the only larger correlation being between <code>Year</code> and <code>Volume</code>, as the amount of trades have increased over time:</p>
+
+<pre><code class="r">smarket %&gt;% group_by(Year) %&gt;% summarise(sum(Volume))
+</code></pre>
+
+<pre><code>## # A tibble: 5 x 2
+##    Year `sum(Volume)`
+##   &lt;dbl&gt;         &lt;dbl&gt;
+## 1  2001          297.
+## 2  2002          360.
+## 3  2003          349.
+## 4  2004          359.
+## 5  2005          483.
+</code></pre>
+
+<h2>4.6.2 - Logistic Regression</h2>
+
+<p>We now use a logistic regression model in order to predict <code>Direction</code> using <code>Lag1 .. Lag5</code> and <code>Volume</code>. </p>
+
+<p>We recall that trying to use a straight line to fit a binary response that is coded 0|1, there are always p(X) &lt; 0 for some values of X. To avoid this, we must model p(X) with a functon that gives us outputs between 0 and 1. The logistic regression uses the <a href="https://en.wikipedia.org/wiki/Logistic_function">logistic function</a>.</p>
+
+<p>We use the <code>glm()</code>, or <em>generalised linear models</em> function to achieve this.</p>
+
+<p>Le</p>
+
+<pre><code class="r">smarket.glm &lt;- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, smarket, family = binomial)
+smarket.glm %&gt;% tidy() %&gt;% arrange(p.value)
+</code></pre>
+
+<pre><code>## # A tibble: 7 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Lag1        -0.0731     0.0502    -1.46    0.145
+## 2 Volume       0.135      0.158      0.855   0.392
+## 3 Lag2        -0.0423     0.0501    -0.845   0.398
+## 4 (Intercept) -0.126      0.241     -0.523   0.601
+## 5 Lag3         0.0111     0.0499     0.222   0.824
+## 6 Lag5         0.0103     0.0495     0.208   0.835
+## 7 Lag4         0.00936    0.0500     0.187   0.851
+</code></pre>
+
+<p>Looking at the p-values for the predictors, the smallest one is <code>Lag1</code> with 0.15, which is larger than our general 0.05 consideration for statistical significance. The negative correlation tells us that if the stock market went up yesterday, it&#39;s more likely to go down today.</p>
+
+<p>The <code>predict()</code> function can be used to predict the probability that the stocket market will go up given the values of the predictors. The <code>type = response</code> option tells R to output probabilities of the form <code>P(Y = 1|X)</code> - the probability that Y equals 1 given X. If no data is given to <code>predict()</code>, it computes the probabilities for the training data.</p>
+
+<p>Lets add these probabilities as a column <code>glm.pred</code> to the <code>smarket</code> data.</p>
+
+<pre><code class="r">(smarket &lt;- smarket %&gt;% add_column(glm.pred = predict(smarket.glm, type = &quot;response&quot;)))
+</code></pre>
+
+<pre><code>## # A tibble: 1,250 x 10
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;    
+##  1  2001  0.381 -0.192 -2.62  -1.06   5.01    1.19  0.959 Up       
+##  2  2001  0.959  0.381 -0.192 -2.62  -1.06    1.30  1.03  Up       
+##  3  2001  1.03   0.959  0.381 -0.192 -2.62    1.41 -0.623 Down     
+##  4  2001 -0.623  1.03   0.959  0.381 -0.192   1.28  0.614 Up       
+##  5  2001  0.614 -0.623  1.03   0.959  0.381   1.21  0.213 Up       
+##  6  2001  0.213  0.614 -0.623  1.03   0.959   1.35  1.39  Up       
+##  7  2001  1.39   0.213  0.614 -0.623  1.03    1.44 -0.403 Down     
+##  8  2001 -0.403  1.39   0.213  0.614 -0.623   1.41  0.027 Up       
+##  9  2001  0.027 -0.403  1.39   0.213  0.614   1.16  1.30  Up       
+## 10  2001  1.30   0.027 -0.403  1.39   0.213   1.23  0.287 Up       
+## # ... with 1,240 more rows, and 1 more variable: glm.pred &lt;dbl&gt;
+</code></pre>
+
+<p>We add another column with the probabilities converted into class labels <code>Up</code> and <code>Down</code>.</p>
+
+<pre><code class="r">(smarket &lt;- smarket %&gt;% mutate(Pred = ifelse(glm.pred &lt; .5, &quot;Down&quot;, &quot;Up&quot;)))
+</code></pre>
+
+<pre><code>## # A tibble: 1,250 x 11
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;    
+##  1  2001  0.381 -0.192 -2.62  -1.06   5.01    1.19  0.959 Up       
+##  2  2001  0.959  0.381 -0.192 -2.62  -1.06    1.30  1.03  Up       
+##  3  2001  1.03   0.959  0.381 -0.192 -2.62    1.41 -0.623 Down     
+##  4  2001 -0.623  1.03   0.959  0.381 -0.192   1.28  0.614 Up       
+##  5  2001  0.614 -0.623  1.03   0.959  0.381   1.21  0.213 Up       
+##  6  2001  0.213  0.614 -0.623  1.03   0.959   1.35  1.39  Up       
+##  7  2001  1.39   0.213  0.614 -0.623  1.03    1.44 -0.403 Down     
+##  8  2001 -0.403  1.39   0.213  0.614 -0.623   1.41  0.027 Up       
+##  9  2001  0.027 -0.403  1.39   0.213  0.614   1.16  1.30  Up       
+## 10  2001  1.30   0.027 -0.403  1.39   0.213   1.23  0.287 Up       
+## # ... with 1,240 more rows, and 2 more variables: glm.pred &lt;dbl&gt;,
+## #   Pred &lt;chr&gt;
+</code></pre>
+
+<p>We&#39;ll now create a &#39;confusion&#39; matrix. In base R this is done using <code>table()</code>. but we&#39;ll use dplyr functions. We also compute the fraction of days for which the prediction was correct.</p>
+
+<pre><code class="r">smarket %&gt;% group_by(Direction, Pred) %&gt;% tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Pred      n
+##   &lt;fct&gt;     &lt;chr&gt; &lt;int&gt;
+## 1 Down      Down    145
+## 2 Down      Up      457
+## 3 Up        Down    141
+## 4 Up        Up      507
+</code></pre>
+
+<pre><code class="r">smarket %&gt;% summarise(mean(Direction == Pred))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   `mean(Direction == Pred)`
+##                       &lt;dbl&gt;
+## 1                     0.522
+</code></pre>
+
+<p>This 0.522, or 52%, means the training error rate is 48%. Training error rates tend to underestimate the test error rate. In order to better assess the model, we&#39;ll <em>hold out</em> some of the data. We&#39;ll train our model on the years 2001 - 2004, and test it against 2005.</p>
+
+<pre><code class="r">smarket_training &lt;- smarket %&gt;% 
+    filter(Year &lt; 2005) %&gt;% 
+    glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, ., family = binomial)
+
+smarket_test &lt;- smarket %&gt;% 
+    filter(Year == 2005) %&gt;% 
+    mutate(Prob = predict(smarket_training, ., type = &#39;response&#39;), Pred = ifelse(Prob &lt; .5, &#39;Down&#39;, &#39;Up&#39;))
+
+smarket_test %&gt;% group_by(Direction, Pred) %&gt;% tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Pred      n
+##   &lt;fct&gt;     &lt;chr&gt; &lt;int&gt;
+## 1 Down      Down     77
+## 2 Down      Up       34
+## 3 Up        Down     97
+## 4 Up        Up       44
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% summarise(mean(Direction == Pred))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   `mean(Direction == Pred)`
+##                       &lt;dbl&gt;
+## 1                     0.480
+</code></pre>
+
+<p>We can see that we&#39;re now at a mean of 0.48, or 48%, which means our error rate is 52%. This is worse that just guessing.</p>
+
+<p>Let&#39;s reduce the regression to only using <code>Lag1</code> and <code>Lag2</code>, which had the lowest p-values.</p>
+
+<pre><code class="r">smarket_training &lt;- smarket %&gt;% 
+    filter(Year &lt; 2005) %&gt;% 
+    glm(Direction ~ Lag1 + Lag2, ., family = binomial)
+
+smarket_test &lt;- smarket %&gt;% 
+    filter(Year == 2005) %&gt;% 
+    mutate(Prob = predict(smarket_training, ., type = &#39;response&#39;), Pred = ifelse(Prob &lt; .5, &#39;Down&#39;, &#39;Up&#39;))
+
+smarket_test %&gt;% group_by(Direction, Pred) %&gt;% tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction Pred      n
+##   &lt;fct&gt;     &lt;chr&gt; &lt;int&gt;
+## 1 Down      Down     35
+## 2 Down      Up       76
+## 3 Up        Down     35
+## 4 Up        Up      106
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% summarise(mean(Direction == Pred))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   `mean(Direction == Pred)`
+##                       &lt;dbl&gt;
+## 1                     0.560
+</code></pre>
+
+<p>Slightly better, with 56% of the daily movements predicted. Let&#39;s see what the predictions are for certain values of <code>Lag1</code> and <code>Lag2</code>:</p>
+
+<pre><code class="r">predict(smarket_training, tibble(Lag1 = c(1.2, 1.5), Lag2 = c(1.1, -0.8)), type = &#39;response&#39;)
+</code></pre>
+
+<pre><code>##         1         2 
+## 0.4791462 0.4960939
+</code></pre>
+
+<h2>4.6.3 - Linear Discriminant Analysis</h2>
+
+<p>Now we perform linear discriminant analysis on the data. Logistic regression involves directly modeling Pr(Y = k|X = x) using the logistic function for the case of two response classes.</p>
+
+<p>In the LDA approach, the conditional distribution of the predictors X is modeled in each of the response classes Y, and then use Bayes&#39; theorem to flip these around into estimates for Pr(Y = X|X=x).</p>
+
+<pre><code class="r">library(MASS)
+</code></pre>
+
+<p>There doesn&#39;t appear to be any broom tidyers for this, so we&#39;ll have to do it in a semi base R way.</p>
+
+<pre><code class="r">(smarket_lda_fit &lt;- smarket %&gt;% filter(Year &lt; 2005) %&gt;% lda(Direction ~ Lag1 + Lag2, .))
+</code></pre>
+
+<pre><code>## Call:
+## lda(Direction ~ Lag1 + Lag2, data = .)
+## 
+## Prior probabilities of groups:
+##     Down       Up 
+## 0.491984 0.508016 
+## 
+## Group means:
+##             Lag1        Lag2
+## Down  0.04279022  0.03389409
+## Up   -0.03954635 -0.03132544
+## 
+## Coefficients of linear discriminants:
+##             LD1
+## Lag1 -0.6420190
+## Lag2 -0.5135293
+</code></pre>
+
+<pre><code class="r">plot(smarket_lda_fit)
+</code></pre>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk lab_4.6.3_1"/></p>
+
+<p>We see the prior probabilities of the groups, and the group means which are the average of each predictor within each class. We also see a plot of the linear dicriminants by computing the function with the coefficients over the training data.</p>
+
+<pre><code class="r">(smarket_test &lt;- smarket_test %&gt;% mutate(lda.pred = predict(smarket_lda_fit, .)$class))
+</code></pre>
+
+<pre><code>## # A tibble: 252 x 13
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;    
+##  1  2005 -0.134  0.008 -0.007  0.715 -0.431  0.787 -0.812 Down     
+##  2  2005 -0.812 -0.134  0.008 -0.007  0.715  1.51  -1.17  Down     
+##  3  2005 -1.17  -0.812 -0.134  0.008 -0.007  1.72  -0.363 Down     
+##  4  2005 -0.363 -1.17  -0.812 -0.134  0.008  1.74   0.351 Up       
+##  5  2005  0.351 -0.363 -1.17  -0.812 -0.134  1.57  -0.143 Down     
+##  6  2005 -0.143  0.351 -0.363 -1.17  -0.812  1.48   0.342 Up       
+##  7  2005  0.342 -0.143  0.351 -0.363 -1.17   1.49  -0.61  Down     
+##  8  2005 -0.61   0.342 -0.143  0.351 -0.363  1.49   0.398 Up       
+##  9  2005  0.398 -0.61   0.342 -0.143  0.351  1.56  -0.863 Down     
+## 10  2005 -0.863  0.398 -0.61   0.342 -0.143  1.51   0.6   Up       
+## # ... with 242 more rows, and 4 more variables: glm.pred &lt;dbl&gt;,
+## #   Pred &lt;chr&gt;, Prob &lt;dbl&gt;, lda.pred &lt;fct&gt;
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% group_by(Direction, lda.pred) %&gt;% tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction lda.pred     n
+##   &lt;fct&gt;     &lt;fct&gt;    &lt;int&gt;
+## 1 Down      Down        35
+## 2 Down      Up          76
+## 3 Up        Down        35
+## 4 Up        Up         106
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% summarise(mean(Direction != lda.pred))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   `mean(Direction != lda.pred)`
+##                           &lt;dbl&gt;
+## 1                         0.440
+</code></pre>
+
+<h2>4.6.4 - Quadratic Discriminant Analysis</h2>
+
+<p>We now apply QDA to the stock market data in the same manner.</p>
+
+<pre><code class="r">(smarket_qda_fit &lt;- smarket %&gt;% filter(Year &lt; 2005) %&gt;% qda(Direction ~ Lag1 + Lag2, .))
+</code></pre>
+
+<pre><code>## Call:
+## qda(Direction ~ Lag1 + Lag2, data = .)
+## 
+## Prior probabilities of groups:
+##     Down       Up 
+## 0.491984 0.508016 
+## 
+## Group means:
+##             Lag1        Lag2
+## Down  0.04279022  0.03389409
+## Up   -0.03954635 -0.03132544
+</code></pre>
+
+<pre><code class="r">(smarket_test &lt;- smarket_test %&gt;% mutate(qda.pred = predict(smarket_qda_fit, .)$class))
+</code></pre>
+
+<pre><code>## # A tibble: 252 x 14
+##     Year   Lag1   Lag2   Lag3   Lag4   Lag5 Volume  Today Direction
+##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;    
+##  1  2005 -0.134  0.008 -0.007  0.715 -0.431  0.787 -0.812 Down     
+##  2  2005 -0.812 -0.134  0.008 -0.007  0.715  1.51  -1.17  Down     
+##  3  2005 -1.17  -0.812 -0.134  0.008 -0.007  1.72  -0.363 Down     
+##  4  2005 -0.363 -1.17  -0.812 -0.134  0.008  1.74   0.351 Up       
+##  5  2005  0.351 -0.363 -1.17  -0.812 -0.134  1.57  -0.143 Down     
+##  6  2005 -0.143  0.351 -0.363 -1.17  -0.812  1.48   0.342 Up       
+##  7  2005  0.342 -0.143  0.351 -0.363 -1.17   1.49  -0.61  Down     
+##  8  2005 -0.61   0.342 -0.143  0.351 -0.363  1.49   0.398 Up       
+##  9  2005  0.398 -0.61   0.342 -0.143  0.351  1.56  -0.863 Down     
+## 10  2005 -0.863  0.398 -0.61   0.342 -0.143  1.51   0.6   Up       
+## # ... with 242 more rows, and 5 more variables: glm.pred &lt;dbl&gt;,
+## #   Pred &lt;chr&gt;, Prob &lt;dbl&gt;, lda.pred &lt;fct&gt;, qda.pred &lt;fct&gt;
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% group_by(Direction, qda.pred) %&gt;% tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Direction [?]
+##   Direction qda.pred     n
+##   &lt;fct&gt;     &lt;fct&gt;    &lt;int&gt;
+## 1 Down      Down        30
+## 2 Down      Up          81
+## 3 Up        Down        20
+## 4 Up        Up         121
+</code></pre>
+
+<pre><code class="r">smarket_test %&gt;% summarise(mean(Direction != qda.pred))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   `mean(Direction != qda.pred)`
+##                           &lt;dbl&gt;
+## 1                         0.401
+</code></pre>
+
+<p>We now have an error rate of 40.1%, which is reasonably good considering the nature of the stock market.</p>
+
+<h2>4.6.5 - K-nearest Neighbours</h2>
+
+<p>We now perform KNN analysis with the <code>knn()</code> function. It&#39;s slightly different than the others in that in that rather than a train/test two step, it forms predictions from a single command.</p>
+
+<p>It requires four inputs:</p>
+
+<ol>
+<li>A matrix with the predictors of the training data.</li>
+<li>A matrix with the predictors of the test data.A</li>
+<li>A vector containing class labels for the training observations.</li>
+<li>A value for K, the number of nearest neighbours.</li>
+</ol>
+
+<pre><code class="r">library(class)
+</code></pre>
+
+<pre><code class="r">smarket_train &lt;- smarket %&gt;% 
+    dplyr::filter(Year &lt; 2005) %&gt;% 
+    dplyr::select(Lag1, Lag2)
+
+smarket_test &lt;- smarket %&gt;% 
+    dplyr::filter(Year == 2005) %&gt;% 
+    dplyr::select(Lag1, Lag2)
+
+smarket_K &lt;- smarket %&gt;% 
+    dplyr::filter(Year &lt; 2005) %&gt;% 
+    dplyr::select(Direction) %&gt;%
+    as_vector()
+
+smarket_knn_pred &lt;- knn(smarket_train, smarket_test, smarket_K, k = 1)
+</code></pre>
+
+<h2>4.6.6 - Caravan Insurance Data</h2>
+
+<p>We apply the KNN approach to the <code>Caravan</code> data set. It contains 85 predictors for the 5,822 individuals. The response variable is <code>Purchase</code>, which indicates whether or not a given individial purchases a caravan insurance policy. The KNN classifier predicts the class of a given test by identifying observations that are nearest to it. Thus the scale of the data matters.</p>
+
+<p>We can standardise the data so that all the data has a mean of 0 and a standard deviation of 1. We do this using the <code>scale()</code> function.</p>
+
+<pre><code class="r">caravan &lt;- as_tibble(Caravan)
+std_caravan &lt;- caravan %&gt;% select(-Purchase) %&gt;% scale() %&gt;% as_tibble()
+</code></pre>
+
+<pre><code>## Error in select(., -Purchase): unused argument (-Purchase)
+</code></pre>
+
+<p>We split the observations into training and test sets.</p>
+
+<pre><code class="r">std_caravan_test &lt;- std_caravan %&gt;% slice(1:1000)
+</code></pre>
+
+<pre><code>## Error in eval(lhs, parent, parent): object &#39;std_caravan&#39; not found
+</code></pre>
+
+<pre><code class="r">std_caravan_train &lt;- std_caravan %&gt;% slice(1001:nrow(.))
+</code></pre>
+
+<pre><code>## Error in eval(lhs, parent, parent): object &#39;std_caravan&#39; not found
+</code></pre>
+
+<pre><code class="r">caravan_test_Y &lt;- caravan %&gt;% slice(1:1000) %&gt;% .[[&#39;Purchase&#39;]]
+caravan_train_Y &lt;- caravan %&gt;% slice(1001:nrow(.)) %&gt;% .[[&#39;Purchase&#39;]]
+
+caravan_knn_pred &lt;- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 1)
+</code></pre>
+
+<pre><code>## Error in as.matrix(train): object &#39;std_caravan_train&#39; not found
+</code></pre>
+
+<pre><code class="r">mean(caravan_knn_pred != caravan_test_Y)
+</code></pre>
+
+<pre><code>## Error in mean(caravan_knn_pred != caravan_test_Y): object &#39;caravan_knn_pred&#39; not found
+</code></pre>
+
+<p>The KNN error rate is just udner 12%. This appears to be good, but since only 6% of the customers purchased insurance, we could get the error rate down to 6% by always predicting <code>No</code>.</p>
+
+<p>Perhaps the company would like to sell insurance to only those customers who are likely to purchase it. We don&#39;t look at the overall error rate, but the error rate for those who are predicted to buy.</p>
+
+<pre><code class="r">tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %&gt;% 
+    group_by(pred_Y, test_Y) %&gt;% 
+    tally()
+</code></pre>
+
+<pre><code>## Error in eval_tidy(xs[[i]], unique_output): object &#39;caravan_knn_pred&#39; not found
+</code></pre>
+
+<p>In this instance, we have <code>10/(67+10) = 13%</code></p>
+
+<p>Let&#39;s change K = 5.</p>
+
+<pre><code class="r">caravan_knn_pred &lt;- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 4)
+</code></pre>
+
+<pre><code>## Error in as.matrix(train): object &#39;std_caravan_train&#39; not found
+</code></pre>
+
+<pre><code class="r">tibble(test_Y = caravan_test_Y, pred_Y = caravan_knn_pred) %&gt;% 
+    group_by(pred_Y, test_Y) %&gt;% 
+    tally()
+</code></pre>
+
+<pre><code>## Error in eval_tidy(xs[[i]], unique_output): object &#39;caravan_knn_pred&#39; not found
+</code></pre>
+
+<p>This gives us <code>4/(11+4) = 26%</code></p>
+
+</body>
+
+</html>

@@ -1,9 +1,10 @@
 # Chapter 4 - Applied
 
 ```{r setup, message = F, echo = F}
-library(tidyverse)
 library(broom)
 library(ISLR)
+library(MASS)
+library(tidyverse)
 ```
 
 ## 10) 'Weekly' Data Set
@@ -48,7 +49,6 @@ We can see that the logistic regression does well to predict when the market goe
 ```{r 10_d_1}
 glm_weekly_90_08 <- weekly %>% 
     dplyr::filter(Year >= 1990 && Year <= 2008) %>% 
-    select(Direction, Lag2) %>% 
     glm(Direction~Lag2,., family = 'binomial')
 
 weekly %>% 
@@ -57,3 +57,157 @@ weekly %>%
     group_by(Direction, Prediction) %>% 
     tally()
 ```
+
+### e)
+*Repeat (d) using LDA.*
+
+```{r 10_e_1}
+lda_weekly_90_08 <- weekly %>% 
+    dplyr::filter(Year <= 2008) %>% 
+    lda(Direction~Lag2, .)
+
+weekly %>% 
+    dplyr::filter(Year > 2008) %>% 
+    mutate(Prediction = ifelse(predict(lda_weekly_90_08, .)$x < .5, "Down", "Up")) %>% 
+    group_by(Direction, Prediction) %>% 
+    tally()
+```
+
+### f)
+*Repeat (d) using QDA.*
+
+```{r 10_f_1}
+qda_weekly_90_08 <- weekly %>% 
+    dplyr::filter(Year <= 2008) %>% 
+    qda(Direction~Lag2, .)
+
+weekly %>%
+    dplyr::filter(Year > 2008) %>%
+    mutate(Prediction = predict(qda_weekly_90_08, .)$class) %>%
+    group_by(Direction, Prediction) %>%
+    tally()
+```
+
+### g)
+```{r 10_g_1}
+library(class)
+weekly_train <- weekly %>% dplyr::filter(Year <= 2008) %>% dplyr::select(Lag2)
+weekly_test <- weekly %>% dplyr::filter(Year > 2008) %>% dplyr::select(Lag2)
+weekly_K <- weekly %>% dplyr::filter(Year <= 2008) %>% dplyr::select(Direction) %>% as_vector()
+weekly %>% dplyr::filter(Year > 2008) %>% mutate(Prediction = knn(weekly_train, weekly_test, weekly_K, 1)) %>% group_by(Direction, Prediction) %>% tally()
+```
+
+### h)
+*Which of these methods appears to provide the best results on this data?*
+
+The error rates are:
+* Logistic: (34 + 5) / 104 = 37.5%
+* LDA: (18 + 37)/104 = 52.8%
+* QDA: (43 / 104) = 41.3%
+* KNN: (22 + 29) / 104 = 49%
+
+THe logistic regression provides the bes
+
+### i)
+*Experiment with different combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the heldout data. Note that you should also experiment with values for K in the KNN classifier.*
+
+## 11) Auto Data Set
+
+### a)
+*Create a binary variable, mpg01 , that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may find it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.*
+
+```{r 11_a_1}
+auto <- as_tibble(Auto) %>% mutate(mpg01 = ifelse(mpg >= median(mpg), 1, 0))
+```
+
+### b)
+*Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01 ? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.*
+
+```{r 11_b_1}
+library(corrplot)
+auto %>% dplyr::select(-name) %>% cor() %>% corrplot()
+auto %>% ggplot() + geom_point(aes(horsepower, displacement, colour = as.factor(mpg01)))
+```
+
+We see a strong negative correlation between mpg01 and cylinders, displacement, horsepower and weight.
+
+### c)
+*Split the data into a training set and a test set.*
+
+We keep all the data in the same tibble, but use a random binomial to split the set:
+```{r 11_c_1}
+set.seed(1)
+auto <- auto %>% dplyr::mutate(training_set = rbinom(n = n(), 1, .5) == 1)
+```
+
+### d)
+*Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+
+```{r 11_d_1}
+mpg.lda <- auto %>% dplyr::filter(training_set) %>% lda(mpg01 ~ cylinders+displacement+horsepower+weight, .)
+auto <- auto %>% mutate(Prediction = predict(mpg.lda, .)$class)
+auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, Prediction) %>% tally()
+```
+
+The test error is 14 + 6 /  212 or 9.4%
+
+### e)
+*Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+
+```{r 11_e_1}
+mpg.qda <- auto %>% qda(mpg01 ~ cylinders+displacement+horsepower+weight, .)
+auto <- auto %>% mutate(qda_prediction = predict(mpg.qda, .)$class)
+auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, qda_prediction) %>% tally()
+```
+
+The test error is 9 + 10 / 212 or 8.9%
+
+### f)
+*Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+
+```{r 11_f_1}
+mpg.logistic <- auto %>% glm(mpg01 ~ cylinders+displacement+horsepower+weight, ., family = binomial)
+auto <- auto %>% mutate(lgstc_prediction = ifelse(predict(mpg.logistic, ., type = 'response') < .5, '0', '1'))
+auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, lgstc_prediction) %>% tally()
+```
+
+The test error is 12 + 10 / 212 or 10%.
+
+### g)
+*Perform KNN on the training data, with several values of K, in order to predict mpg01 . Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?*
+
+```{r 11_g_1}
+auto_knn_train <- auto %>% 
+    dplyr::filter(training_set) %>% 
+    dplyr::select(mpg01, cylinders, displacement, horsepower, weight)
+
+auto_knn_test <- auto %>% 
+    dplyr::filter(!training_set) %>% 
+    dplyr::select(mpg01, cylinders, displacement, horsepower, weight)
+
+auto_knn_K <- auto %>% 
+    dplyr::filter(training_set) %>% 
+    dplyr::select(mpg01) %>% as_vector()
+
+auto %>% dplyr::filter(!training_set) %>% 
+    add_column(knn.pred = knn(auto_knn_train, auto_knn_test, auto_knn_K, k = 1)) %>% 
+    group_by(mpg01, knn.pred) %>% 
+    tally()
+
+auto %>% dplyr::filter(!training_set) %>% 
+    add_column(knn.pred = knn(auto_knn_train, auto_knn_test, auto_knn_K, k = 5)) %>% 
+    group_by(mpg01, knn.pred) %>% 
+    tally()
+
+auto %>% dplyr::filter(!training_set) %>% 
+    add_column(knn.pred = knn(auto_knn_train, auto_knn_test, auto_knn_K, k = 20)) %>% 
+    group_by(mpg01, knn.pred) %>% 
+    tally()
+```
+
+Test error rates:
+* k = 1: 10.3%
+* k = 5: 11.7%
+* k = 10: 12.2%
+
+

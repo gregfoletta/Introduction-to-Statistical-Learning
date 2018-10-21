@@ -459,28 +459,20 @@ library(class)
 
 
 ```r
-(smarket_train <- smarket %>% filter(Year < 2005) %>% select(Lag1, Lag2))
-```
+smarket_train <- smarket %>% 
+    dplyr::filter(Year < 2005) %>% 
+    dplyr::select(Lag1, Lag2)
 
-```
-## Error in select(., Lag1, Lag2): unused arguments (Lag1, Lag2)
-```
+smarket_test <- smarket %>% 
+    dplyr::filter(Year == 2005) %>% 
+    dplyr::select(Lag1, Lag2)
 
-```r
-(smarket_test <- smarket %>% filter(Year == 2005) %>% select(Lag1, Lag2))
-```
+smarket_K <- smarket %>% 
+    dplyr::filter(Year < 2005) %>% 
+    dplyr::select(Direction) %>%
+    as_vector()
 
-```
-## Error in select(., Lag1, Lag2): unused arguments (Lag1, Lag2)
-```
-
-```r
-smarket_K <- smarket %>% filter(Year < 2005) %>% .[['Direction']]
 smarket_knn_pred <- knn(smarket_train, smarket_test, smarket_K, k = 1)
-```
-
-```
-## Error in as.matrix(train): object 'smarket_train' not found
 ```
 
 ## 4.6.6 - Caravan Insurance Data
