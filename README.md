@@ -25,5 +25,6 @@
 ### Exercises
 * [Lab](Chapter_4/lab.md)
 * [Conceptual](Chapter_4/conceptual.md)
+* [Applied](Chapter_4/applied.md)
 
 
