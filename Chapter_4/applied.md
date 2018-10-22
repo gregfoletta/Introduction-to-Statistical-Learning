@@ -162,8 +162,8 @@ weekly %>% dplyr::filter(Year > 2008) %>% mutate(Prediction = knn(weekly_train, 
 ##   <fct>     <fct>      <int>
 ## 1 Down      Down          21
 ## 2 Down      Up            22
-## 3 Up        Down          29
-## 4 Up        Up            32
+## 3 Up        Down          30
+## 4 Up        Up            31
 ```
 
 ### h)
@@ -369,5 +369,177 @@ Test error rates:
 * k = 1: 10.3%
 * k = 5: 11.7%
 * k = 10: 12.2%
+
+## 12) Writing Functions
+
+### a)
+*Write a function, Power() , that prints out the result of raising 2 to the 3rd power.*
+
+Trivial - skipping
+
+### b)
+*Create a new function, Power2() , that allows you to pass any two numbers, x and a , and prints out the value of x^a .*
+
+
+```r
+to_power <- function(x, y) { return(x^y) }
+print(to_power(2,3))
+```
+
+```
+## [1] 8
+```
+
+### c)
+*Using the Power2() function that you just wrote, compute 10pow3, 8pow17, and 131pow3.*
+
+```r
+print(to_power(10,3))
+```
+
+```
+## [1] 1000
+```
+
+```r
+print(to_power(8,17))
+```
+
+```
+## [1] 2.2518e+15
+```
+
+```r
+print(to_power(131,3))
+```
+
+```
+## [1] 2248091
+```
+
+### d) 
+*Now create a new function, Power3() , that actually returns the result x^a as an R object*
+
+Trivial - skipping
+
+### e)
+*Now using the Power3() function, create a plot of f (x) = xpow2*
+
+
+```r
+tibble(x = -100:100, y = to_power(x, 2)) %>% ggplot(aes(x,y)) + geom_line()
+```
+
+![plot of chunk 12_e_1](figure/12_e_1-1.png)
+
+
+### f) 
+*Create a function, PlotPower() , that allows you to create a plot of x against y*
+
+
+```r
+plot_power <- function(x,y) {
+    tibble(x = x, y = to_power(x, y)) %>% ggplot(aes(x,y)) + geom_line()
+}
+
+plot_power(-100:100, 1)
+```
+
+![plot of chunk 12_f_1](figure/12_f_1-1.png)
+
+```r
+plot_power(-100:100, 2)
+```
+
+![plot of chunk 12_f_1](figure/12_f_1-2.png)
+
+```r
+plot_power(-100:100, 3)
+```
+
+![plot of chunk 12_f_1](figure/12_f_1-3.png)
+
+```r
+plot_power(-100:100, 4)
+```
+
+![plot of chunk 12_f_1](figure/12_f_1-4.png)
+
+## 13) Boston Data Set
+
+*Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.*
+
+Let's create a function which let's us run the logistic, LDA and QDA in one go. It takes the data frame, the formula, and the fraction of the table to use for training. It returns the data frame with prediction columns added.
+
+
+```r
+multi_regression <- function(data, formula, fraction = .5) {
+    train <- sample_frac(data, fraction)
+    logistic.reg <- glm(formula, train, family = 'binomial')
+    lda.reg <- lda(formula, train)
+    qda.reg <- qda(formula, train)
+
+    ret_data <- data %>% 
+        mutate(
+            logistic.pred = ifelse(predict(logistic.reg, ., type = 'response') < .5, 0, 1), 
+            lda.pred = predict(lda.reg, .)$class, 
+            qda.pred = predict(qda.reg, .)$class
+        ) 
+    
+    return(ret_data)
+}
+```
+
+Now let's run this across the Boston data set. We at a qualitative coding variable which denotes whether the crime rate is above or below the median. We then take a look at the correllation matrix:
+
+
+```r
+boston <- as_tibble(Boston)
+boston <- boston %>% mutate(crim_above_med = crim > median(.[['crim']]))
+
+boston %>% cor() %>% corrplot()
+```
+
+![plot of chunk 13_2](figure/13_2-1.png)
+
+We see a positive correlation with indus, nox, age, rad and tax. Let's regress on these:
+
+
+```r
+set.seed(1)
+boston_reg <- boston %>% multi_regression(crim_above_med ~ indus + nox + age + rad + tax)
+boston_reg %>% summarise(logistic_error = mean(as.logical(logistic.pred) != crim_above_med))
+```
+
+```
+## # A tibble: 1 x 1
+##   logistic_error
+##            <dbl>
+## 1          0.101
+```
+
+```r
+boston_reg %>% summarise(lda_error = mean(lda.pred != crim_above_med))
+```
+
+```
+## # A tibble: 1 x 1
+##   lda_error
+##       <dbl>
+## 1     0.156
+```
+
+```r
+boston_reg %>% summarise(qda_error = mean(qda.pred != crim_above_med))
+```
+
+```
+## # A tibble: 1 x 1
+##   qda_error
+##       <dbl>
+## 1     0.168
+```
+
+
 
 
