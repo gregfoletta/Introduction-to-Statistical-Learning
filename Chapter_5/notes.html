@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Chapter 4 - Resampling Methods</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Chapter 4 - Resampling Methods</h1>
+
+<p>Resampling involves repeatedly drawing samples from a training set and refitting a model of interest on each sample.</p>
+
+<h2>5.1 - Cross-validation</h2>
+
+<p>We consider a class of methods that estimate the test error rate by <em>holding out</em> a subset of the training observations from the fitting process. The statistical learning method is then applied to these held out observations.</p>
+
+<h3>5.1.1 - Validation Set</h3>
+
+<p>It involves randomly dividing the available set of observations into two parts: the <em>training set</em> and the <em>validation set</em>. The validation set error rate provides an estimate of the test error rate.</p>
+
+<p><strong>Drawbacks</strong></p>
+
+<ul>
+<li>The validation estimate of the test error rate can be highly variable, depending on which observations are included in the training set.</li>
+<li>Only a subset of the observations are used to fit the model. Since statistical methods perform worse with fewer observations, the validation set error rate may overestimate the test error rate.</li>
+</ul>
+
+<h3>5.1.2 - Leave-One-Out Cross Validation (LOOCV)</h3>
+
+<p>Closesly related to the validation set, but attempts to address it&#39;s drawbacks. Instead of two subsets of the same size, a single observation is used for the validation set. Everything else is part of the training set. The statistical learning method is fit on the n - 1 training observations, and a prediction is made for the excluded observation.</p>
+
+<p>The MSE for the single observation is unbiased but highly variable. The approach is repeated n times to give n MSEs. The LOOCV estimate for the test MSE is the average of these n test error estimates.</p>
+
+<p><strong>Advantages</strong>:</p>
+
+<ul>
+<li>Far less bias than the validation set approach.</li>
+<li>Always yields the same result.</li>
+</ul>
+
+<p>The downside is that the model needs to be fit n times, however for least squares linear or polynomial regression, the following formula holds:</p>
+
+<p>\[ CV_{(n)} = \frac{1}{n}\sum_{i=1}^n\Bigg(\frac{y_i - \hat{y}_i}{1 - h_i}\Bigg)^2 \]</p>
+
+<p>Where \(\hat{y}_i\) is the ith fitted value, and \(h_i\) is the leverage. This does not hold in general.</p>
+
+<h3>5.1.3 - k-Fold Cross Validation</h3>
+
+<p>An alternative to LOOCV is k-fold. This involves randomly dividing the set of observations into k groups - or folds - of approximately equal size. The first fold is treated as a validation set, and the method is fit on the remaining k - 1 folds. The MSE is computed on the observations in the held out fold. The k-fold estimate is then computed by averaging the k MSEs:</p>
+
+<p>\[ CV_{(k)} = \frac{1}{k}\sum_{i=1}^kMSE_i \]</p>
+
+<p>LOOCV is therefore a special case of k-fold where k = n.</p>
+
+<p><em>Advantages:</em></p>
+
+<ul>
+<li>Computational - fit the model only k times, not n.</li>
+</ul>
+
+<h4>Bias-Variance Trade-off</h4>
+
+<p>Another advantage of the k-fold is that it often gives more accurate estimates due to the bias-variance trade-off. The LOOCV gives almost unbiased estimates of he test error, since each training set contains n-1 observations - almost the full data set. For increasing k there is an increase in the bias, since each training set contains (k-1)n/k observations. From a bias reductions perspecive LOOCV is preferable to k-fold.</p>
+
+<p>However from a variance perspective, the LOOCV is the mean of the n fitted models, each of which nearly have the same observations. The outputs are highly correlated with each other. Since the mean of many highly correlated quantities has higher variance, the LOOCV has a higher variane.</p>
+
+<h3>5.1.5 - Cross-validation on Classification Problems</h3>
+
+<p>In this setting, cross-validation works just as described except that rather than using MSE to quantify test error, we instead use the number of misclassifed observations.</p>
+
+<p>\[ CV_{(n)} = \frac{1}{n}\sum_{i=1}^nErr_i\]</p>
+
+<p>where \(Err_i = I(y_i \neq \hat{y}_i)\)</p>
+
+<h1>5.2 - The Bootstrap</h1>
+
+<p>The bootstrap can be used to quantify the uncertainty associated with a given estimator or statistical learning method. Rather than obtaining new data sets from the population, we obtain distinct data sets by repeatedly sampling observations from the original data set.</p>
+
+<p>The procedure is:</p>
+
+<ul>
+<li>Randomly select n observations from the data set \(Z\) <strong>with replacement</strong> - i.e. the same observation can be taken more than once. This gives us \(Z^{*1}\).</li>
+<li>This data set is used to produce a new estimate \(\hat{\alpha}\).</li>
+<li>This is repeated \(B\) times for a large value of \(B\) in order to produce \(Z^{*1},\ldots,Z^{*B}\) data sets and corresponding estimates.</li>
+<li>The standard error of the estimates is then computed using:
+\[ SE^B(\hat{\alpha}) = \sqrt{\frac{1}{B - 1}\sum_{r=1}^B}\Bigg(\hat{\alpha}^{*r} - \frac{1}{B}\sum_{r'=1}^B\hat{\alpha}^{*r'}\Bigg)^2 \]</li>
+</ul>
+
+<p>This services as an estimate of the standard error of \(\hat{\alpha}\) from the original data set.</p>
+
+</body>
+
+</html>

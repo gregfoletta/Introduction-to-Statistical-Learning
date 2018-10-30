@@ -1,0 +1,86 @@
+# Chapter 5 - Lab - Cross-validation and the Bootstrap
+
+```{r setup, message=F}
+library(tidyverse)
+library(ISLR)
+```
+
+## Validation Set
+
+Let's first use the validation set approach. The `sample()` function gives us a random vector of row numbers for our training set. The single number in the first argument is the same as 1:n. 
+
+We can perform a linear regression with `lm()` on only a subset of the observations. We then take the full auto set, take out the training observations with `slice()`, add the prediction for the validation set, and summarise the mean squared error of these predictions.
+
+```{r 5_1}
+set.seed(1)
+auto <- as_tibble(Auto)
+auto_training <- sample(nrow(auto), nrow(auto) / 2)
+auto.lm <- lm(mpg ~ horsepower, auto, subset = auto_training)
+auto %>% 
+    slice(-auto_training) %>% 
+    mutate(lm.pred = predict(auto.lm, .)) %>% 
+    summarise(MSE = mean((mpg - lm.pred)^2))
+```
+
+Let's now run across a number of polynomials and see how the MSE changes:
+
+
+```{r 5_2}
+auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto, subset = auto_training))
+map_df(1:10, 
+    ~ auto %>% 
+       slice(-auto_training) %>% 
+       mutate(lm.pred = predict(auto.lms[[.x]], .)) %>% 
+       summarise(MSE = mean((mpg - lm.pred)^2)) %>% 
+       mutate(poly = .x)
+    ) %>% 
+    ggplot(aes(poly,MSE)) + 
+        geom_point() + 
+        geom_line()
+```
+
+## Leave-one-out Cross Validation
+
+The LOOCV estimate can be automatically computed for any generalised linear model using the `glm()` and `cv.glm()` functions. The `glm()` will perform a linear regression if no 'family' argument is passed.
+
+A note: I attempted to put these into a pipeline, but this resulted in an error. When the `cv.glm()` calculates all of the LOOCV, it uses a capture of the formula to re-run the regression across while 'leaving on out'. However the '.x' in the map statement isn't visible from the environment where it's run, and so an error is thrown.
+
+```{r 5_3}
+library(boot)
+1:5 %>% 
+  map(~glm(mpg~poly(horsepower, degree = .x), data = auto)) %>% 
+  map(~cv.glm(auto, .x)$delta)
+```
+
+We can instead run it in a for loop. We then graph the MSE for each degree of polynomial.
+```{r 5_4}
+cv_error <- rep(0,10)
+for (x in 1:10) { 
+    fit <- glm(mpg~poly(horsepower,x), data = auto)
+    cv_error[x] <- cv.glm(auto, fit)$delta[1] 
+}
+
+tibble(x = 1:10, y = cv_error) %>% 
+    ggplot(aes(x,y)) + 
+        geom_line() + 
+        geom_point()
+```
+
+## k-fold Cross Validation
+
+The `cv.glm()` can also be used to implement k-fold CV. We pass a `k` variable to the formula to achieve this.
+```{r 5_4}
+cv_error <- rep(0,10)
+for (x in 1:10) { 
+    fit <- glm(mpg~poly(horsepower,x), data = auto)
+    cv_error[x] <- cv.glm(auto, fit, K = 10)$delta[1] 
+}
+
+tibble(x = 1:10, y = cv_error) %>% 
+    ggplot(aes(x,y)) + 
+        geom_line() + 
+        geom_point()
+```
+
+## The Bootstrap
+

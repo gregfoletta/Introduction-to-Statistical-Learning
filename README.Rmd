@@ -27,4 +27,6 @@
 * [Conceptual](Chapter_4/conceptual.md)
 * [Applied](Chapter_4/applied.md)
 
+## Chapter 5 - Resampling Methods
 
+* [Notes](Chapter_5/notes.md)
