@@ -2,6 +2,8 @@
 
 
 ```r
+library(broom)
+library(modelr)
 library(tidyverse)
 library(ISLR)
 ```
@@ -86,3 +88,49 @@ tibble(x = 1:10, y = cv_error) %>%
 
 ![plot of chunk 5_4](figure/5_4-1.png)
 
+## k-fold Cross Validation
+
+The `cv.glm()` can also be used to implement k-fold CV. We pass a `k` variable to the formula to achieve this.
+
+```r
+cv_error <- rep(0,10)
+for (x in 1:10) { 
+    fit <- glm(mpg~poly(horsepower,x), data = auto)
+    cv_error[x] <- cv.glm(auto, fit, K = 10)$delta[1] 
+}
+
+tibble(x = 1:10, y = cv_error) %>% 
+    ggplot(aes(x,y)) + 
+        geom_line() + 
+        geom_point()
+```
+
+![plot of chunk 5.3.3_a](figure/5.3.3_a-1.png)
+
+## The Bootstrap
+
+The advantage of a bootstrap is that it can be applied in almost all situations. Two steps are needed:
+* Create a function that computes the statistic of interest.
+* Repeatedly sample observations from the data with replacement.
+
+Let's use the bootstrap to estimate the accuracy of a linear regression. In the pipeline below, we take the auto data set take 100 samples with replacement. On each of these samples we calculate the linear regression of mpg on to horsepower.
+
+For each of the models we get the coefficient of the beta_1 value (using the `tidy()` function) and then calculate the standard error.
+
+
+```r
+set.seed(1)
+auto %>% 
+    bootstrap(n = 100) %>% 
+    mutate(model = map(strap, ~lm(mpg~horsepower, .x))) %>% 
+    mutate(coefs = map(model, ~tidy(.x)[2,])) %>% 
+    unnest(coefs) %>% 
+    summarise(stderr = sd(estimate)/sqrt(n()))
+```
+
+```
+## # A tibble: 1 x 1
+##     stderr
+##      <dbl>
+## 1 0.000762
+```
