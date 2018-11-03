@@ -2,36 +2,33 @@
 
 ```{r setup, message=F}
 library(tidyverse)
+library(modelr)
 library(ISLR)
 ```
 
 ## Validation Set
 
-Let's first use the validation set approach. The `sample()` function gives us a random vector of row numbers for our training set. The single number in the first argument is the same as 1:n. 
+Let's first use the validation set approach. We use `resample_partition()` to generate a training set and a test set.
 
-We can perform a linear regression with `lm()` on only a subset of the observations. We then take the full auto set, take out the training observations with `slice()`, add the prediction for the validation set, and summarise the mean squared error of these predictions.
+We can perform a linear regression with `lm()` on the training observations. We then run the prediction across the test set.
 
 ```{r 5_1}
 set.seed(1)
 auto <- as_tibble(Auto)
-auto_training <- sample(nrow(auto), nrow(auto) / 2)
-auto.lm <- lm(mpg ~ horsepower, auto, subset = auto_training)
-auto %>% 
-    slice(-auto_training) %>% 
-    mutate(lm.pred = predict(auto.lm, .)) %>% 
-    summarise(MSE = mean((mpg - lm.pred)^2))
+auto_sample <- auto %>% resample_partition(c(test = 0.5, train = 0.5))
+auto.lm <- lm(mpg ~ horsepower, data = auto_sample$train)
+auto %>% slice(auto_sample$test$idx) %>% mse(auto.lm, .)
 ```
 
 Let's now run across a number of polynomials and see how the MSE changes:
 
-
 ```{r 5_2}
-auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto, subset = auto_training))
+set.seed(1)
+auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto_sample$train))
 map_df(1:10, 
     ~ auto %>% 
-       slice(-auto_training) %>% 
-       mutate(lm.pred = predict(auto.lms[[.x]], .)) %>% 
-       summarise(MSE = mean((mpg - lm.pred)^2)) %>% 
+       slice(auto_sample$test$idx) %>% 
+       mse(auto.lms[[.x]], .)
        mutate(poly = .x)
     ) %>% 
     ggplot(aes(poly,MSE)) + 
