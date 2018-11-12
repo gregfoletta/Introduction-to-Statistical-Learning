@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Chapter 5 - Lab - Cross-validation and the Bootstrap</title>
+<title>Chapter 5 - Applied</title>
 
 <script type="text/javascript">
 window.onload = function() {
@@ -201,111 +201,250 @@ hr {
 </head>
 
 <body>
-<h1>Chapter 5 - Lab - Cross-validation and the Bootstrap</h1>
+<h1>Chapter 5 - Applied</h1>
 
-<pre><code class="r">library(broom)
+<pre><code class="r">library(ISLR)
+library(broom)
 library(modelr)
 library(tidyverse)
-library(modelr)
-library(ISLR)
 </code></pre>
 
-<h2>Validation Set</h2>
+<h2>5)</h2>
 
-<p>Let&#39;s first use the validation set approach. We use <code>resample_partition()</code> to generate a training set and a test set.</p>
+<p><em>In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.</em></p>
 
-<p>We can perform a linear regression with <code>lm()</code> on the training observations. We then run the prediction across the test set.</p>
+<h3>a)</h3>
+
+<p><em>Fit a logistic regression model that uses income and balance to predict default.</em></p>
+
+<pre><code class="r">default &lt;- as.tibble(Default)
+default.log &lt;- glm(default~balance, data = default, family = binomial)
+</code></pre>
+
+<h3>b)</h3>
+
+<p><em>Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:</em></p>
+
+<h4>i)</h4>
+
+<p><em>Split the sample set into a training set and a validation set.</em></p>
 
 <pre><code class="r">set.seed(1)
-auto &lt;- as_tibble(Auto)
-auto_sample &lt;- auto %&gt;% resample_partition(c(test = 0.5, train = 0.5))
-auto.lm &lt;- lm(mpg ~ horsepower, data = auto_sample$train)
-as.tibble(auto_sample$test) %&gt;% mse(auto.lm, data = .)
+default_split &lt;- resample_partition(default, c(train = 0.5, test = 0.5))
 </code></pre>
 
-<pre><code>## [1] 23.37628
+<h4>ii)</h4>
+
+<p><em>Fit a multiple logistic regression model using only the training observations.</em></p>
+
+<pre><code class="r">default_split_train &lt;- glm(default ~ balance, data = as.tibble(default_split$train), family = binomial)
 </code></pre>
 
-<p>Let&#39;s now run across a number of polynomials and see how the MSE changes:</p>
+<h4>iii)</h4>
 
-<pre><code class="r">auto.lms &lt;- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto_sample$train))
-map_df(1:10, 
-    ~ auto %&gt;% 
-       slice(auto_sample$test$idx) %&gt;% 
-       mse(auto.lms[[.x]], .)
-       mutate(poly = .x)
-    ) %&gt;% 
-    ggplot(aes(poly,MSE)) + 
-        geom_point() + 
-        geom_line()
+<p><em>Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.</em></p>
+
+<pre><code class="r">as.tibble(default_split$test) %&gt;% 
+    mutate(pred_default = ifelse(predict(default_split_train, ., type = &#39;response&#39;) &lt; 0.5, &quot;No&quot;, &quot;Yes&quot;))
 </code></pre>
 
-<pre><code>## Error: &lt;text&gt;:6:8: unexpected symbol
-## 5:        mse(auto.lms[[.x]], .)
-## 6:        mutate
-##           ^
+<pre><code>## # A tibble: 5,001 x 5
+##    default student balance income pred_default
+##    &lt;fct&gt;   &lt;fct&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       
+##  1 No      No        1074. 31767. No          
+##  2 No      No         529. 35704. No          
+##  3 No      Yes        920.  7492. No          
+##  4 No      No         826. 24905. No          
+##  5 No      Yes        809. 17600. No          
+##  6 No      No        1161. 37469. No          
+##  7 No      No         237. 28252. No          
+##  8 No      No        1113. 23810. No          
+##  9 No      No           0  50265. No          
+## 10 No      Yes        528. 17637. No          
+## # ... with 4,991 more rows
 </code></pre>
 
-<h2>Leave-one-out Cross Validation</h2>
+<h4>iv)</h4>
 
-<p>We can use the <code>crossv_kfold()</code> function with an <em>k</em> parameter of the total number of observations. This the becomes the LOOCV. Let&#39;s see what the average MSE is for these observations. To do this, the <code>crossv_kfold()</code> function creates <em>k</em> train and <em>k</em> test resmaple objects. We perform a linear regression on each of the training samples. For each of these models, we calculate the MSE on the test sample, and then summarise the average MSE for each of the samples.</p>
+<p><em>Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.</em></p>
 
-<pre><code class="r">auto %&gt;% 
+<pre><code class="r">as.tibble(default_split$test) %&gt;% 
+    mutate(pred_default = ifelse(predict(default_split_train, ., type = &#39;response&#39;) &lt; 0.5, &quot;No&quot;, &quot;Yes&quot;)) %&gt;% 
+    group_by(default, pred_default) %&gt;% 
+    tally()
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   default [?]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4821
+## 2 No      Yes             11
+## 3 Yes     No             122
+## 4 Yes     Yes             47
+</code></pre>
+
+<p>Out of 5001 observations, 11 + 122 are incorrect. The error rate is therefore (11 + 122) / 5001 = 2.65%</p>
+
+<h3>c)</h3>
+
+<p><em>Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.</em></p>
+
+<p>We&#39;ll be a bit lazy with this and use a for loop.</p>
+
+<pre><code class="r">set.seed(2)
+for (i in 1:3) {
+    default_split &lt;- resample_partition(default, c(train = 0.5, test = 0.5))
+    default_split_train &lt;- glm(default ~ balance, data = as.tibble(default_split$train), family = binomial)
+    as.tibble(default_split$test) %&gt;% 
+        mutate(pred_default = ifelse(predict(default_split_train, ., type = &#39;response&#39;) &lt; 0.5, &quot;No&quot;, &quot;Yes&quot;)) %&gt;% 
+        group_by(default, pred_default) %&gt;% 
+        tally() %&gt;% 
+        print()
+}
+</code></pre>
+
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   default [?]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4827
+## 2 No      Yes             24
+## 3 Yes     No              99
+## 4 Yes     Yes             51
+## # A tibble: 4 x 3
+## # Groups:   default [?]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4826
+## 2 No      Yes             23
+## 3 Yes     No             113
+## 4 Yes     Yes             39
+## # A tibble: 4 x 3
+## # Groups:   default [?]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4807
+## 2 No      Yes             20
+## 3 Yes     No             125
+## 4 Yes     Yes             49
+</code></pre>
+
+<p>We get error rates of 2.4%, 2.8% and 2.7%.</p>
+
+<h3>d)</h3>
+
+<p><em>Now consider a logistic regression model that predicts the prob ability of default using income , balance , and a dummy variable for student . Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.</em></p>
+
+<p>We modify the formula in the <code>glm()</code> to be <code>default ~ balance + student</code>. We then run the three validation set tests and get error percentages of 2.4%, 2.7% and 2.7%. There seems to be no reduction in the error rate by adding in the student variable.</p>
+
+<h2>6)</h2>
+
+<p><em>We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression co efficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.</em></p>
+
+<h3>a)</h3>
+
+<p><em>Using the summary() and glm() functions, determine the estimated standard errors for the coefficients associated with income and balance in a multiple logistic regression model that uses both predictors.</em></p>
+
+<pre><code class="r">glm(default ~ income + balance, data = default, family = &#39;binomial&#39;) %&gt;% tidy()
+</code></pre>
+
+<pre><code>## # A tibble: 3 x 5
+##   term           estimate  std.error statistic   p.value
+##   &lt;chr&gt;             &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) -11.5       0.435         -26.5  2.96e-155
+## 2 income        0.0000208 0.00000499      4.17 2.99e-  5
+## 3 balance       0.00565   0.000227       24.8  3.64e-136
+</code></pre>
+
+<p>We see the standard error for the coefficients is 0.00000499 for income and 0.000227 for balance.</p>
+
+<h3>b) &amp; c)</h3>
+
+<p><em>Use the bootstrap to estimate the standard errors of the logistic regression coefficients</em></p>
+
+<pre><code class="r">set.seed(1)
+default %&gt;% 
+    modelr::bootstrap(n = 20) %&gt;% 
+    mutate(model = map(strap, ~glm(default~income+balance, data = .x, family = &#39;binomial&#39;))) %&gt;% 
+    mutate(tidy = map(model, ~tidy(.x))) %&gt;% 
+    unnest(tidy) %&gt;% 
+    group_by(term) %&gt;% 
+    summarise(avg_stderr = mean(std.error))
+</code></pre>
+
+<pre><code>## # A tibble: 3 x 2
+##   term        avg_stderr
+##   &lt;chr&gt;            &lt;dbl&gt;
+## 1 (Intercept) 0.429     
+## 2 balance     0.000225  
+## 3 income      0.00000498
+</code></pre>
+
+<p>We see the average standard error to be 0.000225 for balance and 0.00000498 for income.</p>
+
+<h3>d)</h3>
+
+<p><em>Comment on the estimated standard errors.</em></p>
+
+<p>The difference in the standard errors from the bootstrap compared to the formula is small: a 1% different from balance and a .2% difference for income.</p>
+
+<h2>7)</h2>
+
+<p><em>Compute the LOOCV error for a simple logistic regression model on the Weekly data set.</em></p>
+
+<h3>a)</h3>
+
+<p><em>Fit a logistic regression model that predicts Direction using Lag1 and Lag2</em></p>
+
+<pre><code class="r">weekly &lt;- as.tibble(Weekly)
+weekly.logistic &lt;- glm(Direction ~ Lag1 + Lag2, data = weekly, family = &#39;binomial&#39;)
+</code></pre>
+
+<h3>b)</h3>
+
+<p><em>Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.</em></p>
+
+<pre><code class="r">weekly.logistic.loo &lt;- glm(Direction ~ Lag1 + Lag2, data = weekly[-1,], family = &#39;binomial&#39;)
+</code></pre>
+
+<h3>c)</h3>
+
+<p><em>Use the model from (b) to predict the direction of the first observation.</em></p>
+
+<pre><code class="r">weekly[1,] %&gt;% 
+    mutate(Prediction = ifelse(predict(weekly.logistic.loo, ., type = &#39;response&#39;) &gt; 0.5, &quot;Up&quot;, &quot;Down&quot;)) %&gt;% 
+    select(Direction, Prediction)
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 2
+##   Direction Prediction
+##   &lt;fct&gt;     &lt;chr&gt;     
+## 1 Down      Up
+</code></pre>
+
+<p>The prediction was &#39;Up&#39;, but the true direction was &#39;Down&#39;.</p>
+
+<h3>d)</h3>
+
+<p><em>Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:
+    * Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2 .
+    * Compute the posterior probability of the market moving up for the ith observation.
+    * Use the posterior probability for the ith observation in order to predict whether or not the market moves up.
+    * Determine whether or not an error was made in predicting the direction for the ith observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a .</em></p>
+
+<pre><code class="r">weekly %&gt;% 
     crossv_kfold(k = nrow(.)) %&gt;% 
-    mutate(model = map(train, ~lm(mpg~horsepower, data = .))) %&gt;% 
-    mutate(mse = map2_dbl(model, test, ~mse(.x, .y))) %&gt;% 
-    summarise(mean_mse = mean(mse))
+    mutate(model = map(train, ~glm(Direction ~ Lag1 + Lag2, data = .x, family = &#39;binomial&#39;))) %&gt;% 
+    mutate(prediction = map2_chr(model, test, ~ifelse(predict(.x, .y, type = &#39;response&#39;) &gt; 0.5, &quot;Up&quot;, &quot;Down&quot;))) %&gt;% 
+    mutate(test_direction = map_chr(test, ~as.character(as.tibble(.x)[[&#39;Direction&#39;]]))) %&gt;% 
+    summarise(error = mean(prediction != test_direction))
 </code></pre>
 
 <pre><code>## # A tibble: 1 x 1
-##   mean_mse
-##      &lt;dbl&gt;
-## 1     24.2
-</code></pre>
-
-<h2>k-fold Cross Validation</h2>
-
-<p>k-fold is the same as LOOCV, except we&#39;re reducing the number of folds using the <em>k</em> parameter.</p>
-
-<pre><code class="r">auto %&gt;%
-    crossv_kfold(k = 5) %&gt;%
-    mutate(model = map(train, ~lm(mpg~horsepower, data = .))) %&gt;%
-    mutate(mse = map2_dbl(model, test, ~mse(.x, .y))) %&gt;%
-    summarise(mean_mse = mean(mse))
-</code></pre>
-
-<pre><code>## # A tibble: 1 x 1
-##   mean_mse
-##      &lt;dbl&gt;
-## 1     24.1
-</code></pre>
-
-<h2>The Bootstrap</h2>
-
-<p>The advantage of a bootstrap is that it can be applied in almost all situations. Two steps are needed:</p>
-
-<ul>
-<li>Create a function that computes the statistic of interest.</li>
-<li>Repeatedly sample observations from the data with replacement.</li>
-</ul>
-
-<p>Let&#39;s use the bootstrap to estimate the accuracy of a linear regression. In the pipeline below, we take the auto data set take 100 samples with replacement. On each of these samples we calculate the linear regression of mpg on to horsepower.</p>
-
-<p>For each of the models we get the coefficient of the beta_1 value (using the <code>tidy()</code> function) and then calculate the standard error.</p>
-
-<pre><code class="r">set.seed(1)
-auto %&gt;% 
-    bootstrap(n = 100) %&gt;% 
-    mutate(model = map(strap, ~lm(mpg~horsepower, .x))) %&gt;% 
-    mutate(coefs = map(model, ~tidy(.x)[2,])) %&gt;% 
-    unnest(coefs) %&gt;% 
-    summarise(stderr = sd(estimate)/sqrt(n()))
-</code></pre>
-
-<pre><code>## # A tibble: 1 x 1
-##     stderr
-##      &lt;dbl&gt;
-## 1 0.000762
+##   error
+##   &lt;dbl&gt;
+## 1 0.450
 </code></pre>
 
 </body>

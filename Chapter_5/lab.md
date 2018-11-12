@@ -5,45 +5,38 @@
 library(broom)
 library(modelr)
 library(tidyverse)
+library(modelr)
 library(ISLR)
 ```
 
 ## Validation Set
 
-Let's first use the validation set approach. The `sample()` function gives us a random vector of row numbers for our training set. The single number in the first argument is the same as 1:n. 
+Let's first use the validation set approach. We use `resample_partition()` to generate a training set and a test set.
 
-We can perform a linear regression with `lm()` on only a subset of the observations. We then take the full auto set, take out the training observations with `slice()`, add the prediction for the validation set, and summarise the mean squared error of these predictions.
+We can perform a linear regression with `lm()` on the training observations. We then run the prediction across the test set.
 
 
 ```r
 set.seed(1)
 auto <- as_tibble(Auto)
-auto_training <- sample(nrow(auto), nrow(auto) / 2)
-auto.lm <- lm(mpg ~ horsepower, auto, subset = auto_training)
-auto %>% 
-    slice(-auto_training) %>% 
-    mutate(lm.pred = predict(auto.lm, .)) %>% 
-    summarise(MSE = mean((mpg - lm.pred)^2))
+auto_sample <- auto %>% resample_partition(c(test = 0.5, train = 0.5))
+auto.lm <- lm(mpg ~ horsepower, data = auto_sample$train)
+as.tibble(auto_sample$test) %>% mse(auto.lm, data = .)
 ```
 
 ```
-## # A tibble: 1 x 1
-##     MSE
-##   <dbl>
-## 1  26.1
+## [1] 23.37628
 ```
 
 Let's now run across a number of polynomials and see how the MSE changes:
 
 
-
 ```r
-auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto, subset = auto_training))
+auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto_sample$train))
 map_df(1:10, 
     ~ auto %>% 
-       slice(-auto_training) %>% 
-       mutate(lm.pred = predict(auto.lms[[.x]], .)) %>% 
-       summarise(MSE = mean((mpg - lm.pred)^2)) %>% 
+       slice(auto_sample$test$idx) %>% 
+       mse(auto.lms[[.x]], .)
        mutate(poly = .x)
     ) %>% 
     ggplot(aes(poly,MSE)) + 
@@ -51,61 +44,52 @@ map_df(1:10,
         geom_line()
 ```
 
-![plot of chunk 5_2](figure/5_2-1.png)
+```
+## Error: <text>:6:8: unexpected symbol
+## 5:        mse(auto.lms[[.x]], .)
+## 6:        mutate
+##           ^
+```
 
 ## Leave-one-out Cross Validation
 
-The LOOCV estimate can be automatically computed for any generalised linear model using the `glm()` and `cv.glm()` functions. The `glm()` will perform a linear regression if no 'family' argument is passed.
-
-A note: I attempted to put these into a pipeline, but this resulted in an error. When the `cv.glm()` calculates all of the LOOCV, it uses a capture of the formula to re-run the regression across while 'leaving on out'. However the '.x' in the map statement isn't visible from the environment where it's run, and so an error is thrown.
+We can use the `crossv_kfold()` function with an *k* parameter of the total number of observations. This the becomes the LOOCV. Let's see what the average MSE is for these observations. To do this, the `crossv_kfold()` function creates *k* train and *k* test resmaple objects. We perform a linear regression on each of the training samples. For each of these models, we calculate the MSE on the test sample, and then summarise the average MSE for each of the samples.
 
 
 ```r
-library(boot)
-1:5 %>% 
-  map(~glm(mpg~poly(horsepower, degree = .x), data = auto)) %>% 
-  map(~cv.glm(auto, .x)$delta)
+auto %>% 
+    crossv_kfold(k = nrow(.)) %>% 
+    mutate(model = map(train, ~lm(mpg~horsepower, data = .))) %>% 
+    mutate(mse = map2_dbl(model, test, ~mse(.x, .y))) %>% 
+    summarise(mean_mse = mean(mse))
 ```
 
 ```
-## Error in poly(horsepower, degree = .x): (list) object cannot be coerced to type 'double'
+## # A tibble: 1 x 1
+##   mean_mse
+##      <dbl>
+## 1     24.2
 ```
-
-We can instead run it in a for loop. We then graph the MSE for each degree of polynomial.
-
-```r
-cv_error <- rep(0,10)
-for (x in 1:10) { 
-    fit <- glm(mpg~poly(horsepower,x), data = auto)
-    cv_error[x] <- cv.glm(auto, fit)$delta[1] 
-}
-
-tibble(x = 1:10, y = cv_error) %>% 
-    ggplot(aes(x,y)) + 
-        geom_line() + 
-        geom_point()
-```
-
-![plot of chunk 5_4](figure/5_4-1.png)
 
 ## k-fold Cross Validation
 
-The `cv.glm()` can also be used to implement k-fold CV. We pass a `k` variable to the formula to achieve this.
+k-fold is the same as LOOCV, except we're reducing the number of folds using the *k* parameter.
+
 
 ```r
-cv_error <- rep(0,10)
-for (x in 1:10) { 
-    fit <- glm(mpg~poly(horsepower,x), data = auto)
-    cv_error[x] <- cv.glm(auto, fit, K = 10)$delta[1] 
-}
-
-tibble(x = 1:10, y = cv_error) %>% 
-    ggplot(aes(x,y)) + 
-        geom_line() + 
-        geom_point()
+auto %>%
+    crossv_kfold(k = 5) %>%
+    mutate(model = map(train, ~lm(mpg~horsepower, data = .))) %>%
+    mutate(mse = map2_dbl(model, test, ~mse(.x, .y))) %>%
+    summarise(mean_mse = mean(mse))
 ```
 
-![plot of chunk 5.3.3_a](figure/5.3.3_a-1.png)
+```
+## # A tibble: 1 x 1
+##   mean_mse
+##      <dbl>
+## 1     24.1
+```
 
 ## The Bootstrap
 
