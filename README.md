@@ -30,3 +30,8 @@
 ## Chapter 5 - Resampling Methods
 
 * [Notes](Chapter_5/notes.md)
+
+### Exercises
+* [Lab](Chapter_5/lab.md)
+* [Conceptual](Chapter_5/conceptual.md)
+* [Applied](Chapter_5/applied.md)
