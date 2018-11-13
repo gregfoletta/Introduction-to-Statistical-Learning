@@ -235,11 +235,10 @@ weekly[1,] %>%
 The prediction was 'Up', but the true direction was 'Down'.
 
 ### d)
-*Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:
+*Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:*
     * Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2 .
     * Compute the posterior probability of the market moving up for the ith observation.
     * Use the posterior probability for the ith observation in order to predict whether or not the market moves up.
-    * Determine whether or not an error was made in predicting the direction for the ith observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a .*
 
 
 ```r
@@ -258,4 +257,86 @@ weekly %>%
 ## 1 0.450
 ```
 
+## 8)
+*We will now perform cross-validation on a simulated data set.*
 
+### a) 
+*Generate a simulated data set*
+
+
+```r
+set.seed(1)
+(simulated <- tibble(x = rnorm(100), y = x - 2*x^2 + rnorm(100)))
+```
+
+```
+## # A tibble: 100 x 2
+##         x      y
+##     <dbl>  <dbl>
+##  1 -0.626 -2.03 
+##  2  0.184  0.158
+##  3 -0.836 -3.14 
+##  4  1.60  -3.34 
+##  5  0.330 -0.542
+##  6 -0.820 -0.400
+##  7  0.487  0.729
+##  8  0.738  0.558
+##  9  0.576  0.297
+## 10 -0.305  1.19 
+## # ... with 90 more rows
+```
+
+In this daya set, *n* is 100 and *p* is 2.
+
+### b)
+*Create a scatterplot of X against Y . Comment on what you find.*
+
+
+```r
+simulated %>% 
+    ggplot(aes(x, y)) + 
+    geom_point()
+```
+
+![plot of chunk 5.8.b](figure/5.8.b-1.png)
+
+We see that Y appears have a quadratic relationship to X.
+
+### c)
+*Compute the LOOCV errors that result from fitting `Y ~ poly(X, d)` where `d = {1 .. 4}`.*
+
+In our pipeline, we create a tibble with a degree column and four rows. We then generate a kfold set with k being the number of rows in the dataset, which then becomes a LOOCV set.
+
+We unnest all of the sets and fit a model based on the degree on each sample's training set. We then predict the y_hat value using the model and the test set.
+
+We extract out the real y value from the test set, calculate the MSE, then calculate the LOOCV error based on the degree.
+
+
+```r
+(results <- tibble(degree = 1:4) %>%
+    mutate(sim_loocv = map(degree, ~crossv_kfold(simulated, k = nrow(simulated)))) %>%
+    unnest(sim_loocv) %>%
+    mutate(model = map2(degree, train, ~lm(y ~ poly(x,.x), data = .y))) %>%
+    mutate(y_hat = map2_dbl(model, test, ~predict(.x, .y))) %>%
+    mutate(y = map_dbl(test, ~as.tibble(.x)[['y']])) %>%
+    mutate(mse = (y - y_hat)^2) %>%
+    group_by(degree) %>%
+    summarise(loocv_err = sum(mse) / n())
+)
+```
+
+```
+## # A tibble: 4 x 2
+##   degree loocv_err
+##    <int>     <dbl>
+## 1      1     7.29 
+## 2      2     0.937
+## 3      3     0.957
+## 4      4     0.954
+```
+
+```r
+results %>% ggplot(aes(degree, loocv_err)) + geom_point() + geom_line()
+```
+
+![plot of chunk 5.8.c](figure/5.8.c-1.png)
