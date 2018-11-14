@@ -204,6 +204,7 @@ hr {
 <h1>Chapter 5 - Applied</h1>
 
 <pre><code class="r">library(ISLR)
+library(MASS)
 library(broom)
 library(modelr)
 library(tidyverse)
@@ -524,6 +525,186 @@ weekly.logistic &lt;- glm(Direction ~ Lag1 + Lag2, data = weekly, family = &#39;
 </code></pre>
 
 <p><img src="data:image/png;base64,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" alt="plot of chunk 5.8.c"/></p>
+
+<h3>d)</h3>
+
+<p>Skipped</p>
+
+<h3>e)</h3>
+
+<p><em>Which of the models in &copy; had the smallest LOOCV error? Is this what you expected? Explain your answer.</em></p>
+
+<p>The model with a second degree polynomial provided the lowest error. This is to be expected given that the response variable is explicitly quadratically realted to <em>x</em>.</p>
+
+<h3>f)</h3>
+
+<pre><code class="r">tibble(degree = 1:4) %&gt;%
+    mutate(sim_loocv = map(degree, ~crossv_kfold(simulated, k = nrow(simulated)))) %&gt;%
+    unnest(sim_loocv) %&gt;%
+    mutate(model = map2(degree, train, ~lm(y ~ poly(x,.x), data = .y))) %&gt;%
+    mutate(tidy = map(model, ~tidy(.x))) %&gt;%
+    unnest(tidy) %&gt;%
+    group_by(degree, term) %&gt;%
+    summarise(avg_p.value = mean(p.value))
+</code></pre>
+
+<pre><code>## # A tibble: 14 x 3
+## # Groups:   degree [?]
+##    degree term         avg_p.value
+##     &lt;int&gt; &lt;chr&gt;              &lt;dbl&gt;
+##  1      1 (Intercept)     4.84e- 8
+##  2      1 poly(x, .x)     2.24e- 2
+##  3      2 (Intercept)     2.75e-28
+##  4      2 poly(x, .x)1    7.00e- 6
+##  5      2 poly(x, .x)2    3.43e-42
+##  6      3 (Intercept)     4.95e-28
+##  7      3 poly(x, .x)1    7.45e- 6
+##  8      3 poly(x, .x)2    8.45e-42
+##  9      3 poly(x, .x)3    7.81e- 1
+## 10      4 (Intercept)     4.70e-28
+## 11      4 poly(x, .x)1    6.87e- 6
+## 12      4 poly(x, .x)2    9.06e-42
+## 13      4 poly(x, .x)3    7.81e- 1
+## 14      4 poly(x, .x)4    1.98e- 1
+</code></pre>
+
+<p>We can see that across all degrees, <em>x</em> and <em>x<sup>2</sup></em> terms have the strongest statisitical significance. The <em>x<sup>3</sup></em> and <em>x<sup>4</sup></em> have very little.</p>
+
+<h2>9)</h2>
+
+<p><em>We will now consider the Boston housing data set.</em></p>
+
+<h3>a)</h3>
+
+<p><em>Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat</em></p>
+
+<pre><code class="r">boston &lt;- as.tibble(Boston)
+boston %&gt;% summarise(medv_mu_hat = mean(medv))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   medv_mu_hat
+##         &lt;dbl&gt;
+## 1        22.5
+</code></pre>
+
+<p>The estimate for the population mean is 22.5</p>
+
+<h3>b)</h3>
+
+<p><em>Provide an estimate of the standard error of mu_hat. Interpret this result.</em></p>
+
+<pre><code class="r">boston %&gt;% summarise(sd = sd(medv), stderr = sd/sqrt(n()))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 2
+##      sd stderr
+##   &lt;dbl&gt;  &lt;dbl&gt;
+## 1  9.20  0.409
+</code></pre>
+
+<p>The standard error is 0.409 - therefore we would expect, with 95% probability, that the real population mean is in the range [22.5 - 1.96 * 0.409, 22.5 + 1.96 * 0.409] = [21.698, 23.302].</p>
+
+<h3>c)</h3>
+
+<p>*Now estimate the standard error of mu_hat sing the bootstrap. How does this compare to your answer from (b)?</p>
+
+<pre><code class="r">set.seed(1)
+boston %&gt;% 
+    modelr::bootstrap(n = 1000) %&gt;% 
+    mutate(medv_mu_hat = map_dbl(strap, ~mean(as.tibble(.x)[[&#39;medv&#39;]]))) %&gt;% 
+    summarise(
+        sd = sd(medv_mu_hat), 
+    )
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##      sd
+##   &lt;dbl&gt;
+## 1 0.416
+</code></pre>
+
+<p>We see the SD across the bootstraps is 0.416 - close to the 0.409 from b).</p>
+
+<h3>d)</h3>
+
+<p><em>Based on your bootstrap estimate from &copy;, provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).</em></p>
+
+<p>Our calculate SD is 0.416, so our 95% confidence interval is [22.53 - 1.96 * 0.416, 22.53 + 196 * 0.416] = [21.71464 23.34536].</p>
+
+<p>Compared to :</p>
+
+<pre><code class="r">t.test(boston$medv) %&gt;% tidy()
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 8
+##   estimate statistic   p.value parameter conf.low conf.high method
+##      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt; 
+## 1     22.5      55.1 9.37e-216       505     21.7      23.3 One S…
+## # ... with 1 more variable: alternative &lt;chr&gt;
+</code></pre>
+
+<h3>e)</h3>
+
+<p><em>Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.</em></p>
+
+<pre><code class="r">boston %&gt;% summarise(median = median(medv))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   median
+##    &lt;dbl&gt;
+## 1   21.2
+</code></pre>
+
+<h3>f)</h3>
+
+<p><em>We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.</em></p>
+
+<pre><code class="r">set.seed(1)
+boston %&gt;% 
+    modelr::bootstrap(n = 1000) %&gt;% 
+    mutate(median_medv = map_dbl(strap, ~median(as.tibble(.x)[[&#39;medv&#39;]]))) %&gt;% 
+    summarise(median_std_err = sd(median_medv))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   median_std_err
+##            &lt;dbl&gt;
+## 1          0.383
+</code></pre>
+
+<p>We see the standard error for the median is 0.383.</p>
+
+<h3>g)</h3>
+
+<p><em>Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.</em></p>
+
+<pre><code class="r">quantile(boston$medv, probs = c(.1))
+</code></pre>
+
+<pre><code>##   10% 
+## 12.75
+</code></pre>
+
+<h3>h)</h3>
+
+<p><em>Use the bootstrap to estimate the standard error of this 10% quantile</em></p>
+
+<pre><code class="r">set.seed(1)
+boston %&gt;% 
+    modelr::bootstrap(n = 1000) %&gt;% 
+    mutate(ten_pc_quantile = map_dbl(strap, ~quantile(as.tibble(.x)$medv, c(0.1))[[&#39;10%&#39;]])) %&gt;% 
+    summarise(quant_std_err = sd(ten_pc_quantile))
+</code></pre>
+
+<pre><code>## # A tibble: 1 x 1
+##   quant_std_err
+##           &lt;dbl&gt;
+## 1         0.498
+</code></pre>
+
+<p>We estimated standard error is 0.498.</p>
 
 </body>
 

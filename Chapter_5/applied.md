@@ -3,6 +3,7 @@
 
 ```r
 library(ISLR)
+library(MASS)
 library(broom)
 library(modelr)
 library(tidyverse)
@@ -340,3 +341,202 @@ results %>% ggplot(aes(degree, loocv_err)) + geom_point() + geom_line()
 ```
 
 ![plot of chunk 5.8.c](figure/5.8.c-1.png)
+
+### d) 
+
+Skipped
+
+### e) 
+*Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.*
+
+The model with a second degree polynomial provided the lowest error. This is to be expected given that the response variable is explicitly quadratically realted to *x*.
+
+### f)
+
+
+```r
+tibble(degree = 1:4) %>%
+    mutate(sim_loocv = map(degree, ~crossv_kfold(simulated, k = nrow(simulated)))) %>%
+    unnest(sim_loocv) %>%
+    mutate(model = map2(degree, train, ~lm(y ~ poly(x,.x), data = .y))) %>%
+    mutate(tidy = map(model, ~tidy(.x))) %>%
+    unnest(tidy) %>%
+    group_by(degree, term) %>%
+    summarise(avg_p.value = mean(p.value))
+```
+
+```
+## # A tibble: 14 x 3
+## # Groups:   degree [?]
+##    degree term         avg_p.value
+##     <int> <chr>              <dbl>
+##  1      1 (Intercept)     4.84e- 8
+##  2      1 poly(x, .x)     2.24e- 2
+##  3      2 (Intercept)     2.75e-28
+##  4      2 poly(x, .x)1    7.00e- 6
+##  5      2 poly(x, .x)2    3.43e-42
+##  6      3 (Intercept)     4.95e-28
+##  7      3 poly(x, .x)1    7.45e- 6
+##  8      3 poly(x, .x)2    8.45e-42
+##  9      3 poly(x, .x)3    7.81e- 1
+## 10      4 (Intercept)     4.70e-28
+## 11      4 poly(x, .x)1    6.87e- 6
+## 12      4 poly(x, .x)2    9.06e-42
+## 13      4 poly(x, .x)3    7.81e- 1
+## 14      4 poly(x, .x)4    1.98e- 1
+```
+
+We can see that across all degrees, *x* and *x^2* terms have the strongest statisitical significance. The *x^3* and *x^4* have very little.
+
+
+## 9)
+*We will now consider the Boston housing data set.*
+
+### a) 
+*Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat*
+
+
+```r
+boston <- as.tibble(Boston)
+boston %>% summarise(medv_mu_hat = mean(medv))
+```
+
+```
+## # A tibble: 1 x 1
+##   medv_mu_hat
+##         <dbl>
+## 1        22.5
+```
+
+The estimate for the population mean is 22.5
+
+### b)
+*Provide an estimate of the standard error of mu_hat. Interpret this result.*
+
+```r
+boston %>% summarise(sd = sd(medv), stderr = sd/sqrt(n()))
+```
+
+```
+## # A tibble: 1 x 2
+##      sd stderr
+##   <dbl>  <dbl>
+## 1  9.20  0.409
+```
+
+The standard error is 0.409 - therefore we would expect, with 95% probability, that the real population mean is in the range [22.5 - 1.96 * 0.409, 22.5 + 1.96 * 0.409] = [21.698, 23.302].
+
+### c)
+*Now estimate the standard error of mu_hat sing the bootstrap. How does this compare to your answer from (b)?
+
+
+```r
+set.seed(1)
+boston %>% 
+    modelr::bootstrap(n = 1000) %>% 
+    mutate(medv_mu_hat = map_dbl(strap, ~mean(as.tibble(.x)[['medv']]))) %>% 
+    summarise(
+        sd = sd(medv_mu_hat), 
+    )
+```
+
+```
+## # A tibble: 1 x 1
+##      sd
+##   <dbl>
+## 1 0.416
+```
+
+We see the SD across the bootstraps is 0.416 - close to the 0.409 from b).
+
+### d)
+*Based on your bootstrap estimate from (c), provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).*
+
+Our calculate SD is 0.416, so our 95% confidence interval is [22.53 - 1.96 * 0.416, 22.53 + 196 * 0.416] = [21.71464 23.34536].
+
+Compared to :
+
+```r
+t.test(boston$medv) %>% tidy()
+```
+
+```
+## # A tibble: 1 x 8
+##   estimate statistic   p.value parameter conf.low conf.high method
+##      <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl> <chr> 
+## 1     22.5      55.1 9.37e-216       505     21.7      23.3 One S…
+## # ... with 1 more variable: alternative <chr>
+```
+
+### e)
+*Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.*
+
+
+```r
+boston %>% summarise(median = median(medv))
+```
+
+```
+## # A tibble: 1 x 1
+##   median
+##    <dbl>
+## 1   21.2
+```
+
+
+### f)
+*We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.*
+
+
+```r
+set.seed(1)
+boston %>% 
+    modelr::bootstrap(n = 1000) %>% 
+    mutate(median_medv = map_dbl(strap, ~median(as.tibble(.x)[['medv']]))) %>% 
+    summarise(median_std_err = sd(median_medv))
+```
+
+```
+## # A tibble: 1 x 1
+##   median_std_err
+##            <dbl>
+## 1          0.383
+```
+
+We see the standard error for the median is 0.383.
+
+### g)
+*Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.*
+
+
+```r
+quantile(boston$medv, probs = c(.1))
+```
+
+```
+##   10% 
+## 12.75
+```
+
+### h)
+*Use the bootstrap to estimate the standard error of this 10% quantile*
+
+
+```r
+set.seed(1)
+boston %>% 
+    modelr::bootstrap(n = 1000) %>% 
+    mutate(ten_pc_quantile = map_dbl(strap, ~quantile(as.tibble(.x)$medv, c(0.1))[['10%']])) %>% 
+    summarise(quant_std_err = sd(ten_pc_quantile))
+```
+
+```
+## # A tibble: 1 x 1
+##   quant_std_err
+##           <dbl>
+## 1         0.498
+```
+
+We estimated standard error is 0.498.
+
+
