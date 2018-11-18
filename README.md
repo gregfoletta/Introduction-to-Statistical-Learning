@@ -35,3 +35,7 @@
 * [Lab](Chapter_5/lab.md)
 * [Conceptual](Chapter_5/conceptual.md)
 * [Applied](Chapter_5/applied.md)
+
+## Chapter 6 - Linear Model Selection and Regularization
+
+* [Notes](Chapter_6/notes.md)
