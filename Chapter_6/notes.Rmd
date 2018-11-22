@@ -189,3 +189,107 @@ This is termed *dimension reduction* because it reduces the problem of estimatin
 Dimension reduction serves to constrain and therefore bias the coefficient estimates. However in situations where $p$ is large relative to $n$, selecting a value of $M \ll p$ can significantly reduce the variance of the fitted coefficients.
 
 All dimension reduction consists of obtained the transformed predictors, then a model is fit to those predictors. The choice of the transformed predictors can be achieved in different ways; we will consider *principal components* and *partial least squares*.
+
+### 6.3.1 - Principal Components Analysis (PCA)
+
+PCA is a technique for reducing the dimension of an $n x p$ data matrix $X$. The *first principal component* direction of the data is that along which the observations *vary the most*. If the observations were projected on to the line, then the resulting projected observations would have the largest variance. Projecting a point on to the line involves finding the location on the line which is clostest to the point.
+
+$Z_1$ is a vector of length $n$. The values $z_{11},\dots,z_{n1}$ are the *principal component scores*.
+
+There is also another interpretation for PCA: the first principal component vector defines the line that is *as close as possible* to the data. The first principal component score for the $i$th observation is the distance on the component vector line from zero.
+
+We can think of the principal component $Z_1$ assingle number summaries of the joint $x$ and $y$ components.
+
+In general one can construct $p$ principal components. The second principal component is a linear combination of the variables that is *uncorrelated* with $Z_1$ and has the largest variance subject to this constraint. The zero correlation condition of $Z_1$ with $Z_2$ is equivalent to the condition that the direction must be *orthogonal* to the first principal component direction.
+
+With $p$ dimensional data we can construct at most $p$ principal components. 
+
+#### Principal Components Regression (PCR)
+
+The *PCR* approach involves constructing the first $M$ principal components $Z_1,\ldots,Z_M$ and then using these components as the predictors in a linear regression using least squares. The key idea is that often a small number of principal components suffice to explain most of the variability in the data. Another way: *we assume the directions in which $X_1,\ldots,X_p$ show the most variation are the directions associated with Y*.
+
+This assumption is not always guaranteed. If it holds, fitting least squares to the principal components will lead to better results than standard least squares since:
+
+1. Most of the information in the data relates to the response is contained in the 
+1. By estimating only $M \ll p$ coefficients we can mitigate overfitting.
+
+When performing PCR it is recommended to *standardise* each predictor. This ensures all the variables are on the same scale.
+
+### 6.3.2 - Partial Least Squares (PLS)
+
+The PCR approach is *unsupervised*, as the response $Y$ is not used to help determine the principal component directions.
+
+PLS is a supervised alternative to PCR. It's a dimension reduction method, which:
+1. Identifies a new set of features $Z_1,\dots,Z_M$ that are linear combinations of the original features.
+1. Fits a linear model via least squares on these $M$ features.
+
+Unlike PCR, it identifies the features in a supervised way. 
+
+The process is:
+1. Standardise the $p$ predictors
+1. Sets each $\phi_{j1}$ (from the PCA formula) equal to the coefficient from the simple linear regression of $Y$ on to $X_j$.
+1. This coefficient is proportional to the correlation between $Y$ and $X_j$.
+1. Hence in computing $Z_1 = \sum_{j=1}^p\phy_{j1}X_j$, PLS places the highest weight on variables that are most strongly related to the response.
+
+To identify the second PLS direction we first adjust each of the variabes by $Z_1$, by regressing each variable on $Z_1$ and taking the residuals. 
+
+The residuals can be interpreted as the remaining information that has not been explained by the first PLS direction.
+
+We then compute $Z_2$ using this *orthogonalised* data in exactly the same fashion as $Z_1$. This iterative aproach can be applied $M$ times. Finally we use a least squares to fit a linear model to predict $Y$ using $Z_1,\ldots,Z_M$.
+
+## 6.4 - Considerations in High Dimensions
+
+### 6.4.1 - High Dimensional Data.
+
+Mos traditional statistical techniques for regression and classification are intended for the *low dimensional* setting where $n\gg p$. Data sets containing more features than observations are often referred to has *high dimensional*.A
+
+### 6.4.2 - What Goes Wrong in High Dimensions
+
+When the number of features $p$ is as large as, or larger than, the observations $n$, least squares should not (or cannot) be performed. The reason: whether or not there is a relationship, least squares will yeild a set of coefficient estimates that result in a perfect fit of the data. As an example, let's take a $p$ of seven unrelated variables and calculate the $R^2$ values for $n = 200,\ldots,7$:
+```{r 6.4.2}
+set.seed(1)
+tibble(n = 200:7) %>% 
+    mutate(data = map(n, ~tibble(a = 1:.x, 
+                                 b = rnorm(.x), 
+                                 c = rnorm(.x), 
+                                 d = rnorm(.x), 
+                                 e = rnorm(.x), f = rnorm(.x))), 
+           model = map(data, ~lm(a~., .x)), 
+           glance = map(model, ~glance(.x))) %>% 
+    unnest(glance) %>% 
+    ggplot(aes(n, r.squared)) + 
+    geom_point() + 
+    geom_line() +
+    scale_x_reverse()
+```
+
+We can see the $R^2$ increases from almost 0 to almost 1 as the number of observations decreases (note the X axis scale is reversed).
+
+When $p \gt n$ or $p \approx n$ the simple least squares is too flexible and hence overfits the data.
+
+### 6.4.3 - Regression in High Dimensions
+
+Many methods for fitting *less flexible* least squares models, such as forward stepwise, ridge regression, lasso, and principal components regression, are useful in a high dimensional setting.
+
+There are three key points:
+1. Regularisation or shrinkage plays a key role in high-dimensional problems
+1. Appropriate tuning parameter selection is crucial for good predictive performance
+1. The test error tends to increase as the dimensionality of the problem increases, unless the additional features are truly related to the response.
+
+The third point is known as the **curse of dimensionality**. New technologies that allow for the collection of thousands or millions of features are a double-edged sword: they can lead to improved predictive models if the features are relevant to the problem in hand. But they will lead to worse results if the features are not relevant. 
+
+Even if they are relevant, the variance incurred in fitting their coefficients may outweigh the reduction in bias they bring.
+
+### 6.4.4 - Interpreting Results in High Dimensions
+
+In a high-dimensional setting there is an extreme *multicolinearity* problem: any variable in the model can be written as a linear combination of all the other variables in the model. We can never know which variables truly are predictive of the outcome, and we can never identify the best coefficients for use in the regression.
+
+We must be careful not to overstate the results obtained, and to make it clear that we have identified *one of many possible models* for predicting an outcome.
+
+As we have seen, when $p \gt n$ it is easy to obtain a useless model that has zero residuals. One should never use sum of squared, p-values, $R^2$ or other traditional measures of good fit on the training data in a high-dimensional setting.
+
+```{r setup_6.4.3, message = F}
+library(glmnet)
+```
+```{r 6.4.3}
+
