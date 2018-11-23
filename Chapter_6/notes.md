@@ -324,6 +324,24 @@ We must be careful not to overstate the results obtained, and to make it clear t
 
 As we have seen, when $p \gt n$ it is easy to obtain a useless model that has zero residuals. One should never use sum of squared, p-values, $R^2$ or other traditional measures of good fit on the training data in a high-dimensional setting.
 
+We can see this in action: in the code below we create a tibble with $p$ values from 2 to 1000, increasing in increments of 50. We then create random data by generating 1000 random normal values for the $p$ predictos, placing these into a tibble in each $p$ row. By default the columns are named $V1,\ldots,Vp$. 
+
+For each tibble of data with $p$ columns and $n = 1000$, we perform a linear regression of $V1$ on to all of the other predictors. We then add the $model_data$ and unnest its columns into each row.
+
+From there we can plot the number of predictors versus the $R^2$ value that was calculated by performing a linear regression on all of them.
+
+
+```r
+tibble(p = seq(2,1000, 50)) %>%
+    mutate(data = map(p, ~unnest(as.tibble(rbind(map(1:.x, ~rnorm(1000))))))) %>%
+    mutate(model = map(data, ~lm(V1~., .x)),
+           model_data = map(model, ~glance(.x))) %>%
+    unnest(model_data) %>%
+    ggplot(aes(p, r.squared)) +
+    geom_point() + geom_line()
+```
+
+![plot of chunk 6.4.4](figure/6.4.4-1.png)
 
 ```r
 library(glmnet)
@@ -332,4 +350,6 @@ library(glmnet)
 ```
 ## Error in library(glmnet): there is no package called 'glmnet'
 ```
+
+We can clearly see the $R^2$ increases as the curse of dimensionality takes effect.
 
