@@ -295,6 +295,7 @@ For each tibble of data with $p$ columns and $n = 1000$, we perform a linear reg
 From there we can plot the number of predictors versus the $R^2$ value that was calculated by performing a linear regression on all of them.
 
 ```{r 6.4.4}
+set.seed(1)
 tibble(p = seq(2,1000, 50)) %>%
     mutate(data = map(p, ~unnest(as.tibble(rbind(map(1:.x, ~rnorm(1000))))))) %>%
     mutate(model = map(data, ~lm(V1~., .x)),
@@ -302,8 +303,6 @@ tibble(p = seq(2,1000, 50)) %>%
     unnest(model_data) %>%
     ggplot(aes(p, r.squared)) +
     geom_point() + geom_line()
-```{r setup_6.4.3, message = F}
-library(glmnet)
 ```
 
 We can clearly see the $R^2$ increases as the curse of dimensionality takes effect.

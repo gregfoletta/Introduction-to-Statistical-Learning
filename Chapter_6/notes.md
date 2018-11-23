@@ -332,6 +332,7 @@ From there we can plot the number of predictors versus the $R^2$ value that was 
 
 
 ```r
+set.seed(1)
 tibble(p = seq(2,1000, 50)) %>%
     mutate(data = map(p, ~unnest(as.tibble(rbind(map(1:.x, ~rnorm(1000))))))) %>%
     mutate(model = map(data, ~lm(V1~., .x)),
@@ -342,14 +343,6 @@ tibble(p = seq(2,1000, 50)) %>%
 ```
 
 ![plot of chunk 6.4.4](figure/6.4.4-1.png)
-
-```r
-library(glmnet)
-```
-
-```
-## Error in library(glmnet): there is no package called 'glmnet'
-```
 
 We can clearly see the $R^2$ increases as the curse of dimensionality takes effect.
 
