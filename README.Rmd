@@ -39,3 +39,7 @@
 ## Chapter 6 - Linear Model Selection and Regularization
 
 * [Notes](Chapter_6/notes.md)
+
+### Exercises
+
+* [Lab](Chapter_6/lab.md)
