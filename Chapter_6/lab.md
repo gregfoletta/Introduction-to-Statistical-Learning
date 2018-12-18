@@ -14,8 +14,7 @@ We wish to predict a baseball player's salary on the bassis of various statistic
 
 
 ```r
-hitters <- as.tibble(Hitters)
-hitters <- hitters %>% dplyr::filter(!is.na(Salary))
+hitters <- Hitters %>% na.omit() %>% as.tibble()
 ```
 
 We use the `regsubsets()` function to perform a best subset selection by identifying the best model that contains a given number of predictors.
@@ -189,9 +188,8 @@ library(modelr)
 
 
 ```r
-x <- na.omit(hitters) %>% model.matrix(Salary ~ ., .) 
+x <- hitters %>% model.matrix(Salary ~ ., .) 
 y <- hitters$Salary
-y <- y[!is.na(y)]
 ```
 
 The `glmnet()` function has an `alpha` parameter that determines what type of model is fit. If `alpha = 0` then a ridge regresion model is fit. If `alpha = 1` then a lasso is fit.
@@ -268,22 +266,23 @@ hitters.resample <-
 
 x.train <- 
     hitters.resample$train %>% 
-    as.tibble() %>% 
-    na.omit() %>% 
     model.matrix(Salary ~ ., .)
 
 y.train <- 
     hitters.resample$train %>% 
     as.tibble() %>% 
-    na.omit() %>% .$Salary
+    .$Salary
 ```
 
 We now fit the model to the training set and generate the predictions using `predict()` with a $\lambda = 4$.
 
 
 ```r
-x.test <- hitters.resample$test %>% as.tibble() %>% na.omit() %>% model.matrix(Salary ~ ., .)
-y.test <- as.tibble(hitters.resample$test) %>% na.omit() %>% .$Salary
+x.test <- hitters.resample$test %>% 
+    model.matrix(Salary ~ ., .)
+
+y.test <- as.tibble(hitters.resample$test) %>% 
+    .$Salary
 
 y.prediction <- predict(ridge.mod, s = 4, newx = x.test)
 mean((y.prediction - y.test)^2)
@@ -307,11 +306,9 @@ mean((y.prediction - y.test)^2)
 
 We see the MSE increase. Now we compare against a regular least squres to determine whether there is a benefit in using $\lambda = 4$. A normal least squares is the same as having a $\lambda = 0$. We have to add `exact = T` becuase (from the manual):
 
-```
-If exact=FALSE (default), then the predict function uses linear interpolation to make predictions for values of s (lambda) that do not coincide with those used in the fitting algorithm. While this is often a good approximation, it can sometimes be a bit coarse. 
+*If exact=FALSE (default), then the predict function uses linear interpolation to make predictions for values of s (lambda) that do not coincide with those used in the fitting algorithm. While this is often a good approximation, it can sometimes be a bit coarse. 
 
-With exact=TRUE, these different values of s are merged (and sorted) with object$lambda, and the model is refit before predictions are made. In this case, it is required to supply the original data x= and y= as additional named arguments to predict() or coef(). The workhorse predict.glmnet() needs to update the model, and so needs the data used to create it.
-```
+With exact=TRUE, these different values of s are merged (and sorted) with object$lambda, and the model is refit before predictions are made. In this case, it is required to supply the original data x= and y= as additional named arguments to predict() or coef(). The workhorse predict.glmnet() needs to update the model, and so needs the data used to create it.*
 
 
 ```r
@@ -325,7 +322,8 @@ mean((y.prediction - y.test)^2)
 
 So fitting with a $\lambda = 4$ leads to a lower test MSE.
 
-In general it would be better to use cross validation to determine the $\lambda$. We can use the `cv.glmnet()` to do this. By default is does ten folds.
+In general it would be better to use cross validation to determine the $\lambda$. We can use the `cv.glmnet()` to do this. By default is does ten folds. We see the $\lambda$ with the smallest cross validation error is 27. We plug this back in and see an MSE of 121,165.
+
 
 
 ```r
@@ -342,25 +340,349 @@ cv.out %>%
 ![plot of chunk 6.6.1_h](figure/6.6.1_h-1.png)
 
 ```r
-cv.out %>% 
-    tidy() %>% 
-    arrange(estimate) %>% 
-    .$lambda %>% 
-    .[1]
+cv.out$lambda.min
 ```
 
 ```
 ## [1] 27.11101
 ```
 
+```r
+y.prediction <- predict(ridge.mod, s = 27, newx = x.test)
+mean((y.prediction - y.test)^2)
+```
+
+```
+## [1] 121165.3
+```
+
+### 6.6.6 - The Lasso
+
+Let's see whether the lasso can yield either a more accurate or a more interpretable model than ridge regression. We continue to use the `glmnet()` function, but we set `alpha = 1`. Ither than than that most of the steps are the same.
 
 
+```r
+lasso.mod <- glmnet(x.train, y.train, alpha = 1, lambda = 10^seq(10, -2, length = 100))
+lasso.mod %>%
+    tidy() %>%
+    dplyr::filter(term %in% c('AtBat', 'Hits', 'Walks', 'Years', 'Salary', 'Runs')) %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(x = log_lambda, y = estimate, colour = term)) +
+    geom_line()
+```
+
+![plot of chunk 6.6.6_a](figure/6.6.6_a-1.png)
+
+We can see that the coefficients we have chosen will eventually go to zero. We run a cross-validation and compute the test error.
 
 
+```r
+set.seed(1)
+lasso.cv <- cv.glmnet(x.train, y.train, alpha = 1)
+
+lasso.cv %>%
+    tidy() %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(x = log_lambda, y = estimate)) +
+    geom_line() +
+    geom_point()
+```
+
+![plot of chunk 6.6.6_b](figure/6.6.6_b-1.png)
+
+```r
+lasso.pred <- predict(lasso.mod, s = lasso.cv$lambda.min, newx = x.test)
+mean((lasso.pred - y.test)^2)
+```
+
+```
+## [1] 147964.5
+```
+
+The main advantage over the ridge regression is that the estimates are sparse:
+
+```r
+predict(lasso.mod, s = lasso.cv$lambda.min, type = 'coefficients')
+```
+
+```
+## 21 x 1 sparse Matrix of class "dgCMatrix"
+##                        1
+## (Intercept)  -50.9475142
+## (Intercept)    .        
+## AtBat         -0.2076188
+## Hits           1.0571536
+## HmRun          3.1270724
+## Runs           .        
+## RBI            2.2654979
+## Walks          4.8394796
+## Years         -3.4568155
+## CAtBat         .        
+## CHits          0.3743793
+## CHmRun        -0.6036365
+## CRuns          0.4838344
+## CRBI           .        
+## CWalks        -0.6536503
+## LeagueN       23.0199715
+## DivisionW   -126.5994583
+## PutOuts        0.2709289
+## Assists        .        
+## Errors        -1.7373176
+## NewLeagueN     .
+```
+
+We see a number of the coefficients have been taken to 0.
+
+## 6.7 - PCR and PLS Regression
+
+### 6.7.1 - Principal Components Regression
+
+Principal components regression can be performed using the `pcr()` function which is part of the `pls` library. However we are going to take a different direction and use the `prcmp()` function in a tidier manner.
+
+Before looking at the hitters data, we take a look at a simpler data set with two principal components:
 
 
+```r
+library(pls)
+```
 
 
+```r
+set.seed(1)
+sample <- tibble(x = 1:1000, y = 2*x + rnorm(length(x), 30, 300))
+sample %>% ggplot(aes(x,y)) + geom_point()
+```
+
+![plot of chunk 6.7.1_a](figure/6.7.1_a-1.png)
+
+We take this data set and nest it in a tibble. We then run the `prcomp()` function over the top to get our princpal components. We augment these with the `broom` library which gives us each observations projection into the PCA space and then unnest this variable.
+
+The two PC columns per observation are '.fittedPC1' and '.fittedPC2', so we summarise the variance of both of these columns. The resulting tibble has those two columns with their variance, so we gather them togeher to there's a column for the PC number, and a column for the variance.
+
+We then calculate the percentage of the total variance, ending up with 96.7% of the variance explained by the first principal component, and 3.3% being described by the second principal component.
 
 
+```r
+sample %>% 
+    nest() %>% 
+    mutate(
+        pc = map(data, ~prcomp(.x)), 
+        pc_aug = map2(data, pc, ~augment(.y, data = .x))
+    ) %>% 
+    unnest(pc_aug) %>% 
+    summarise_at(vars(contains('PC')), funs(var)) %>% 
+    gather(key = pc, value = variance) %>% 
+    mutate(var_explained = variance/sum(variance))
+```
+
+```
+## # A tibble: 2 x 3
+##   pc         variance var_explained
+##   <chr>         <dbl>         <dbl>
+## 1 .fittedPC1  487593.        0.967 
+## 2 .fittedPC2   16480.        0.0327
+```
+
+Let's now apply this to the `hitters` data. There are two extra steps in the pipeline: we remove columns that aren't numeric, and we rename the PC columns for aesthetics.
+
+
+```r
+hitters_pca_variance <- 
+    hitters %>% 
+    select_if(is.numeric) %>% 
+    nest() %>% 
+    mutate(
+        pc = map(data, ~prcomp(.x, center = T, scale = T)), 
+        pc_augment = map2(pc, data, ~augment(.x, .y))
+    ) %>% 
+    unnest(pc_augment) %>% 
+    summarise_at(vars(contains('PC')), funs(var)) %>% 
+    rename_all(funs(str_replace(., '.fittedPC', ''))) %>% 
+    gather(key = pc, value = variance) %>% 
+    mutate(pc = as.integer(pc)) %>%
+    mutate(explained_variance = variance/sum(variance))
+
+hitters_pca_variance
+```
+
+```
+## # A tibble: 17 x 3
+##       pc variance explained_variance
+##    <int>    <dbl>              <dbl>
+##  1     1  7.69             0.452    
+##  2     2  4.12             0.242    
+##  3     3  1.73             0.102    
+##  4     4  0.917            0.0539   
+##  5     5  0.707            0.0416   
+##  6     6  0.524            0.0308   
+##  7     7  0.488            0.0287   
+##  8     8  0.251            0.0148   
+##  9     9  0.181            0.0106   
+## 10    10  0.132            0.00779  
+## 11    11  0.0974           0.00573  
+## 12    12  0.0594           0.00349  
+## 13    13  0.0538           0.00317  
+## 14    14  0.0267           0.00157  
+## 15    15  0.0141           0.000828 
+## 16    16  0.00481          0.000283 
+## 17    17  0.00120          0.0000707
+```
+
+Let's have a look at the graph:
+
+```r
+hitters_pca_variance %>% ggplot() + geom_bar(aes(pc, explained_variance), stat = 'identity')
+```
+
+![plot of chunk 6.7.1_d](figure/6.7.1_d-1.png)
+
+Now we go back to using the `prc()` function.
+
+
+```r
+pcr_fit <- pcr(formula = Salary ~ ., data = hitters, scale = T, validation = "CV")
+pcr_fit %>% summary()
+```
+
+```
+## Data: 	X dimension: 263 19 
+## 	Y dimension: 263 1
+## Fit method: svdpc
+## Number of components considered: 19
+## 
+## VALIDATION: RMSEP
+## Cross-validated using 10 random segments.
+##        (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+## CV             452    356.5    353.8    352.9    350.9    347.7    344.0
+## adjCV          452    355.9    353.2    352.3    350.3    347.1    343.1
+##        7 comps  8 comps  9 comps  10 comps  11 comps  12 comps  13 comps
+## CV       344.3    345.3    346.7     350.7     352.7     354.7     355.2
+## adjCV    343.4    344.4    345.7     349.4     351.3     353.2     353.6
+##        14 comps  15 comps  16 comps  17 comps  18 comps  19 comps
+## CV        353.2     353.9     346.8     349.5     348.1     350.6
+## adjCV     351.3     352.0     344.7     347.1     345.6     348.0
+## 
+## TRAINING: % variance explained
+##         1 comps  2 comps  3 comps  4 comps  5 comps  6 comps  7 comps
+## X         38.31    60.16    70.84    79.03    84.29    88.63    92.26
+## Salary    40.63    41.58    42.17    43.22    44.90    46.48    46.69
+##         8 comps  9 comps  10 comps  11 comps  12 comps  13 comps  14 comps
+## X         94.96    96.28     97.26     97.98     98.65     99.15     99.47
+## Salary    46.75    46.86     47.76     47.82     47.85     48.10     50.40
+##         15 comps  16 comps  17 comps  18 comps  19 comps
+## X          99.75     99.89     99.97     99.99    100.00
+## Salary     50.55     53.01     53.85     54.61     54.61
+```
+
+```r
+validationplot(pcr_fit, val.type = 'MSEP')
+```
+
+![plot of chunk 6.7.1_e](figure/6.7.1_e-1.png)
+
+The CV score is the *root mean squared error*. To obtain the usual MSE, the values need to be squared.
+
+
+```r
+set.seed(1)
+hitters_pcr <- hitters %>%
+    resample_partition(c('train' = .5, 'test' = .5)) %>%
+    rbind() %>%
+    as.tibble() %>%
+    mutate(pcr = map(train, ~pcr(Salary ~ ., data = as.tibble(.x), scale = T, validation = 'CV')))
+
+hitters_pcr
+```
+
+```
+## # A tibble: 1 x 3
+##   train          test           pcr      
+##   <list>         <list>         <list>   
+## 1 <S3: resample> <S3: resample> <S3: mvr>
+```
+
+```r
+hitters_pcr %>% pull(pcr) %>% .[[1]] %>% validationplot(., val.type = 'MSEP')
+```
+
+![plot of chunk 6.7.1_f](figure/6.7.1_f-1.png)
+
+We now see the lowest validation occurs when $M = 7$. We calculate the test MSE:
+
+
+```r
+hitters_pcr %>% 
+    transmute(
+        pred = map2(pcr, test, ~predict(.x, as.tibble(.y), ncomp = 5)), 
+        res = map(test, ~as.tibble(.x))) %>% 
+        unnest() %>% 
+        summarise(test_mse = mean((pred - Salary)^2))
+```
+
+```
+## # A tibble: 1 x 1
+##   test_mse
+##      <dbl>
+## 1  148922.
+```
+
+### 6.7.2 - Partial Least Squares
+
+Partial least squares is implemented using the `plsr()` function, which is also a part of the `pls` library. The syntax is the same as the `pcr()` function.
+
+
+```r
+hitters <- as.tibble(Hitters)
+set.seed(1)
+hitters_pls <- hitters %>%
+    nest() %>%
+    mutate(
+        sample = map(data, ~resample_partition(.x, c(test = .5, train = .5))),
+        pls = map2(data, sample, ~plsr(Salary ~ ., data = .x, subset = as.integer(.y$test), scale = T, validation = 'CV'))
+    ) 
+
+hitters_pls %>%
+    pull(pls) %>%
+    .[[1]] %>%
+    summary()
+```
+
+```
+## Data: 	X dimension: 130 19 
+## 	Y dimension: 130 1
+## Fit method: kernelpls
+## Number of components considered: 19
+## 
+## VALIDATION: RMSEP
+## Cross-validated using 10 random segments.
+##        (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+## CV           428.7    319.4    321.3    331.3    344.4    358.2    359.0
+## adjCV        428.7    318.4    319.8    328.8    340.8    352.9    353.7
+##        7 comps  8 comps  9 comps  10 comps  11 comps  12 comps  13 comps
+## CV       356.6    352.7    354.5     354.0     355.5     352.5     351.1
+## adjCV    351.5    348.0    349.7     348.9     350.3     347.4     346.0
+##        14 comps  15 comps  16 comps  17 comps  18 comps  19 comps
+## CV        350.5     352.2     349.7     348.8     346.3     352.8
+## adjCV     345.2     346.8     344.4     343.5     341.3     347.1
+## 
+## TRAINING: % variance explained
+##         1 comps  2 comps  3 comps  4 comps  5 comps  6 comps  7 comps
+## X         38.41    54.19    68.24    74.68    77.88    83.48    88.71
+## Salary    50.99    54.77    56.19    57.31    59.15    60.09    60.55
+##         8 comps  9 comps  10 comps  11 comps  12 comps  13 comps  14 comps
+## X         91.35    93.35     94.58     97.32     97.93     98.63     98.97
+## Salary    60.96    61.39     62.04     62.29     62.88     63.17     63.50
+##         15 comps  16 comps  17 comps  18 comps  19 comps
+## X          99.23     99.44     99.74     99.95    100.00
+## Salary     63.75     64.07     64.20     64.25     64.44
+```
+
+```r
+hitters_pls %>%
+    pull(pls) %>%
+    .[[1]] %>%
+    validationplot(val.type = 'MSEP')
+```
+
+![plot of chunk 6.7.2_a](figure/6.7.2_a-1.png)
 

@@ -12,8 +12,7 @@ library(tidyverse)
 We wish to predict a baseball player's salary on the bassis of various statistics associated with the performance in the previous year. Let's remove the players for which the salary is missing from the dataset.
 
 ```{r 6.5.1_a}
-hitters <- as.tibble(Hitters)
-hitters <- hitters %>% dplyr::filter(!is.na(Salary))
+hitters <- Hitters %>% na.omit() %>% as.tibble()
 ```
 
 We use the `regsubsets()` function to perform a best subset selection by identifying the best model that contains a given number of predictors.
@@ -114,9 +113,8 @@ library(modelr)
 ```
 
 ```{r 6.6}
-x <- na.omit(hitters) %>% model.matrix(Salary ~ ., .) 
+x <- hitters %>% model.matrix(Salary ~ ., .) 
 y <- hitters$Salary
-y <- y[!is.na(y)]
 ```
 
 The `glmnet()` function has an `alpha` parameter that determines what type of model is fit. If `alpha = 0` then a ridge regresion model is fit. If `alpha = 1` then a lasso is fit.
@@ -162,21 +160,23 @@ hitters.resample <-
 
 x.train <- 
     hitters.resample$train %>% 
-    as.tibble() %>% 
-    na.omit() %>% 
     model.matrix(Salary ~ ., .)
 
 y.train <- 
     hitters.resample$train %>% 
     as.tibble() %>% 
-    na.omit() %>% .$Salary
+    .$Salary
 ```
 
 We now fit the model to the training set and generate the predictions using `predict()` with a $\lambda = 4$.
 
 ```{r 6.6.1_e}
-x.test <- hitters.resample$test %>% as.tibble() %>% na.omit() %>% model.matrix(Salary ~ ., .)
-y.test <- as.tibble(hitters.resample$test) %>% na.omit() %>% .$Salary
+
+x.test <- hitters.resample$test %>% 
+    model.matrix(Salary ~ ., .)
+
+y.test <- as.tibble(hitters.resample$test) %>% 
+    .$Salary
 
 y.prediction <- predict(ridge.mod, s = 4, newx = x.test)
 mean((y.prediction - y.test)^2)
@@ -191,11 +191,9 @@ mean((y.prediction - y.test)^2)
 
 We see the MSE increase. Now we compare against a regular least squres to determine whether there is a benefit in using $\lambda = 4$. A normal least squares is the same as having a $\lambda = 0$. We have to add `exact = T` becuase (from the manual):
 
-```
-If exact=FALSE (default), then the predict function uses linear interpolation to make predictions for values of s (lambda) that do not coincide with those used in the fitting algorithm. While this is often a good approximation, it can sometimes be a bit coarse. 
+*If exact=FALSE (default), then the predict function uses linear interpolation to make predictions for values of s (lambda) that do not coincide with those used in the fitting algorithm. While this is often a good approximation, it can sometimes be a bit coarse. 
 
-With exact=TRUE, these different values of s are merged (and sorted) with object$lambda, and the model is refit before predictions are made. In this case, it is required to supply the original data x= and y= as additional named arguments to predict() or coef(). The workhorse predict.glmnet() needs to update the model, and so needs the data used to create it.
-```
+With exact=TRUE, these different values of s are merged (and sorted) with object$lambda, and the model is refit before predictions are made. In this case, it is required to supply the original data x= and y= as additional named arguments to predict() or coef(). The workhorse predict.glmnet() needs to update the model, and so needs the data used to create it.*
 
 ```{r 6.6.1_g}
 y.prediction <- predict(ridge.mod, s = 0, newx = x.test, exact = TRUE, x = x.train, y = y.train)
@@ -204,7 +202,8 @@ mean((y.prediction - y.test)^2)
 
 So fitting with a $\lambda = 4$ leads to a lower test MSE.
 
-In general it would be better to use cross validation to determine the $\lambda$. We can use the `cv.glmnet()` to do this. By default is does ten folds.
+In general it would be better to use cross validation to determine the $\lambda$. We can use the `cv.glmnet()` to do this. By default is does ten folds. We see the $\lambda$ with the smallest cross validation error is 27. We plug this back in and see an MSE of 121,165.
+
 
 ```{r 6.6.1_h}
 set.seed(1)
@@ -216,21 +215,169 @@ cv.out %>%
     geom_line() + 
     geom_point()
 
-cv.out %>% 
-    tidy() %>% 
-    arrange(estimate) %>% 
-    .$lambda %>% 
-    .[1]
+cv.out$lambda.min
+
+y.prediction <- predict(ridge.mod, s = 27, newx = x.test)
+mean((y.prediction - y.test)^2)
 ```
 
+### 6.6.6 - The Lasso
 
+Let's see whether the lasso can yield either a more accurate or a more interpretable model than ridge regression. We continue to use the `glmnet()` function, but we set `alpha = 1`. Ither than than that most of the steps are the same.
 
+```{r 6.6.6_a}
+lasso.mod <- glmnet(x.train, y.train, alpha = 1, lambda = 10^seq(10, -2, length = 100))
+lasso.mod %>%
+    tidy() %>%
+    dplyr::filter(term %in% c('AtBat', 'Hits', 'Walks', 'Years', 'Salary', 'Runs')) %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(x = log_lambda, y = estimate, colour = term)) +
+    geom_line()
+```
 
+We can see that the coefficients we have chosen will eventually go to zero. We run a cross-validation and compute the test error.
 
+```{r 6.6.6_b}
+set.seed(1)
+lasso.cv <- cv.glmnet(x.train, y.train, alpha = 1)
 
+lasso.cv %>%
+    tidy() %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(x = log_lambda, y = estimate)) +
+    geom_line() +
+    geom_point()
 
+lasso.pred <- predict(lasso.mod, s = lasso.cv$lambda.min, newx = x.test)
+mean((lasso.pred - y.test)^2)
+```
 
+The main advantage over the ridge regression is that the estimates are sparse:
+```{r 6.6.6_c}
+predict(lasso.mod, s = lasso.cv$lambda.min, type = 'coefficients')
+```
 
+We see a number of the coefficients have been taken to 0.
 
+## 6.7 - PCR and PLS Regression
 
+### 6.7.1 - Principal Components Regression
+
+Principal components regression can be performed using the `pcr()` function which is part of the `pls` library. However we are going to take a different direction and use the `prcmp()` function in a tidier manner.
+
+Before looking at the hitters data, we take a look at a simpler data set with two principal components:
+
+```{r 6.7.1_setup, message = F}
+library(pls)
+```
+
+```{r 6.7.1_a}
+set.seed(1)
+sample <- tibble(x = 1:1000, y = 2*x + rnorm(length(x), 30, 300))
+sample %>% ggplot(aes(x,y)) + geom_point()
+```
+
+We take this data set and nest it in a tibble. We then run the `prcomp()` function over the top to get our princpal components. We augment these with the `broom` library which gives us each observations projection into the PCA space and then unnest this variable.
+
+The two PC columns per observation are '.fittedPC1' and '.fittedPC2', so we summarise the variance of both of these columns. The resulting tibble has those two columns with their variance, so we gather them togeher to there's a column for the PC number, and a column for the variance.
+
+We then calculate the percentage of the total variance, ending up with 96.7% of the variance explained by the first principal component, and 3.3% being described by the second principal component.
+
+```{r 6.7.1_b}
+sample %>% 
+    nest() %>% 
+    mutate(
+        pc = map(data, ~prcomp(.x)), 
+        pc_aug = map2(data, pc, ~augment(.y, data = .x))
+    ) %>% 
+    unnest(pc_aug) %>% 
+    summarise_at(vars(contains('PC')), funs(var)) %>% 
+    gather(key = pc, value = variance) %>% 
+    mutate(var_explained = variance/sum(variance))
+```
+
+Let's now apply this to the `hitters` data. There are two extra steps in the pipeline: we remove columns that aren't numeric, and we rename the PC columns for aesthetics.
+
+```{r 6.7.1_c}
+hitters_pca_variance <- 
+    hitters %>% 
+    select_if(is.numeric) %>% 
+    nest() %>% 
+    mutate(
+        pc = map(data, ~prcomp(.x, center = T, scale = T)), 
+        pc_augment = map2(pc, data, ~augment(.x, .y))
+    ) %>% 
+    unnest(pc_augment) %>% 
+    summarise_at(vars(contains('PC')), funs(var)) %>% 
+    rename_all(funs(str_replace(., '.fittedPC', ''))) %>% 
+    gather(key = pc, value = variance) %>% 
+    mutate(pc = as.integer(pc)) %>%
+    mutate(explained_variance = variance/sum(variance))
+
+hitters_pca_variance
+```
+
+Let's have a look at the graph:
+```{r 6.7.1_d}
+hitters_pca_variance %>% ggplot() + geom_bar(aes(pc, explained_variance), stat = 'identity')
+```
+
+Now we go back to using the `prc()` function.
+
+```{r 6.7.1_e}
+pcr_fit <- pcr(formula = Salary ~ ., data = hitters, scale = T, validation = "CV")
+pcr_fit %>% summary()
+validationplot(pcr_fit, val.type = 'MSEP')
+```
+
+The CV score is the *root mean squared error*. To obtain the usual MSE, the values need to be squared.
+
+```{r 6.7.1_f}
+set.seed(1)
+hitters_pcr <- hitters %>%
+    resample_partition(c('train' = .5, 'test' = .5)) %>%
+    rbind() %>%
+    as.tibble() %>%
+    mutate(pcr = map(train, ~pcr(Salary ~ ., data = as.tibble(.x), scale = T, validation = 'CV')))
+
+hitters_pcr
+
+hitters_pcr %>% pull(pcr) %>% .[[1]] %>% validationplot(., val.type = 'MSEP')
+```
+
+We now see the lowest validation occurs when $M = 7$. We calculate the test MSE:
+
+```{r 6.7.1_g}
+hitters_pcr %>% 
+    transmute(
+        pred = map2(pcr, test, ~predict(.x, as.tibble(.y), ncomp = 5)), 
+        res = map(test, ~as.tibble(.x))) %>% 
+        unnest() %>% 
+        summarise(test_mse = mean((pred - Salary)^2))
+```
+
+### 6.7.2 - Partial Least Squares
+
+Partial least squares is implemented using the `plsr()` function, which is also a part of the `pls` library. The syntax is the same as the `pcr()` function.
+
+```{r 6.7.2_a}
+hitters <- as.tibble(Hitters)
+set.seed(1)
+hitters_pls <- hitters %>%
+    nest() %>%
+    mutate(
+        sample = map(data, ~resample_partition(.x, c(test = .5, train = .5))),
+        pls = map2(data, sample, ~plsr(Salary ~ ., data = .x, subset = as.integer(.y$test), scale = T, validation = 'CV'))
+    ) 
+
+hitters_pls %>%
+    pull(pls) %>%
+    .[[1]] %>%
+    summary()
+
+hitters_pls %>%
+    pull(pls) %>%
+    .[[1]] %>%
+    validationplot(val.type = 'MSEP')
+```
 
