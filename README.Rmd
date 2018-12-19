@@ -53,5 +53,6 @@ This chapter discusses subset selection (best subset, stepwise selection), shrin
 ### Exercises
 
 * [Lab](Chapter_6/lab.md)
+* [Conceptual](Chapter_6/conceptual.md)
 
 

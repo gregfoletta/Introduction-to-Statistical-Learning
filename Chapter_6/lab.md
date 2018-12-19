@@ -632,8 +632,8 @@ Partial least squares is implemented using the `plsr()` function, which is also 
 
 
 ```r
-hitters <- as.tibble(Hitters)
-set.seed(1)
+hitters <- na.omit(Hitters) %>% as.tibble()
+set.seed(2)
 hitters_pls <- hitters %>%
     nest() %>%
     mutate(
@@ -648,33 +648,33 @@ hitters_pls %>%
 ```
 
 ```
-## Data: 	X dimension: 130 19 
-## 	Y dimension: 130 1
+## Data: 	X dimension: 131 19 
+## 	Y dimension: 131 1
 ## Fit method: kernelpls
 ## Number of components considered: 19
 ## 
 ## VALIDATION: RMSEP
 ## Cross-validated using 10 random segments.
 ##        (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
-## CV           428.7    319.4    321.3    331.3    344.4    358.2    359.0
-## adjCV        428.7    318.4    319.8    328.8    340.8    352.9    353.7
+## CV           420.9    329.2    332.3    340.4    342.3    356.3    359.1
+## adjCV        420.9    328.2    330.9    338.0    339.8    352.4    355.0
 ##        7 comps  8 comps  9 comps  10 comps  11 comps  12 comps  13 comps
-## CV       356.6    352.7    354.5     354.0     355.5     352.5     351.1
-## adjCV    351.5    348.0    349.7     348.9     350.3     347.4     346.0
+## CV       364.0    356.8    353.9     356.5     356.5     357.8     367.7
+## adjCV    358.8    352.4    349.7     352.3     352.0     353.3     362.2
 ##        14 comps  15 comps  16 comps  17 comps  18 comps  19 comps
-## CV        350.5     352.2     349.7     348.8     346.3     352.8
-## adjCV     345.2     346.8     344.4     343.5     341.3     347.1
+## CV        366.5     358.5     359.7     360.0     359.4     368.3
+## adjCV     360.8     353.6     354.8     355.1     354.6     362.8
 ## 
 ## TRAINING: % variance explained
 ##         1 comps  2 comps  3 comps  4 comps  5 comps  6 comps  7 comps
-## X         38.41    54.19    68.24    74.68    77.88    83.48    88.71
-## Salary    50.99    54.77    56.19    57.31    59.15    60.09    60.55
+## X         36.30    53.97    65.17    70.87    75.99    83.24    86.98
+## Salary    45.72    48.70    50.92    52.47    54.08    55.21    56.33
 ##         8 comps  9 comps  10 comps  11 comps  12 comps  13 comps  14 comps
-## X         91.35    93.35     94.58     97.32     97.93     98.63     98.97
-## Salary    60.96    61.39     62.04     62.29     62.88     63.17     63.50
+## X         89.41    91.85     95.89     96.42     97.28     97.89     98.28
+## Salary    56.73    56.97     57.03     57.42     57.68     57.99     58.34
 ##         15 comps  16 comps  17 comps  18 comps  19 comps
-## X          99.23     99.44     99.74     99.95    100.00
-## Salary     63.75     64.07     64.20     64.25     64.44
+## X          98.75     99.69     99.82     99.99    100.00
+## Salary     58.49     58.50     58.54     58.56     58.64
 ```
 
 ```r
@@ -686,3 +686,23 @@ hitters_pls %>%
 
 ![plot of chunk 6.7.2_a](figure/6.7.2_a-1.png)
 
+The lowest cross-validation error occurs when $M = 2$. We now evaluate the test set.
+
+
+```r
+hitters_pls %>% 
+    mutate(
+        pred = map2(sample, pls, ~as.vector(predict(.y, .x$test, ncomp = 2))), 
+        salary = map(sample, function(x) as.tibble(x$test)$Salary)) %>% 
+    unnest(pred, salary) %>% 
+    summarise(mse = mean((pred - salary)^2))
+```
+
+```
+## # A tibble: 1 x 1
+##      mse
+##    <dbl>
+## 1 89506.
+```
+
+We get an MSE of 89,509, which looks rather good.

@@ -361,8 +361,8 @@ hitters_pcr %>%
 Partial least squares is implemented using the `plsr()` function, which is also a part of the `pls` library. The syntax is the same as the `pcr()` function.
 
 ```{r 6.7.2_a}
-hitters <- as.tibble(Hitters)
-set.seed(1)
+hitters <- na.omit(Hitters) %>% as.tibble()
+set.seed(2)
 hitters_pls <- hitters %>%
     nest() %>%
     mutate(
@@ -381,3 +381,15 @@ hitters_pls %>%
     validationplot(val.type = 'MSEP')
 ```
 
+The lowest cross-validation error occurs when $M = 2$. We now evaluate the test set.
+
+```{r 6.7.2_b}
+hitters_pls %>% 
+    mutate(
+        pred = map2(sample, pls, ~as.vector(predict(.y, .x$test, ncomp = 2))), 
+        salary = map(sample, function(x) as.tibble(x$test)$Salary)) %>% 
+    unnest(pred, salary) %>% 
+    summarise(mse = mean((pred - salary)^2))
+```
+
+We get an MSE of 89,509, which looks rather good.
