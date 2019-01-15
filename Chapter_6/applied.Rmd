@@ -1,0 +1,347 @@
+# Applied
+
+```{r setup, message = F}
+library(tidyverse)
+library(leaps)
+library(broom)
+library(glmnet)
+library(modelr)
+library(ISLR)
+```
+
+## 8 - Subset Selection
+
+### a)
+*Use the rnorm() function to generate a predictor $X$ of length $n = 100$, as well as a noise vector of length $n = 100$.*
+```{r 8.a}
+set.seed(1)
+subset_selection = tibble(x = rnorm(100), e = rnorm(100, 0, 4))
+```
+
+### b)
+*Generate a response vector Y of length n = 100 according to a cubic model*
+```{r 8.b}
+subset_selection <- subset_selection %>%
+    mutate(y = 4 - 2*x + 6*x^2 - x^3 + e)
+```
+
+### c)
+*Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors $X, X^2, \ldots, X^10$. What is the best model obtained according to $C_p$, BIC, and adjusted $R^2$?*
+
+```{r 8.c.1}
+bestsub_result <- subset_selection %>%
+    regsubsets(y ~ poly(x, 10, raw = T), data = ., nvmax = 10)
+
+bestsub_result %>% summary() %>% .$cp %>% which.min()
+bestsub_result %>% summary() %>% .$bic %>% which.min()
+bestsub_result %>% summary() %>% .$adjr2 %>% which.max()
+
+bestsub_metrics <- bestsub_result %>%
+    summary() %>%
+    rbind() %>%
+    as.tibble() %>%
+    dplyr::select(rsq, rss, adjr2, cp, bic) %>%
+    unnest() %>%
+    rownames_to_column('polynomial') %>%
+    mutate(polynomial = as.integer(polynomial))
+
+bestsub_metrics
+```
+We see that all three have chosen a third degree polynomial.
+
+*Show some plots to provide evidencefor your answer, and report the coefficients of the best model obtained.* 
+
+```{r 8.c.2}
+bestsub_metrics %>%
+    gather(key = 'metric', value = 'value', c(rsq, rss, adjr2, cp, bic)) %>%
+    ggplot(aes(polynomial, value)) +
+    geom_point() +
+    facet_wrap(~metric, scales = 'free')
+```
+
+We can see that in all of the graphs, the 'elbow' of the graph is at polynomial order 3.
+
+```{r 8.c.3}
+coefficients(bestsub_result, id = 3)
+```
+
+We see the coefficients are reasonably close to the 4, -2, 6 and -1, however it's chosen the 2nd, 3rd and 5th monomials.
+
+### d)
+*Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?*
+
+```{r 8.d.1}
+fw_result <- subset_selection %>%
+    regsubsets(y ~ poly(x, 10, raw = T), data = ., nvmax = 10, method = 'forward')
+
+bw_result <- subset_selection %>%
+    regsubsets(y ~ poly(x, 10, raw = T), data = ., nvmax = 10, method = 'backward')
+
+fw_result %>% summary() %>% .$cp %>% which.min()
+fw_result %>% summary() %>% .$bic %>% which.min()
+fw_result %>% summary() %>% .$adjr2 %>% which.max()
+
+bw_result %>% summary() %>% .$cp %>% which.min()
+bw_result %>% summary() %>% .$bic %>% which.min()
+bw_result %>% summary() %>% .$adjr2 %>% which.max()
+```
+
+We see the forward stepwise has chosen the 3rd degree polynomial, however the backward selection has chosen polynomials of degree 6, 4 and 6.
+
+```{r 8.d.2}
+fw_metrics <- fw_result %>%
+    summary() %>%
+    rbind() %>%
+    as.tibble() %>%
+    dplyr::select(rsq, rss, adjr2, cp, bic) %>%
+    unnest() %>%
+    rownames_to_column('polynomial') %>%
+    mutate(polynomial = as.integer(polynomial))
+
+fw_metrics
+
+bw_metrics <- bw_result %>%
+    summary() %>%
+    rbind() %>%
+    as.tibble() %>%
+    dplyr::select(rsq, rss, adjr2, cp, bic) %>%
+    unnest() %>%
+    rownames_to_column('polynomial') %>%
+    mutate(polynomial = as.integer(polynomial))
+
+fw_metrics
+```
+
+We now have a look at the graphs:
+
+```{r 8.d.3}
+fw_metrics %>%
+    gather(key = 'metric', value = 'value', c(rsq, rss, adjr2, cp, bic)) %>%
+    ggplot(aes(polynomial, value)) +
+    geom_point() +
+    facet_wrap(~metric, scales = 'free')
+
+bw_metrics %>%
+    gather(key = 'metric', value = 'value', c(rsq, rss, adjr2, cp, bic)) %>%
+    ggplot(aes(polynomial, value)) +
+    geom_point() +
+    facet_wrap(~metric, scales = 'free')
+```
+
+We now look at the coefficients chosen for the 3 degree polynomial with forward selection, and for the 4 and 6 degree for backward selection:
+```{r 8.d.4}
+coefficients(fw_result, id = 3)
+coefficients(bw_result, id = 3)
+coefficients(bw_result, id = 4)
+coefficients(bw_result, id = 6)
+```
+
+The forward stepwise has chosed coefficients close to the real ones. The backwards stepwise has not done as well.
+
+### e)
+*Now fit a lasso model to the simulated data, again using $X, X^2 ,\ldots, X^10$ as predictors. Use cross-validation to select the optimal value of $\lambda$.*
+
+We first generate our lasso model - we remove the intercept from the model matrix.
+
+```{r 8.e.1}
+cubic_data <- subset_selection
+
+cubic_predictors <- model.matrix(y ~ poly(x, 10, raw = T), data = cubic_data)[,-1]
+cubic_response <- cubic_data$y
+
+cubic_lasso <- glmnet(cubic_predictors, cubic_response, alpha = 1, lambda = 10 ^ seq(10, -2, length = 100))
+```
+
+Let's now have a look at the graph of the coefficients:
+```{r 8.e.2}
+cubic_lasso %>%
+    tidy() %>%
+    dplyr::filter(term != '(Intercept)') %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(log_lambda, estimate, colour = term)) +
+    geom_line()
+```
+
+We now run a cross-validation on this with `glmnet()`:
+
+```{r 8.e.3}
+set.seed(1)
+cubic_lasso_cv <- cv.glmnet(cubic_predictors, cubic_response, alpha = 1)
+
+cubic_lasso_cv %>%
+    tidy() %>%
+    mutate(log_lambda = log(lambda)) %>%
+    ggplot(aes(log_lambda, estimate)) +
+    geom_line()
+
+cubic_lasso_cv$lambda.min
+```
+
+*Report the resulting coefficient estimates, and discuss the results obtained.*
+
+```{r 8.e.4}
+best_lasso <- glmnet(cubic_predictors, cubic_response, alpha = 1)
+```
+
+### f)
+**Now generate a response vector Y according to the model**
+$$ Y = \beta_0 + \beta_7X^7 + e $$
+*and perform best subset selection and the lasso. Discuss the results obtained.*
+
+We choose $\beta_7$ to be 9.
+
+```{r 8.f.1}
+septic_response <- subset_selection %>%
+    mutate(y = 4 + 9*x^7 + e)
+
+septic_best_sub <- septic_response %>%
+    regsubsets(y ~ poly(x, 10, raw = T), data = ., nvmax = 10)
+
+septic_best_sub %>% summary() %>% .$cp %>% which.min()
+septic_best_sub %>% summary() %>% .$bic %>% which.min()
+septic_best_sub %>% summary() %>% .$adjr2 %>% which.max()
+
+coefficients(septic_best_sub, id = 1)
+coefficients(septic_best_sub, id = 2)
+coefficients(septic_best_sub, id = 4)
+```
+
+We see the BIC picks the one variable model with a coefficient very close to the original coefficient.
+
+We now try a lasso:
+
+```{r 8.f.2}
+septic_x <- model.matrix(y ~ poly(x, 10, raw = T), data = septic_response)[,-1]
+septic_y <- septic_response$y
+
+septic_lasso_cv <- cv.glmnet(septic_x, septic_y, alpha = 1)
+septic_lasso_cv$lambda.min
+
+glmnet(septic_x, septic_y, alpha = 1, lambda = septic_lasso_cv$lambda.min) %>% coefficients()
+```
+
+The lasso correctly picks the seventh degree polynomial, and is also close to the real value.
+
+## 9
+*In this exercise, we will predict the number of applications received using the other variables in the College data set.*
+
+### a)
+*Split the data set into a training set and a test set.*
+
+```{r 9.a.1}
+set.seed(1)
+college <- College %>%
+    as.tibble() %>%
+    nest() %>%
+    mutate(partition = map(data, ~resample_partition(.x, c(train = .5, test = .5))))
+
+college
+```
+
+### b)
+*Fit a linear model using least squares on the training set, and report the test error obtained.*
+
+```{r 9.b.1}
+college <- college %>%
+    mutate(
+        lm = map(partition, ~lm(Apps ~ ., data = .x$train)),
+        lm.mse = map2(partition, lm, ~mse(.y, .x$test))
+    ) %>%
+    select(-lm) %>%
+    unnest(lm.mse)
+
+college
+```
+
+### c)
+*Fit a ridge regression model on the training set, with $\lambda$ chosen by cross-validation. Report the test error obtained.*
+
+```{r 9.c.1}
+set.seed(1)
+college <- college %>%
+    mutate(rr = map(partition, ~cv.glmnet(
+        model.matrix(Apps ~ ., .x$train),
+        as.tibble(.x$train)$Apps,
+        alpha = 0,
+        lambda = 10 ^ seq(10, -2, length = 100)
+    ))) %>%
+    mutate(
+        rr.pred = map2(
+            partition,
+            rr,
+            ~predict(.y, s = .y$lambda.min, newx = model.matrix(Apps ~ ., .x$test)
+        )),
+        rr.mse = map2(partition, rr.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
+    ) %>%
+    select(-c(rr, rr.pred)) %>%
+    unnest(rr.mse)
+
+college
+```
+
+### d)
+*Fit a lasso model on the training set, with $\lambda$ chosen by crossvalidation. Report the test error obtained, along with the number of non-zero coefficient estimates.*
+
+```{r 9.d.1}
+set.seed(1)
+college <- college %>%
+    mutate(lasso = map(partition, ~cv.glmnet(
+        model.matrix(Apps ~ ., .x$train),
+        as.tibble(.x$train)$Apps,
+        alpha = 1,
+        lambda = 10 ^ seq(10, -2, length = 100)
+    ))) %>%
+    mutate(
+        lasso.pred = map2(
+            partition,
+            lasso,
+            ~predict(.y, s = .y$lambda.min, newx = model.matrix(Apps ~ ., .x$test)
+        )),
+        lasso.mse = map2(partition, lasso.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
+    ) %>%
+    select(-c(lasso, lasso.pred)) %>%
+    unnest(lasso.mse)
+
+college
+```
+
+### e)
+*Fit a PCR model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
+
+```{r 9.e.1}
+set.seed(1)
+college <- college %>%
+    mutate(
+        pcr = map(partition, ~pcr(Apps ~ ., data = .x$train, scale = T, validation = 'CV')),
+        pcr.pred = map2(partition, pcr, ~predict(.y, .x$test, ncomp = 5)),
+        pcr.mse = map2(partition, pcr.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
+    ) %>%
+    select(-c(pcr, pcr.pred)) %>%
+    unnest(pcr.mse)
+```
+
+### f)
+*Fit a PLS model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
+
+```{r 9.f.1}
+college %>%
+    mutate(
+        pls = map(partition, ~plsr(Apps ~ ., data = .x$train, scale = T, validation = 'CV')),
+        pls.pred = map2(partition, pls, ~predict(.y, .x$test, ncomp = 7)),
+        pls.mse = map2(partition, pls.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
+    ) %>%
+    select(-c(pls, pls.pred)) %>%
+    unnest(pls.mse)
+
+college
+```
+### g)
+*Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?*
+
+```{r 9.g.1}
+college %>%
+    select(-c(data, partition)) %>%
+    gather(key = 'method', value = 'mse', c(lm.mse, rr.mse, lasso.mse, pcr.mse, pls.mse)) %>%
+    ggplot() +
+    geom_bar(aes(method, mse), stat = 'identity')
+```
