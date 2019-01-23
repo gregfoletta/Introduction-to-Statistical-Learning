@@ -62,7 +62,7 @@ for my $file_r (@rmd_files) {
 
 
     # Change to the directory the file is in.
-    chdir $file_r->[DIR];
+    #chdir $file_r->[DIR];
 
     my $R = Statistics::R->new;
 
