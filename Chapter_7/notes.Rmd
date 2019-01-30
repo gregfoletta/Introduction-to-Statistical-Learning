@@ -1,0 +1,259 @@
+# Chapter 7 - Moving Beyond Linearity
+
+In the previous chapters we have discussed linear models. Standard linear regression can have limited predictive power. This is because the linearity assumption is almost always an approximation.
+
+In the previous chapter we reduced the complexity of the least squares model using the lasso, ridge-regression, PCA, and other techniques. However it's still a linear model.
+
+In this chapter we relax the linearity assumption:
+
+* *Polynomial regression* extends the linear model but adding extra predictors.
+* *Step functions* cut the range of a variable into $K$ distinct regions in order to produce a qualitative variable.
+* *Regression splines* are more flexible than polynomials and step functons. They involve cutting the range of $X$ into $K$ distinct regions, then fitting a polynomial within that region.
+* *Smoothing splines* are similar to regression splines, but result from minimising the RSS subject to a smoothness penalty.
+* *Local regression* is similar to splines, but allows the regions to overlap.
+* *Generalised additative models* extend the methods above to multiple pedictors.
+
+## 7.1 - Polynomial Regression
+
+The standard way to extend the linear regression to settings where the relationship betwee the predictors and the response is non-linear is to replace the linear model with a polynomial function:
+$$ y_i = \beta_0 + \beta_1x_i + \ldots + \beta_dx_i^d + \epsilon_i $$
+
+Generally speaking it is unusual to use $d$ greater than 3 or 4 as the cuve can become overly flexible and take on strange shapes.
+
+As an example we take the `Wage` data and fit a polynomial to it. We create a tibble of the predictions for each age, which we use to show the curve of the model.
+
+```{r setup, message = F}
+library(ISLR)
+library(tidyverse)
+```
+
+```{r 7.1.1}
+wage <- as.tibble(Wage)
+wage_model <- wage %>% lm(wage ~ poly(age, 4), data = .)
+
+wage_model_curve <- tibble(
+    age = min(wage$age):max(wage$age),
+    wage = predict(wage_model, newdata = tibble(age))
+)
+
+ggplot(wage) +
+    geom_jitter(aes(age, wage), colour = 'grey') +
+    geom_line(data = wage_model_curve, aes(age, wage))
+```
+
+How are the standard error curves calculated? If we have computed:
+$$ \hat{f}(x_0) = \hat{\beta_0} + \hat{\beta_1}x_0 + \ldots + \hat{\beta_4}x^4_0 $$
+
+What is the variance of the fit? Least squares returns the variance of the estimates for each of the coefficients $\hat{\beta_j}$ as well as the covarainces between the pairs of coefficient estimates. If $\hat{C}$ is the covariance matrix of the $\hat{\beta_j}$ and $\ell^T_0 = (1, x_0, x^2_0, \ldots, x^d_0)$ then $Var[\hat{f}(x_0)] = \ell^T_0\hat{C}\ell_0$.
+
+There appears to be two distinct wage bands. We can create a binary variable for age and fit a logistic regression:
+
+```{r 7.1.2}
+high_earn_mdl <- wage %>%
+    mutate(high_earn = wage > 250) %>%
+    glm(high_earn ~ poly(age, 4), data = ., family = 'binomial')
+```
+
+We can then view the probability of being in the high earners based on age:
+
+```{r 7.1.3}
+tibble(
+    age = min(wage$age):max(wage$age),
+    high_earn_prob = predict(high_earn_mdl, newdata = tibble(age), type = 'response')
+) %>%
+ggplot(aes(age, high_earn_prob)) +
+geom_line()
+```
+
+## 7.1 - Step Functions
+
+Using polynomial functions of the features imposes a *global* structure on the non-linear function of $X$. We can use *step functions* in order to avoid imposing such global structure. We break the range into $X$ bins and fit a different constant to each bin.
+
+This amounts to converting a continuous variable into an *ordered categorical* variable.
+
+We create cutpoints $c_1, c_2, \ldots, c_K$ in the range of $X$ and then construct $K$ new variables:
+
+$$ C_0(X) = I(X < c_1)$$
+
+$$ C_1(X) = I(c_1 \leq X < c_2) $$
+
+$$\vdots$$
+
+$$C_{K-1}(X) = I(c_{K-1} \leq X < c_K)$$
+
+$$ C_K = I(c_K \leq X) $$
+
+Where $I(.)$ is an indicator function that returns 1 if the condition is true or 0 if it is false. This means that for any value of $X$, $C_0(X) + \ldots + C_K(X) = 1$ since $X$ must be in exactly one of the intervals. We can then use least squares to fit a linear model using $C_1(X), \ldots, C_K(X)$. Note that $C_0(X)$ is excluded because it's redundant with the intercept. The decision to exclude $C_0(X)$ instead of any of the other $K$ is arbitrary. We could also include it and exclude the intercept.
+
+Unless there are natural breakpoints in the predictors, piecewise-constant functions can miss the action. They are often popular in biostatistics and epidemiology where 5 year bins are used.
+
+## 7.3 - Basis Functions
+
+Polynomial and step functions are actually special cases of a *basis function* approach. The idea is to have at hand a family of functions or transformations that can be applied to variable $X$. Instead of fitting a linear model in $X$, we fit:
+
+$$ y_i = \beta_0 + \beta_1b_1(x_i) + \ldots + \beta_Kb_K(x_i) + \epsilon_i $$
+
+Note that the basis functions are fixed and known. For polynomials the basis function is $b_j(x_i) = x_i^j$.
+
+Many alternatives are possible, for example wavelets or Fourier series, to construct the basis functions. A very common choice is a regression spline.
+
+## 7.4 - Regression Spline
+
+### 7.4.1 - Piecewise Polynomials
+
+Instead of fitting a high degree polynomial over the entire range of $X$, we fit separate low-degree polynomials over different regions of $X$. The points where the coefficients change are called knots. The functions are often discontinuous, with huge jumps where the piecewise sections meet.
+
+### 7.4.2 - Constraints and Splines
+
+The problem with the piecewise polynomial is that they were too flexible. However they can be fit under the constraint that they must be continuous. We can also add a constraint that the first and second derivatives of must be continuous as well.
+
+Each constraint imposed frees up one degree of freedom. So with a cubic and two sections, there are eight degrees of freedom. By putting in place three constraints (continuity of the 0th, 1st and 2nd derivatives) there are only five degrees of freedom left.
+
+### 7.4.3 - The Spline Basis Representation
+
+How do we fit a piecewise degree-d polynomial under the constraint that it (and possibly degree d-1 derivaties) be continuous? The basis model can be used. A cubic spline with $K$ knots can be modeled as:
+
+$$ y_i = \beta_0 + \beta_1b_1(x_i) + \ldots + \beta_{K+3}b_{K+3}(x_i) + \epsilon_i $$
+
+for an appropraite choice of basis functions. The model can then be fit using least squares.
+
+The most direct way to do this is to start off with the basis for a cubic polynomial ($x, x^2, x^3$) and then add one *truncated power basis* function per knot. This name is derived from the fact that these functions are shifted power functions that get truncated to zero to the left of the knot.
+
+$$ \\
+h(x, \xi) = (x - \xi)^3_+ =
+\begin{cases} \\
+    (x - \xi)^3 & \text{if} x > \xi \\
+    0 & \text{otherwise} \\
+\end{cases} 
+$$
+
+Where $\xi$ is the knot.
+
+```{r 7.4.3.a}
+h <- function(x, xi) { ifelse(x <= xi, 0, (x - xi)^3) }
+tibble(
+    x = -10:60,
+    y = h(x, 40)
+) %>%
+ggplot(aes(x,y)) +
+geom_line()
+```
+
+In other words in order to fit a cubic spline to a data set with $K$ knots we perform a least squares regression with an intercept and $3 + K$ predictors. These are of the form 
+$X, X^2, X^3, h(X,\xi_1), h(X,\xi_2), \ldots, h(x,\xi_K)$, where the $\xi_1, \ldots, \xi_K$ are the knots. This amounts to estimating $K + 4$ regression coefficients.
+
+Splines can have high variance at the outer range of the predictors. A *natural spline* is a regression spline with additional boundary constraints. The function is required to be linear at the boundary.
+
+### 7.4.4 - Chosing the Knots
+
+Where should the knots be placed? One way is to specify the degrees of freedom, and have the software automatically place the corresponding number of knots at uniform quantiles in the data.
+
+Cross validation can be used - a portion of data is removed, then use the slpine to make predictions on the held out piece. We repeat this process multiple times until every piece has been held out once, then compute the overall cross-validated RSS. This can be repeated for different numbers of $K$.
+
+### 7.4.5 - Comparison to Polynomial Regression
+
+Regression splines often give superior results to polynomial regression. This is because unlike polynomials which must use a high degree (e.g. $X^10$) to produce flexible fits, splines introduce flexibility by increasing the number of knots but keeping the degrees of freedom fixed. Generally this produces more stable estimates. They also allow knots to be placed in regions where f appears to be changing rapidly, and fewer where f appears stable.
+
+## 7.5 - Smoothing Splines
+
+In fitting a smooth curve to a set of data, what we really want to do is find a function $g(x)$ that fits the observed data well. That is we want $RSS = \sum_{i=1}^n(y_i - g(x_i))^2$ to be small. The problem is that we can always make RSS zero by simply interpolating all of the $y_i$. Such a function massively overfits the data and is far too flexible. We want a function that reduces the RSS but is smooth.
+
+### 7.5.1 - Overview
+
+We can ensure $g(x)$ is smooth by minimusing:
+$$ \sum_{i=1}^n(y_i - g(x_i))^2 + \lambda\int{}g\prime\prime(x)^2dt $$
+
+where $\lambda$ is a non-negative tuning parameter.
+
+The function $g(x)$ that minimises the formula above is known as a *smoothing spline*.
+
+The first term is a $loss$ term that encourages g to fit the data well. The second term is a penalty term that penalises the variability in g. The double-prime indicates the second derivative of the g, which corresponds to the amount the slope is changing (think accelleration). It is large if $g(t)$ is 'wiggly' near $t$, and close to zero otherwise.
+
+The integral is the summation over the range $t$. When $\lambda = 0$ the penality term has no effect. When $\lambda \to \inf$ g will be perfectly smooth - it will be a straight line that passes as closely to all the points - i.e. it will be the least squares line. We see that $\lambda$ controls the bias-variance trade-off of the smoothing spline.
+
+The function $g(x)$ is a natural cubic spline, however it's not the same that would would get if one applied the basis function approach. Rather it is a *shrunken* version of a natural cubic spline, where the value of the tuning parameter controls the level of shrinkage.
+
+### 7.5.1 - Choosing the Smoothing Parameter
+
+It might seem that the smoothing spline would have too many degrees of flexibility, since a knot at each data point allows for a lot of flexibility. However the tuning paramter $\lambda$ controls the roughness and hence the *effective degrees of freedom*. As $\lambda$ increases from 0 to $\inf$, the effective degrees of freedom ($df_\lambda$) decrease from $n$ to 2.
+
+Usually degrees of freedom refer to the number of free parameters, such as the number of coefficients fit in a polynomial or cubic spline. Although a smoothing spline has $n$ parameters and hence $n$ degrees of freedom, these are heavily constrained or shrunk down. The effective degrees of freedom is technical. We can write:
+
+$$ \hat{\mathbf{g}}_\lambda = \mathbf{S}_\lambda\mathbf{y} $$
+
+where $\hat{\mathbf{g}}$ is the solution of g for a particular $\lambda$. It's an $n$ vector containing the fitted values of the smoothing spline at the training points $x_1, \ldots, x_n$. The equation indicates that the vector can be written as an $n \times n$ matrix $\mathbf{S}_\lambda$ times the response vector $\mathbf{y}$.
+
+The effective degrees of freedom is then defined to be:
+
+$$ df_\lambda = \sum_{i=1}^n{\mathbf{S}_\lambda}_{ii} $$
+
+or the sum of the diagonal elements of the matrix $\mathbf{S}_\lambda$.
+
+In fitting a smoothing spline, we don't need to choose how many knots there are: there will be one at each training observation $x_0, \ldots, x_n$. Instead we need to choose the value of $\lambda$.
+
+It turns out LOOCV can be computed very efficiently for smoothing splines. It's done with the following formula:
+
+$$ RSS_{cv}(\lambda) = \sum_{i=1}^n(y_i - \hat{g}_\lambda^{(-i)}(x_i))^2 = \sum_{i=1}^n\Bigg[\frac{y_i - \hat{g}_\lambda(x_i)}{1 - {\mathbf{S}_\lambda}_ii}\bigg]^2 $$
+
+The notiation $\hat{g}_\lambda^{(-1)}(x_i)$ indicates the fitted value for the smoothing spline evaluated at $x_i$ where the fit uses all of the training observations except the $i$th observation.
+
+The exactly formulas for calculating $\hat{g}(x_i)$ and $\mathbf{S}_\lambda$ are technical, however there are efficient algorithms available.
+## 7.4 - Local Regression
+
+Local regression is a different approach for fitting flexible non-linear functions. It involves computing the fit at a target point $x_0$ using only the nearby training observations.
+
+The algorith can be specified as:
+
+* Gather the fraction $s = \frac{k}{n}$ of training points whose $x_i$ are closest to $x_0$.
+* Assign a weight $K_{i0} = K(x_i,x_0)$ to each point in this neighborhood, so that the point furtherest from $x_0$ is 0.
+* Fit a weighted least squares  of the $y_i$ on the $x_i$ using the aforementioned weights by finding $\hat{\beta}_0, \hat{\beta}_1$ that minimise:
+
+$$ \sum_{i=1}^nK_{i0}(y_i - \beta_0 - \beta_1x_i)^2 $$
+
+* The fitted value at $x_0$ is given by $\hat{f}(x_0) = \hat{\beta}_0 + \hat{\beta}_1x_0$
+
+The idea of local regression can be generalised in different ways. In a setting with multiple features $X_1, \ldots, X_p$, one useful generalisation involves fitting a multiple linear regression model that is global in some features and local in others such as time. Such *varying coefficient models* are a useful way of adapting a model to the most recently gathered data.
+
+In order to perform a local regression, there are a number of choices to be made, such as choosing the weighting function $K$, and whether to fit a linear, constant or quadratic regression. The most important choice is the span $s$. It plays a role like $\lambda$ in that it controls the flexibility of a non-linear fit. The smaller it is, the more local and wiggly the fit. A large value will lead to a global fit of all the data.
+
+We can again use CV to select the value, or specify it directly.
+
+## 7.7 - Generalised Additive Models
+
+The previous approaches can be seen as extensions of a standard linear model a response $Y$ and a single predictor $X$.
+
+In this section we discuss the problem of flexibly predicting $Y$ on the basis of several predctors $X_1, \ldots, \X_P$.
+
+*Generalised additive models* provide a framework for extending the linear model by allowing non-linear models while maintaining *additivity*.
+
+### 7.7.1 - GAMs for Regression Problems
+
+A natural way to extend the linar model
+
+$$ y_i = \beta_0 + \beta_1x_{i1} + \ldots + \beta_px_{ip} + \epsilon_i $$
+
+to allow for non-linear relationships between each feature and the response is to replace each $\beta_jx_{ij}$ with a smooth non-linear function $f_j(x_{ij})$. We can then re-write the model as:
+
+$$ y_i = \beta_0 + \sum_{j=1}^pf_k(x_{ij}) + \epsilon_i $$
+
+This is a GAM, and it's additive because we calculate a separate $f_j$ for each $X_j$, then add together all of their contributions.
+
+We don't have to use splines as the building blocks for GAMs: we can just as well use local regression, polynomial regression, or any combination of the approaches seen earlier in this chapter in order to create a GAM.
+
+#### Pros and Cons of GAMs
+
+* **Pros::**
+    * Allow us to fit a non-linear $f_j$ to each $X_j$ so that we can automatically model non-linear relationships that a standard linear model will miss.
+    * The non-linear fits can potentially make more accurate predictions for the response $Y$.
+    * Because the model is additive, we can still examine the effect of each $X_j$ on $Y$ independently while holding all other variables fixed.
+    * The smoothness of the function $f_j$ for the variable $X_J$ can be summarised via degrees of freedom.
+* **Cons:**
+    * The main limitation is the the model is restricted to being additive. With many variables, important interactions can be missed. However as with linear regresion, we can add interation terms ($X_j \times X_k$). We can also add low-dimensional interaction functions of the form $f_j(X_j, X_k)$ into the model. Such terms can be fit using two-dimensional smoothers such as local regression or two-dimensional splines. 
+
+### 7.7.2 - GAMs for Classification
+
+GAMs can be used where $Y$ is qualitative. Assume $Y \in {0,1}$ and let $p(X) = Pr(Y = 1|X)$ be the conditional probability (given the predictors) that the response equals one. We can extend the *logit* (log odds) model to allow for non-linear relatonships:
+
+$$ log\bigg(\frac{p(X)}{1 - p(X)}\bigg) = \beta_0 + f_1(X_1) + \ldots + f_p(X_p) $$
+
+This is a *logistic regression GAM*.
