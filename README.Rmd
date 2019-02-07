@@ -56,4 +56,12 @@ This chapter discusses subset selection (best subset, stepwise selection), shrin
 * [Conceptual](Chapter_6/conceptual.md)
 * [Applied](Chapter_6/applied.md)
 
+## Chapter 7 - Moving Beyond Linearity
 
+This chapter discusses polynomials, splines, and general additative models (GAMs).
+
+* [Notes](Chapter_7/notes.md)
+
+### Exercises
+
+* [Lab](Chapter_7/lab.md)

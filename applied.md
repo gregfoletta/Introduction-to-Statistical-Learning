@@ -577,21 +577,60 @@ college <- college %>%
         )),
         lasso.mse = map2(partition, lasso.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
     ) %>%
-    select(-c(lasso, lasso.pred)) %>%
+    select(-c(lasso.pred)) %>%
     unnest(lasso.mse)
 
 college
 ```
 
 ```
-## # A tibble: 1 x 5
-##   data                partition    lm.mse   rr.mse lasso.mse
-##   <list>              <list>        <dbl>    <dbl>     <dbl>
-## 1 <tibble [777 × 18]> <list [2]> 1407766. 1422683.  1458869.
+## # A tibble: 1 x 6
+##   data                partition    lm.mse  rr.mse lasso          lasso.mse
+##   <list>              <list>        <dbl>   <dbl> <list>             <dbl>
+## 1 <tibble [777 × 18]> <list [2]> 1407766.  1.42e6 <S3: cv.glmne…  1458869.
 ```
+
+Let's take a look at the coefficients:
+
+```r
+college %>%
+    pull(lasso) %>%
+    predict(object = .[[1]], s = .[[1]]$lambda.min, type = 'coefficients')
+```
+
+```
+## 19 x 1 sparse Matrix of class "dgCMatrix"
+##                         1
+## (Intercept) -7.923062e+02
+## (Intercept)  .           
+## PrivateYes  -6.180410e+02
+## Accept       1.252269e+00
+## Enroll       .           
+## Top10perc    5.475042e+01
+## Top25perc   -1.922255e+01
+## F.Undergrad  1.791780e-02
+## P.Undergrad  .           
+## Outstate    -3.095159e-02
+## Room.Board   1.902181e-01
+## Books        1.471236e-03
+## Personal     1.066474e-01
+## PhD         -4.511206e+00
+## Terminal     .           
+## S.F.Ratio    .           
+## perc.alumni -6.971380e+00
+## Expend       6.221479e-02
+## Grad.Rate    6.821201e+00
+```
+
+We see it's reduced *Enroll*, *P.Undergrad*, *Terminal* and *S.F Ratio* to zero.
 
 ### e)
 *Fit a PCR model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
+
+```r
+library(pls)
+```
+
 
 
 ```r
@@ -606,41 +645,33 @@ college <- college %>%
     unnest(pcr.mse)
 ```
 
-```
-## Error in mutate_impl(.data, dots): Evaluation error: could not find function "pcr".
-```
-
 ### f)
 *Fit a PLS model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
 
 
 ```r
-college %>%
+college <- college %>%
     mutate(
         pls = map(partition, ~plsr(Apps ~ ., data = .x$train, scale = T, validation = 'CV')),
         pls.pred = map2(partition, pls, ~predict(.y, .x$test, ncomp = 7)),
         pls.mse = map2(partition, pls.pred, ~mean((as.tibble(.x$test)$Apps - .y)^2))
     ) %>%
     select(-c(pls, pls.pred)) %>%
-    unnest(pls.mse)
-```
+    unnest(pls.mse) -> college
 
-```
-## Error in mutate_impl(.data, dots): Evaluation error: could not find function "plsr".
-```
-
-```r
 college
 ```
 
 ```
-## # A tibble: 1 x 5
-##   data                partition    lm.mse   rr.mse lasso.mse
-##   <list>              <list>        <dbl>    <dbl>     <dbl>
-## 1 <tibble [777 × 18]> <list [2]> 1407766. 1422683.  1458869.
+## # A tibble: 1 x 8
+##   data       partition   lm.mse  rr.mse lasso    lasso.mse pcr.mse pls.mse
+##   <list>     <list>       <dbl>   <dbl> <list>       <dbl>   <dbl>   <dbl>
+## 1 <tibble [… <list [2]>  1.41e6  1.42e6 <S3: cv…  1458869.  3.80e6  1.49e6
 ```
 ### g)
 *Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?*
+
+Let's have a look at the MSE across the different methods:
 
 
 ```r
@@ -651,6 +682,329 @@ college %>%
     geom_bar(aes(method, mse), stat = 'identity')
 ```
 
+![plot of chunk 9.g.1](figure/9.g.1-1.png)
+
+We see most of the methods return similar MSEs - except for PCR which is much greater.
+
+## 10)
+*We have seen that as the number of features used in a model increases, the training error will necessarily decrease, but the test error may not. We will now explore this in a simulated data set.*
+
+### a)
+*Generate a data set with $p = 20$ features, $n = 1,000$ observations, and an associated quantitative response vector generated according a standard linear model. Let $\beta$ have some elements that are 0*
+
+
+```r
+set.seed(1)
+n = 1000
+p = 20
+X <- matrix(rnorm(p * n), n, p)
+Beta <- rnorm(p)
+Beta[ sample(1:p, 5) ] = 0
+Y <- X %*% Beta + rnorm(p)
+
+data_set <- as.tibble(X) %>% mutate(Y = Y)
 ```
-## Error in map_lgl(.x, .p, ...): object 'pcr.mse' not found
+
+### b)
+*Split your data set into a training set containing 100 observations and a test set containing 900 observations.*
+
+
+```r
+set.seed(1)
+data_set <- data_set %>%
+    nest(.key = 'data_set') %>%
+    mutate(partition = map(data_set, ~resample_partition(.x, c(train = .1, test = .9))))
 ```
+
+### c)
+
+*Perform best subset selection on the training set, and plot the training set MSE associated with the best model of each size.*
+
+The first thing we create is a `predict.regsubsets()` function we can use.
+This function takes the model and data, and returns a list of responses, one for each of the sizes.
+
+
+```r
+predict.regsubsets <- function(model, data) {
+    ret <- list()
+    nvmax <- model$np - 1
+
+    for (x in 1:nvmax) {
+        coefs <- coefficients(model, x)[-1]
+        matrix_columns <- names(data) %in% names(coefs)
+
+        result <- as.vector( as.matrix(data[, matrix_columns]) %*% coefs )
+        ret[[x]] <- result
+    }
+
+    return (ret)
+}
+```
+Let's run the best subset across the data and pull out the metrics for each size:
+
+
+```r
+data_set <- data_set %>%
+    mutate(best_sub = map(partition, ~regsubsets(Y ~ ., data = .x$train, nvmax = 20)))
+```
+Now we use our predict function to calculate the training MSE. We then take our data set and transmute this to a tibble with the predictions, a list of 1:20 representing the model sizes, and the response variable from the test partition. We unnest predictions and sizes and preserve the responses. We then calculate the MSE for each of the sizes and unnest this value.
+
+
+```r
+regsub_train_mse <- data_set %>%
+    transmute(
+        pred = map2(partition, best_sub, ~predict(.y, as.tibble(.x$train))),
+        size = list(1:20),
+        response = map(partition, ~as.tibble(.x$train)[['Y']])
+    ) %>%
+    unnest(pred, size, .preserve = response) %>%
+    mutate(mse = map2(response, pred, ~mean((.x - .y)^2))) %>%
+    unnest(mse)
+
+regsub_train_mse
+```
+
+```
+## # A tibble: 20 x 4
+##    response   pred        size   mse
+##    <list>     <list>     <int> <dbl>
+##  1 <dbl [99]> <dbl [99]>     1 10.2 
+##  2 <dbl [99]> <dbl [99]>     2  8.27
+##  3 <dbl [99]> <dbl [99]>     3  5.26
+##  4 <dbl [99]> <dbl [99]>     4  4.44
+##  5 <dbl [99]> <dbl [99]>     5  3.55
+##  6 <dbl [99]> <dbl [99]>     6  3.01
+##  7 <dbl [99]> <dbl [99]>     7  2.49
+##  8 <dbl [99]> <dbl [99]>     8  2.18
+##  9 <dbl [99]> <dbl [99]>     9  1.79
+## 10 <dbl [99]> <dbl [99]>    10  1.62
+## 11 <dbl [99]> <dbl [99]>    11  1.42
+## 12 <dbl [99]> <dbl [99]>    12  1.33
+## 13 <dbl [99]> <dbl [99]>    13  1.24
+## 14 <dbl [99]> <dbl [99]>    14  1.21
+## 15 <dbl [99]> <dbl [99]>    15  1.17
+## 16 <dbl [99]> <dbl [99]>    16  1.14
+## 17 <dbl [99]> <dbl [99]>    17  1.12
+## 18 <dbl [99]> <dbl [99]>    18  1.11
+## 19 <dbl [99]> <dbl [99]>    19  1.12
+## 20 <dbl [99]> <dbl [99]>    20  1.11
+```
+
+Now let's graph it:
+
+
+```r
+regsub_train_mse %>%
+    ggplot(aes(size, mse)) +
+    geom_line() +
+    geom_point()
+```
+
+![plot of chunk 10.c.4](figure/10.c.4-1.png)
+
+### d)
+*Plot the test set MSE associated with the best model of each size.*
+
+We perform the same pipeline, but use the test partition.
+
+
+```r
+regsub_test_mse <- data_set %>%
+    transmute(
+        pred = map2(partition, best_sub, ~predict(.y, as.tibble(.x$test))),
+        size = list(1:20),
+        response = map(partition, ~as.tibble(.x$test)[['Y']])
+    ) %>%
+    unnest(pred, size, .preserve = response) %>%
+    mutate(mse = map2(response, pred, ~mean((.x - .y)^2))) %>%
+    unnest(mse)
+
+regsub_test_mse
+```
+
+```
+## # A tibble: 20 x 4
+##    response    pred         size   mse
+##    <list>      <list>      <int> <dbl>
+##  1 <dbl [901]> <dbl [901]>     1 14.5 
+##  2 <dbl [901]> <dbl [901]>     2  8.20
+##  3 <dbl [901]> <dbl [901]>     3  5.83
+##  4 <dbl [901]> <dbl [901]>     4  5.33
+##  5 <dbl [901]> <dbl [901]>     5  4.25
+##  6 <dbl [901]> <dbl [901]>     6  3.76
+##  7 <dbl [901]> <dbl [901]>     7  3.25
+##  8 <dbl [901]> <dbl [901]>     8  2.92
+##  9 <dbl [901]> <dbl [901]>     9  2.19
+## 10 <dbl [901]> <dbl [901]>    10  2.07
+## 11 <dbl [901]> <dbl [901]>    11  1.91
+## 12 <dbl [901]> <dbl [901]>    12  1.55
+## 13 <dbl [901]> <dbl [901]>    13  1.51
+## 14 <dbl [901]> <dbl [901]>    14  1.40
+## 15 <dbl [901]> <dbl [901]>    15  1.50
+## 16 <dbl [901]> <dbl [901]>    16  1.59
+## 17 <dbl [901]> <dbl [901]>    17  1.62
+## 18 <dbl [901]> <dbl [901]>    18  1.67
+## 19 <dbl [901]> <dbl [901]>    19  1.69
+## 20 <dbl [901]> <dbl [901]>    20  1.66
+```
+
+We now graph the test MSE against the size of each model:
+
+```r
+regsub_test_mse %>%
+     ggplot(aes(size, mse)) +
+     geom_line() + 
+     geom_point()
+```
+
+![plot of chunk 10.d.3](figure/10.d.3-1.png)
+
+### e)
+*For which model size does the test set MSE take on its minimum value? Comment on your results.*
+
+Which model has the minimum test MSE?
+
+
+```r
+which.min(regsub_test_mse$mse)
+```
+
+```
+## [1] 14
+```
+
+The model with 14 coefficients has the minimum test MSE.
+
+Originally we had the following coefficients set to 0:
+
+```r
+sum(!Beta == 0)
+```
+
+```
+## [1] 15
+```
+
+So there is only one coefficient different.
+
+
+### f)
+*
+Lets see which ones have been set to zero in our model:
+
+```r
+full_coefs <- map_chr(1:20, ~paste('V', .x, sep = ''))
+model_coefs <- data_set %>%
+    pull(best_sub) %>% 
+    .[[1]] %>% 
+    coefficients(id = 14) %>% 
+    attributes() %>%
+    .[['names']]
+
+full_coefs[!full_coefs %in% model_coefs]
+```
+
+```
+## [1] "V2"  "V5"  "V9"  "V12" "V13" "V15"
+```
+
+The best subset has removed an additional coefficient.
+
+### g)
+*Create a plot displaying $\sqrt{\sum_{j=1}\beta_j − \hat{\beta_j^r}}$ for a range of values f r, where β̂ j r is the jth coefficient estimate for the best model containing r coefficients. Comment on what you observe. How does this compare to the test MSE plot from (d)?i*
+
+We take our best_subset model, and add a column with the vector of original $\beta$ and a vector with each of the model sizes. We unnest the model size while preserving the model and the $\beta$ 
+
+For each model size we extact out the $\hat{\beta}$, excluding the coefficient. We then select the columns leaving model size, the original $\beta$ and the $\hat{\beta}$.
+
+
+```r
+model_betas <- data_set %>%
+    select(best_sub) %>%
+    mutate(
+        beta = list(Beta),
+        model_size = list(1:20)
+    ) %>%
+    unnest(model_size, .preserve = c(best_sub, beta)) %>%
+    mutate(beta_hat = map2(best_sub, model_size, ~coefficients(.x, id = .y)[-1])) %>%
+    select(model_size,beta, beta_hat)
+
+model_betas
+```
+
+```
+## # A tibble: 20 x 3
+##    model_size beta       beta_hat  
+##         <int> <list>     <list>    
+##  1          1 <dbl [20]> <dbl [1]> 
+##  2          2 <dbl [20]> <dbl [2]> 
+##  3          3 <dbl [20]> <dbl [3]> 
+##  4          4 <dbl [20]> <dbl [4]> 
+##  5          5 <dbl [20]> <dbl [5]> 
+##  6          6 <dbl [20]> <dbl [6]> 
+##  7          7 <dbl [20]> <dbl [7]> 
+##  8          8 <dbl [20]> <dbl [8]> 
+##  9          9 <dbl [20]> <dbl [9]> 
+## 10         10 <dbl [20]> <dbl [10]>
+## 11         11 <dbl [20]> <dbl [11]>
+## 12         12 <dbl [20]> <dbl [12]>
+## 13         13 <dbl [20]> <dbl [13]>
+## 14         14 <dbl [20]> <dbl [14]>
+## 15         15 <dbl [20]> <dbl [15]>
+## 16         16 <dbl [20]> <dbl [16]>
+## 17         17 <dbl [20]> <dbl [17]>
+## 18         18 <dbl [20]> <dbl [18]>
+## 19         19 <dbl [20]> <dbl [19]>
+## 20         20 <dbl [20]> <dbl [20]>
+```
+
+The indicies from each best subset model are of the form $V1, \ldots, V20$, so we use a regex to extract out the vector of indicies. We then redefine the $\beta$ to be only those indicies chosen from the model, allowing us to then calculate the MSE
+
+
+```r
+beta_mse <- model_betas %>%
+    mutate(
+        coef_indice = map(beta_hat, ~names(.x) %>% str_extract('\\d+') %>% as.integer()),
+        beta = map2(beta, coef_indice, ~.x[.y]),
+        beta_mse = map2(beta, beta_hat, ~mean((.x - .y)^2))
+    ) %>%
+    select(model_size, beta_mse) %>%
+    unnest()
+
+beta_mse
+```
+
+```
+## # A tibble: 20 x 2
+##    model_size beta_mse
+##         <int>    <dbl>
+##  1          1   0.535 
+##  2          2   0.0494
+##  3          3   0.0487
+##  4          4   0.0190
+##  5          5   0.0208
+##  6          6   0.0195
+##  7          7   0.0355
+##  8          8   0.0435
+##  9          9   0.0256
+## 10         10   0.0215
+## 11         11   0.0141
+## 12         12   0.0156
+## 13         13   0.0152
+## 14         14   0.0117
+## 15         15   0.0162
+## 16         16   0.0181
+## 17         17   0.0185
+## 18         18   0.0197
+## 19         19   0.0195
+## 20         20   0.0203
+```
+
+```r
+beta_mse %>%
+    ggplot(aes(model_size, beta_mse)) +
+    geom_line() +
+    geom_point()
+```
+
+![plot of chunk 10.g.2](figure/10.g.2-1.png)

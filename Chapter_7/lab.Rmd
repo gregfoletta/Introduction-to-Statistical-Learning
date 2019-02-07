@@ -1,0 +1,313 @@
+t s# Chapter 7 - Lab
+
+```{r setup, message = F}
+library(ISLR)
+library(broom)
+library(tidyverse)
+```
+
+## Polynomial and Step Functions
+
+We first fit a polynomial of degree 4 to the wage data
+
+```{r 1}
+wage <- as.tibble(Wage)
+wage %>% 
+    lm(wage ~ poly(age, 4), data = .) %>%
+    tidy()
+```
+
+The `poly()` function allows us to avoid writing out the polynomial formula. The result is a matrix whose columns are a basis of *orthogonal polynomials*. This means that each column is a linear combination of the variables $age, age^2, age^3$ and $age^4$. We can also get the direct polynomials by using `raw = T`.
+
+Let's re-create the first graph from the chapter - this time with the standard error lines.
+
+```{r 2}
+tibble(
+    age = range(wage$age)[1]:range(wage$age)[2]
+) %>%
+mutate(
+    wage = predict(wage_model, newdata = tibble(age = age), se = T)[['fit']],
+    se.fit = predict(wage_model, newdata = tibble(age = age), se = T)[['se.fit']]
+) %>%
+    ggplot() +
+    geom_jitter(data = wage, aes(age,wage), colour = 'grey') +
+    geom_line(aes(age, wage)) +
+    geom_line(aes(age, wage + 2 * se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, wage - 2 * se.fit), linetype = 2, colour = 'red')
+```
+
+In performing a polynomial regression we must decide on the degree of polynomial to use. We now fit models ranging from linear to degree 5.
+
+We use the `anova()` function which performs an *analysis of variance* (ANOVA, using an F-test) in order to test the null hypothesis that a model $M_1$ is sufficient to explain the data against an alternative hypothesis that a more complex model $M_2$ is required.
+
+In order to use ANOVA, $M_1$ and $M_2$ must be nested models: the predictors in the first must be a subset of the predictors in the second.
+
+```{r 3}
+tibble(
+    degree = 1:5,
+    model = map(degree, ~lm(wage ~ poly(age, .x), data = wage))
+) %>%
+pull(model) %>%
+do.call(anova, .)
+```
+
+The p-value comparing the linear to the quadratic is essentially 0, indicating a linear fit is insufficient. The quadratic to cubic is also quite low, so the quadratic fit is not sufficient either. The p-value between the cubic and quartic is 5%, while the quintic seems unnecessary as the p-value is high. This a subic or quartic appears to provide a reasonable fit of the data.
+
+We could have skipped the ANOVA an instead used the fact that the `poly()` function creates orthogonal polynomials:
+
+```{r 4}
+wage_coefs <- wage %>%
+    lm(wage ~ poly(age, 5), data = .) %>%
+    summary() %>%
+    coef() %>%
+    as.tibble()
+wage_coefs
+```
+
+The p-values are the same, and the sqaure of the t-statictics are equal to the F-statistics.
+
+```{r 5}
+wage_coefs %>%
+    mutate(F.stat = `t value`^2)
+```
+
+However the ANOVA model works whether or not we use orthogonal polynomials; it also works when we have other terms in the model as well:
+```{r 6}
+tibble(
+    degree = 1:3,
+    model = map(degree, ~lm(wage ~ education + poly(age, .x), data = wage))
+) %>%
+pull(model) %>%
+do.call(anova, .)
+```
+As an alternative to ANOVA we could choose the polynomial degree using cross-validation.
+
+***
+
+Next we consider the task of predicting whether an individual earns over 250,000 a year. We create a logical variable for whether the earning is above 250k, and perform a logistical regression with a quartic polynomial.
+
+```{r 7}
+wage <- wage %>% mutate(high_earn = wage > 250)
+high_earn_model = wage %>% glm(high_earn ~ poly(age, 4), data = ., family = 'binomial')
+```
+
+There is a slight difference in this scenario with the `predict()` function. By default it returns the *logit* or log-odds:
+$$ log\bigg(\frac{P(Y = 1|X)}{1 - Pr(Y = 1|X)}\bigg) = X\beta $$
+
+The the predictions are given in the form $X\hat{\beta}$. The standard errors are also of this form. We could use the the `type = 'response'` in the predict function, however this will give negative probabilities. 
+
+We obtain the probability by performing the transformation:
+$$ Pr(Y = 1|X) = \frac{exp(X\beta)}{1 + exp(X\beta)} $$
+
+```{r 8}
+tibble(
+    age = range(wage$age)[1]:range(wage$age)[2]
+) %>%
+    mutate(
+        fit = predict(high_earn_model, newdata = tibble(age = age), se = T)[['fit']],
+        se.fit = predict(high_earn_model, newdata = tibble(age = age), se = T)[['se.fit']],
+        prob = exp(fit) / (1 + exp(fit)),
+        se.high = exp(fit + 2 * se.fit) / (1 + exp(fit + 2 * se.fit)),
+        se.low = exp(fit - 2 * se.fit) / (1 + exp(fit - 2 * se.fit))
+    ) %>%
+    ggplot() +
+    geom_jitter(aes = aes(wage, age), data = wage, colour 'grey') +
+    geom_line(aes(age, prob)) +
+    geom_line(aes(age, se.high), linetype = 2, colour = 'red') +
+    geom_line(aes(age, se.low), linetype = 2, colour = 'red')
+```
+
+In order to create a step function we can use the `cut()` function:
+
+```{r 9}
+wage %>%
+    lm(wage ~ cut(age, 4), data = .) %>%
+    tidy()
+```
+
+## Splines
+
+### Basis Functions
+
+In order to fit regression splines in R, we use the `splines` library. We saw that regression splines can be fit be constructing an appropriate matrix of basis functions. The `bs()` function the entire matrix of basis functions for splines with the specified knots. By default cubic splines are created.
+
+```{spline_setup, message = F}
+library(splines)
+```
+
+```{r 10}
+wage %>%
+    lm(wage ~ bs(age, knots = c(25, 40, 60)), data = .) %>%
+    augment(wage) %>%
+    ggplot() +
+    geom_jitter(data = wage, aes(age,wage), alpha = .1) +
+    geom_line(aes(age, .fitted)) +
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+```
+
+We have knots at 25, 40 and 60. This produces a spline with 6 basis functions: a cubic spline with 3 knots has seven degrees of freedon, and these are used up by an intercept and 6 basis functions.
+
+The `df` option to produce a spline with knots at uniform quantiles of the data.
+
+### Natural Splines
+
+In order to fit a natural spline we use the `ns()` function.
+
+```{r 11}
+wage %>%
+    lm(wage ~ ns(age, df = 4), data = .) %>%
+    augment(wage) %>%
+    ggplot() +
+    geom_jitter(data = wage, aes(age,wage), alpha = .1) +
+    geom_line(aes(age, .fitted)) +
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
+    geom_line(aes(age, .fited - 2*.se.fit), linetype = 2)
+```
+
+### Smoothing Splines
+
+In order to fit a smoothing spline, we use the `smooth.spline()` function.
+
+```{r 12}
+wage %>%
+    select(x = age, y = wage) %>%
+    as.list() %>%
+    smooth.spline(x = .) %>%
+    glance()
+```
+
+
+
+The function will perform cross validation. It uses ordinary LOOCV when `cv = T` and generalised cross validation when `cv = F`. It generates a $\lambda$ and calculate the degrees of freedom.
+
+```{r 13}
+wage %>%
+    select(x = age, y = wage) %>%
+    as.list() %>%
+    smooth.spline(x = .) %>%
+    augment() %>%
+    ggplot() +
+    geom_line(aes(x, .fitted))
+```
+
+### Local Regression 
+
+In order to perform local regress we use the `loess()` funfction (localally estimated scatterplot smoothing). 
+
+```{r 14}
+wage %>%
+    loess(wage ~ age, span = .5, data = .) %>%
+    augment() %>%
+    ggplot() +
+    geom_line(aes(age, .fitted)) +
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+```
+
+Let's use a smoothing spline and a local regression and compare the graphs:
+
+```{r 14.1}
+wage %>%
+    select(x = age, y = wage) %>%
+    nest() %>%
+    mutate(
+        ss = map(data, ~smooth.spline(x = .x$x, y = .x$y)),
+        loess = map(data, ~loess(y ~ x, span = .5, data = .))
+    ) %>%
+    gather('model_name', 'model', c(ss, loess)) %>%
+    mutate(pred = map(model, ~augment(.x))) %>%
+    unnest(pred) %>%
+    ggplot() +
+    geom_line(aes(x, .fitted, colour = model_name))
+```
+
+Let's also have a look at how the local regression changes depending on the span parameter:
+
+```{r 15}
+tibble(span = seq(.1, .9, .2)) %>%
+    mutate(
+        local_reg = map(span, ~loess(wage ~ age, span = .x, data = wage)),
+        pred = map(local_reg, ~augment(.x))) %>%
+    unnest(pred) %>%
+    ggplot() +
+    geom_line(aes(age, .fitted, colour = as.factor(span)))
+```
+
+
+## GAMs
+
+We fit a GAM to predict `wage` using natural spline functions of `year` and `age`, treating `education` as a qualitative predictor. Since this is a linear model with appropriate basis functions, we can use `lm()`:
+
+```{r 16}
+wage %>%
+    lm(wage ~ ns(year, 4) + ns(age,5) + education, data = .)
+```
+
+We now fit the model with smoothing splines rather than natural splines. In order to fit more general sorts of GAMs using smoothing splines or other components than cannot be expressed in terms of basis functions, the `gam` library is used.
+
+Within the `gam` library, the `s()` function is used to indicate a smoothing spline. We'll use the standard `plot()` as it has a good `plot.gam()`.
+
+```{r gam_setup, message = F}
+library(gam)
+```
+
+```{r 17}
+wage %>%
+    gam(wage ~ s(year,4) + s(age,5) + education, data = .) %>%
+    plot()
+```
+
+The `year` looks rather linear, so we can perform ANOVA tests in order to determine which of the models is best:
+```{r 18}
+tibble(formula = list(
+    as.formula(wage ~ s(age,5) + education),
+    as.formula(wage ~ year + s(age,5) + education),
+    as.formula(wage ~ s(year, 4) + s(age,5) + education)
+)) %>%
+    mutate(gam = map(formula, ~gam(.x, data = wage))) %>%
+    pull(gam) %>%
+    do.call(anova, .)
+```
+
+We see strong evidence that adding the linear `year` in improves the model, but not much evidence (given the high p value) that a non-linear `year` is needed.
+
+
+Local regression fits can be used in the GAM with the `lo()` function.
+
+```{r 19}
+wage %>%
+    gam(wage ~ s(year, df = 4) + lo(age, span = 0.7) + education, data = .) %>%
+    tidy()
+```
+
+The `lo()` function can also be used to create interactions before calling the `gam()` function:
+
+```{r 20, message = F}
+wage %>%
+    gam(wage ~ lo(year, age, span = 0.5) + education, data = .) %>%
+    tidy()
+```
+
+The `akima` package can be used to plot the bivariate function:
+```{r akima, message = F}
+library(akima)
+```
+
+```{r 21}
+wage %>%
+    gam(wage ~ lo(year, age, span = 0.5), data = .) %>%
+    plot()
+```
+
+### Logistic Regression
+
+In order to fit a logisitic regression GAM, we use the `I()` (inhibit) function in constructing the response variable.
+
+```{r 22}
+wage %>%
+    gam(I(wage > 250) ~ year + s(age, df = 5) + education, data = .) %>%
+    tidy()
+```
+
+
