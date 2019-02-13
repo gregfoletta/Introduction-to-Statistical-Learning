@@ -1,4 +1,4 @@
-t s# Chapter 7 - Lab
+# Chapter 7 - Lab
 
 ```{r setup, message = F}
 library(ISLR)

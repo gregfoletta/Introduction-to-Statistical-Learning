@@ -65,3 +65,4 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 ### Exercises
 
 * [Lab](Chapter_7/lab.md)
+* [Conceptual](Chapter_7/conceptual.md)
