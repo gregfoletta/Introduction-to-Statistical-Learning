@@ -104,7 +104,41 @@ $$ y_i(\beta_0 + \beta_1x_{i1} + \beta_2x_{i2} + \beta_px_{ip}) \ge M(1 - \epsil
 
 $$ \epsilon_i \ge 0, \sum_{i=1}^n \epsilon_i \le C $$
 
+where $C$ is a non-negative tuning parameter. As with the MMC $M$ is the margin we seek to make as large as possible. The $\epsilon_0, \ldots, \epsilon_n$ are *slack variables* that allow individual observations to be on the wrong side of the margin.
+
+The slack variable tells us where the observation is located. If $\epsilon_i = 0$ then the $i$th observation is on the right side of the margin. If it's $e_i > 0$ then the $i$th observation is on the wrong side of the margin and has *violated* the margin. If $\epsilon_i > 0$ then it's on the wrong side of the hyperplane.
+
+$C$ bounds the sum of the $\epsilon_i$ and so determines the number and severity of the violations to the margin we will tolerate. It can be considered the *budget* for the amount the margin can be violated by the $n$ observations.
+
+For $C > 0$ no more than $C$ observations can be on the wrong side of the hyperplane, because $\epsilon_i > 1$ for those observations. $C$ is treated as a tuning parameter selected by cross-validation.
+
+It has an interesting property that only observations that lie on the margin or that violate the margin affect the hyperplane. The fact that the support vector classifier's decision rule is based only on a small subset of the training observations means it is robust to the behaviour of observations far away from the hyperplane.
+
+## 9.3 - Support Vector Machines
+
+### 9.3.1 - Classification with Non-linear Decision Boundaries
+
+The support vector classifier is a natural approach in the two class setting if the decision boundary is linear. However in practice we often deal with non-linear decision boundaries.
+
+With linear regression we enlarged the feature space with functions of the predictors in order to address non-linearity. With a support vector classifier we could address the issue in a similar way by enlarging the feature space using quadratic, cubic, ..., functions:
+
+$$ X_1, X_1^2, X_2, X_2^2, \ldots, X_p, X_p^2 $$
+
+In the enlarged feature space, the decision boundary is still linear, however in the original feature space the decision boundary is of the form $q(x) = 0$ where $q$ is a quadratic polynomial whose solutions are generally non-linear.
+
+There are a number of other ways to enlarge the feature space, and we could end up in a situation where there are a huge number of features making it computationally infeasible.
+
+The support vector machine allows us to enlarge the fature space used by the support vector classifier in a way that leads to efficient computations.
 
 
+### 9.3.2 - Support Vector Machine
 
+The *support vector machine* (SVM) is an extension of the support vector classifier that results in enlarging the feature space in a specific way: using *kernels*.
 
+It turns out that the solution to the support vector classifier problem involves only the *inner products* of the observations, not the observations themselves. The inner product for $r$-vectors $a$ and $b$ is $\langle a,b \rangle \sum_{i=1}^r a_ib_i$.
+
+It can be shown that:
+
+* The linear support vector classifier can be represented as:
+
+$$ f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle $$
