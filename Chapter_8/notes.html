@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>8 - Tree-Based Methods</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>8 - Tree-Based Methods</h1>
+
+<p>This chapter discusses tree-based methods for regression and classification. These involve <strong>stratifying</strong> or <strong>segmenting</strong> the predictor space into a number of simple regions. These types of approaches are known as <strong>decision tree* methods</strong>.</p>
+
+<p>Tree based methods are good for interpretation, but are not competitative against the supervised learning methods in chapters 6 and 7 in terms of prediction accuracy. Hence this chapter also discusses <strong>bagging</strong>, <strong>boosting</strong>, and <strong>random forrests</strong>.</p>
+
+<h2>8.1 - The Basics</h2>
+
+<p>Decision trees can be applied to both regression and classification problems.</p>
+
+<h3>8.1.1 - Regression Trees</h3>
+
+<p>Consider the <code>Hitters</code> data set used to predict a player&#39; salary based on the <code>Years</code> they&#39;ve been playing, and the number of <code>Hits</code> made in the previous year.</p>
+
+<p>The regression tree generates a series of splits in the data. The first split creates the left branch, and is at <code>Years &lt; 4.5</code>. The predicted salary for these players is given by the mean response value for players in the data set with <code>Years &lt; 4.5</code>.</p>
+
+<p>Players with <code>Years &gt;= 4.5</code> are placed in the right branch, and then subdivided by <code>Hits</code>. Overall the tree stratifies or segments players into three regions of predictor space:</p>
+
+<p>$$ </p>
+
+<p>R_1 = { X | Years &lt; 4.5 }
+R_2 = { X | Years &gt;=4.5, Hits &lt; 117.5 }
+R_3 = { X | Years &gt;=4.5, Hits &gt;= 117.5 }</p>
+
+<p>$$</p>
+
+<p>The regions of the tree are known as <em>terminal nodes</em> or <em>leaves</em> of a tree.</p>
+
+<h4>Prediction via Stratification of the Feature Space</h4>
+
+<p>Roughly there are two steps in building the regression tree:</p>
+
+<ul>
+<li>Divide the predictor space (the set of possible values for \(X_1, X_2, \ldots, X_p\)) into \(J\) distinct and non-overlapping regions \(R_1, R_2, \ldots, R_J\).</li>
+<li>For every observation that falls into region \(R_J\), we make the same predictions, which is simply the mean of the response values for the training observations in \(R_J\).</li>
+</ul>
+
+<p>How do we construct the regions? They could have any shape, however we choose to divide the space into high-dimensional rectangles, or <em>boxes</em>. This is for both simplicity and for ease of interpretation.</p>
+
+<p>The goal is to find regions that minimise the RSS given by:</p>
+
+<p>\[ \sum_{j=1}^J \sum_{i \in R_j}(y_i - \hat{y}_R_j)^2 \]</p>
+
+<p>where $ \hat{y}_R_j $ is the mean response for the training observations within the $j$th box.</p>
+
+<p>It is computationally infeasible to consider every possibly partition, so a top-down greedy approach known as <em>recsursive binary splitting</em> is used. It begins at the top of the tree (all observations in a single region) and successively splits the predictor space.</p>
+
+<p>In order to perform recursive binary splitting, we select predictor \(X_j\) and the cutpoint \(s\) such that splitting the preditor space into the regions \({X|X_j < s}\) and \({X|X_j \ge s}\) leads to the greatest possible reduction in RSS. The notation means <em>the region of predictor space in which X_j takes on a value less than s</em>.</p>
+
+<p>The process is repeated, however instead of splitting the entire predictor space, we split one of the two previously identified regions.</p>
+
+<p>Once the regions \(R_1, \ldots, R_J\) have been created. we predict the response for a given test observation using the mean of the training observations in the region to whichthat test observation belongs.</p>
+
+<h4>Tree Pruning</h4>
+
+<p>The process described above is likely to overfit the data, leading to poor test set experience. A smaller tree may have lower variance and better interpretation at the cost of a little bias.</p>
+
+<p>A strategy is to grow a very large tree \(T_0\) and then prune it back in order to obtain a <em>subtree</em>. How do we determine the best way to prune the tree? Our goal is to select a subtree that leads to the lowest test error rate. </p>
+
+<p>Given a subtree, we can estimate its test error using cross-validation or the validation set approach. Estimating the CV error for every possible sub-tree would be too cumbersome.</p>
+
+<p><em>Cost complexity pruning</em> - also known as <em>weakest link pruning</em> - gives us a way to do just this. We consider a sequence of trees indexed by non-negative \(\alpha\):</p>
+
+<ol>
+<li>Use recsursive binary splitting to grow a large tree on the training data.</li>
+<li>Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of \(\alpha\).</li>
+<li>Use k-fold CV to choose \(\alpha\):
+a. Repeat steps 1 and 2 on all but the kth fold of the training data.
+b. Evaluate the MSE on the data in the left-out kth fold, as a function of \(\alpha\). Average the results for each value of \(\alpha\), and pick \(\alpha\) to minimise the average error.</li>
+<li>Returnt he subtree from step 2 that corresponds to the chosen value of \(\alpha\).</li>
+</ol>
+
+<p>For each value of \(\alpha\) there corresponds a subtree \(T \in T_0\) such that
+\[ \sum_{m=1}^{\abs{T}}\sum_{i: x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha\abs{T}\]</p>
+
+<p>is as small as possible. Here \(\abs{T}\) indicates the numner of terminal nodes of the tree \(T\), \(R_m\) is the rectangle corresponding to the $m$th terminal node, and \(\hat{y}_{R_m}\) is the predicted response assoociated with \(R_m\) - that is, the mean training observations in \(R_m\).</p>
+
+<p>The tuning parameter \(\alpha\) controls a tradeoff between the subtrees complexity and its fit to the training data. When its 0, the subtree \(T\) will simply equal \(T_0\) because it just measures the training error.</p>
+
+<p>As \(\alpha\) increases, there is a price to pay for having a tree with many terminal nodes, and so the quantity will tend to be minimised for a smaller subtree.</p>
+
+<p>It turns out that as \(\alpha\) in increased, the branches get pruned in a nested and predictable fashion, so obtaining the whole sequence of subtrees is easy. We can select a value of \(\alpha\) using a validation set or using cross validation.</p>
+
+<h3>Classification Trees</h3>
+
+<p>A classification tree is similar to a regression tree, except its predicting a qualitative response rather than a quantitative response. Instead of using the mean as in the quantitative response, we predict that the observation belongs to the <em>most commonly occurring class</em> of training observations. </p>
+
+<p>We are often interested not only in the class prediction, but also the <em>class proportions</em> among the training ovbservations.</p>
+
+<p>The process is similaer to a regression tree: we use recursive binary splitting to grow a classification tree. However RSS cannot be used as a criterion. The <em>classification error rate</em> is a natural alternative. </p>
+
+<p>Since we plan to assign an observation to the <em>most occurring class</em> of training observations in tat region, the classification error rate is simply the fraction of the training observations in that region that do not belong to the most common class.</p>
+
+<p>\[ E = 1 - max_k(\hat{p}_{mk}) \]</p>
+
+<p>Here \(p_{mk}\) represents the proportion of training observations in the $n$th region that are from the $k$th class. It turns out that the classification error is not sufficiently sensitive for tree-growing.</p>
+
+<p>The <em>Gini index</em> is defined by:</p>
+
+<p>\[ G = \sum_{k=1}^K \hat{p}_{mk}(1 - \hat{p}_{mk)) \]</p>
+
+<p>It&#39;s a measure of the total variance across the \(K\) classes. It takes on a small value if all of the \(\hat{p}_{mk}\)&#39;s are close to zero or one. It is referred to as a measure of node <em>purity</em> - a small value indicates the a node contains observations from a sinlge class.</p>
+
+<p>An alternative is <em>cross-entropy</em>:</p>
+
+<p>\[ D = -\sum_{k=1}^K\hat{p_{mk}}log(\hat{p}_{mk}) \]</p>
+
+<p>Since \(0 \le \hat{p}_{mk} \le 1\), it follows that \(0 \le -\hat{p}_{mk}log(\hat{p}_{mk})\)</p>
+
+<p>One can show hat the cross-entropy will ake on a value near zero of the \(\hat{p}_{mk}\)&#39;s are all near zero or near one. Therefore, like the <em>Gini index</em>, the cross-entropy will take on a small value of the $m$th node is pure.</p>
+
+<p>These two values are typically used to evaluate the quality of a split as they are more sensitive to node purity than the classification error rate.</p>
+
+<h3>8.1.3 - Tree Versus Linear Models</h3>
+
+<p>Regression and classification trees have a very different flavour from the more classical approaches. Suitability depends on the problem at hand. If the relationship between the responses is well approximated by a linear model, then a linear regression approach will likely wokr well.</p>
+
+<p>If the relationship between the features and the response is complex or non-linear, the decision trees may outperform classical approaches. A tree may also be preferable due to its interpretability and visualisation.</p>
+
+<h3>8.1.4 - Advantages and Disadvantages of Trees</h3>
+
+<p><em>Advantages</em></p>
+
+<ol>
+<li>Easy to explain to people.</li>
+<li>Some belief that decision trees more closely mirror human decision making.</li>
+<li>Trees can be displayed graphically.</li>
+<li>Can handle qualitative predictors without the need to create dummy variables.</li>
+</ol>
+
+<p><em>Disadvantages</em></p>
+
+<ol>
+<li>Do not generally have the same predictive accuracy as some other regression and classification approaches.
+a. By aggregating many decision trees using methods like <em>bagging</em>, <em>random forrests</em> and <em>boosting</em>, predictive performance can be substantially improved.</li>
+</ol>
+
+<h2>8.2 - Bagging, Random Forests, Boosting.</h2>
+
+<p>These techniques use trees as building blocks to construct more powerful prediction models.</p>
+
+<h3>8.1.3 - Bagging</h3>
+
+<p>Decision trees suffer from <em>high variance</em> - if we split the training data at random and fit a tree to both halves, the results can be quite different.</p>
+
+<p><em>Bootstrap aggregation</em> or <em>bagging</em> is a general purpose procedure for reducing the variance of a statistical learning method.</p>
+
+<p>Given \(n\) independent observations \(Z_1, \ldots, Z_n\), each with variance \(\sigma^2\), the variance of the mean \(\mean{Z}\) of the observations is given by \(\frac{\sigma^2}{n}\). I.e averaging a set of observations reduces variance.</p>
+
+<p>Thus a way to reduce the variance of a statistical learning method is to take many training sets from the population, build a separate prediction model for each, then take thaverage of the resulting predictions.</p>
+
+<p>We can take \(\hat{f^1}(x), \ldots, \hat{f^B}(x)\) using \(B\) separate training sets, then average them to obtain a single low variance statistical model:</p>
+
+<p>\[ \hat{f_{avg}}(x) = \frac{1}{B}\sum_{b=1}^B\hat{f^b}(x) \]</p>
+
+<p>We don&#39;t generally have mulitple training sets, so we can bootstrap by taking repeating samples from a single training set.</p>
+
+<p>To apply bagging to regression trees, we construct \(B\) regression trees from the \(B\) bootstrapped training sets and average the resulting predictions.</p>
+
+<p>To apply in a qualitative context, for a given observations we record the class predicted by each of the \(B\) trees and take a <em>majority vote</em>. The overall prediction is the most commonly occurring class among the \(B\) prediction. </p>
+
+<h4>Out-of-Bag Error Estimation</h4>
+
+<p>On average each bagged tree makes use of around two-thirds of the observations (see <a href="../Chapter_5/conceptual.md">exercise 2, chapter 5</a>. The remaining one-third not used are referred to as the <em>out-of-bag</em> (OOB) obversations. The response can be predicted by using each of the trees for which that observation was OOB. This yields around \(B/3\) predictions for the $i$th observations. These are then averaged or take a majority vote.</p>
+
+<h4>Variable Importance Measures</h4>
+
+<p>Bagging improves the accuracy, but it can be difficult to interpret the model. A summary of the importance of each predictor can be obtained which can help. This is RSS for bagging regression trees, or the Gini index for bagging classification trees.</p>
+
+<h3>8.2.2 - Random Forests</h3>
+
+<p><em>Random forests</em> provide and improvement over bagged trees by way of a small tweak that <em>decorrelates</em> the trees. As with bagging, a number of decision trees are built on bootstrapped data. However each time a split in a tree is considered a <em>random sample of \(m\) predictors</em> is chosed as split candidates from the full set of \(p\) predictors.</p>
+
+<p>A fresh sample is taken at each split, and typically \(m = \sqrt{p}\).</p>
+
+<p>Consider a data set with a strong predictor. Most of the bagged trees will look the same, having this predictor as the first split. However averaging all of these correlated quantities does not lead to as large a reduction in variance. Random forests overcome this be decorrelating the trees, reducing the variance.</p>
+
+<h3>8.2.3 - Boosting</h3>
+
+<p><em>Boosting</em> is another approach to improve the predictions from a decision tree, although like bagging it can be applied to mant statistical learning methods.</p>
+
+<p>Boosting works similar to bagging, except that the trees are grown using information from previously grown trees. There is no bootstrap of the data; instead each tree is fit on a modified version of the original data set:</p>
+
+<ol>
+<li>Set \(\hat{f}(x) = 0\) and \(r_i = y_i\) for all \(i\) in the training set.</li>
+<li>For \(b = 1, 2, \ldots, B\), repeat:
+a. Fit a tree \(\hat{f^b}\) with \(d\) splits to the training data \((X,r)\).
+b. Update \(\hat{f}\) by adding in a shrunken version of the new tree:
+\[ \hat{f}(X) \leftarrow \hat{f}(x) + \lambda\hat{f^b}(x) \]
+c. Update the residuals
+\[ r_r \leftarrow r_i - \lambda\hat{f^b}(x_i) \]</li>
+<li>Output the boosted model</li>
+</ol>
+
+<p>\[ \hat{f}(x) = \sum_{b=1}^B\lambda\hat{f^b}(x) \]</p>
+
+<p>Like bagging, we&#39;re combining a large number of decision trees. The boosting approach <em>learns slowly</em>. Given the current model, we fit a decision tree to the residuals from the model, rather than the outcome Y. We add this new decision tree into the fitted function in order to update the residuals.</p>
+
+<p>Each of these trees can be small, with just a few terminal nodes. By fitting small trees to the residuals, we slowly improve \(\hat{f}\) in areas where it does not perform well. The shrinkage parameter \(\lambda\) slows the process down even further.</p>
+
+<p>Boosting has three tuning parameters:</p>
+
+<ol>
+<li>\(B\) - the number of trees. Overfitting can occur if \(B\) is too large. Use cross-validation to select \(B\).</li>
+<li>\(\lambda\) - the shrinkage paramter. A small positive number. Tyical values are 0.01 or 0.001. Right choice depends on the problem. Very small \(\lambda\) can require a large \(B\) in order to achieve good performance.</li>
+<li>\(d\) - the number of splits in each tree. Often \(d = 1\) works well.</li>
+</ol>
+
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+# Chapter 8 - Lab
+
+```{r setup, message = F}
+library(ISLR)
+library(broom)
+library(tidyverse)
+library(rpart)
+```
+
+## Fitting Classification Trees
+
+Use classification trees to analyse the `Carseats` data.

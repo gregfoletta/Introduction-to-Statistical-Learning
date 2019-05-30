@@ -4,6 +4,7 @@
 library(ISLR)
 library(broom)
 library(tidyverse)
+library(splines)
 ```
 
 ## Polynomial and Step Functions
@@ -15,6 +16,8 @@ wage <- as.tibble(Wage)
 wage %>% 
     lm(wage ~ poly(age, 4), data = .) %>%
     tidy()
+
+wage_model <- lm(wage ~ poly(age, 4), data = wage)
 ```
 
 The `poly()` function allows us to avoid writing out the polynomial formula. The result is a matrix whose columns are a basis of *orthogonal polynomials*. This means that each column is a linear combination of the variables $age, age^2, age^3$ and $age^4$. We can also get the direct polynomials by using `raw = T`.
@@ -111,7 +114,6 @@ tibble(
         se.low = exp(fit - 2 * se.fit) / (1 + exp(fit - 2 * se.fit))
     ) %>%
     ggplot() +
-    geom_jitter(aes = aes(wage, age), data = wage, colour 'grey') +
     geom_line(aes(age, prob)) +
     geom_line(aes(age, se.high), linetype = 2, colour = 'red') +
     geom_line(aes(age, se.low), linetype = 2, colour = 'red')
@@ -142,8 +144,8 @@ wage %>%
     ggplot() +
     geom_jitter(data = wage, aes(age,wage), alpha = .1) +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
 We have knots at 25, 40 and 60. This produces a spline with 6 basis functions: a cubic spline with 3 knots has seven degrees of freedon, and these are used up by an intercept and 6 basis functions.
@@ -161,8 +163,8 @@ wage %>%
     ggplot() +
     geom_jitter(data = wage, aes(age,wage), alpha = .1) +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fited - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
 ### Smoothing Splines
@@ -201,8 +203,8 @@ wage %>%
     augment() %>%
     ggplot() +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
 Let's use a smoothing spline and a local regression and compare the graphs:

@@ -5,6 +5,7 @@
 library(ISLR)
 library(broom)
 library(tidyverse)
+library(splines)
 ```
 
 ## Polynomial and Step Functions
@@ -30,6 +31,10 @@ wage %>%
 ## 5 poly(age, 4)4    -77.9    39.9       -1.95 5.10e- 2
 ```
 
+```r
+wage_model <- lm(wage ~ poly(age, 4), data = wage)
+```
+
 The `poly()` function allows us to avoid writing out the polynomial formula. The result is a matrix whose columns are a basis of *orthogonal polynomials*. This means that each column is a linear combination of the variables $age, age^2, age^3$ and $age^4$. We can also get the direct polynomials by using `raw = T`.
 
 Let's re-create the first graph from the chapter - this time with the standard error lines.
@@ -50,9 +55,7 @@ mutate(
     geom_line(aes(age, wage - 2 * se.fit), linetype = 2, colour = 'red')
 ```
 
-```
-## Error in mutate_impl(.data, dots): Evaluation error: object 'wage_model' not found.
-```
+![plot of chunk 2](figure/2-1.png)
 
 In performing a polynomial regression we must decide on the degree of polynomial to use. We now fit models ranging from linear to degree 5.
 
@@ -191,18 +194,12 @@ tibble(
         se.low = exp(fit - 2 * se.fit) / (1 + exp(fit - 2 * se.fit))
     ) %>%
     ggplot() +
-    geom_jitter(aes = aes(wage, age), data = wage, colour 'grey') +
     geom_line(aes(age, prob)) +
     geom_line(aes(age, se.high), linetype = 2, colour = 'red') +
     geom_line(aes(age, se.low), linetype = 2, colour = 'red')
 ```
 
-```
-## Error: <text>:12:59: unexpected string constant
-## 11:     ggplot() +
-## 12:     geom_jitter(aes = aes(wage, age), data = wage, colour 'grey'
-##                                                               ^
-```
+![plot of chunk 8](figure/8-1.png)
 
 In order to create a step function we can use the `cut()` function:
 
@@ -242,13 +239,11 @@ wage %>%
     ggplot() +
     geom_jitter(data = wage, aes(age,wage), alpha = .1) +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
-```
-## Error in bs(age, knots = c(25, 40, 60)): could not find function "bs"
-```
+![plot of chunk 10](figure/10-1.png)
 
 We have knots at 25, 40 and 60. This produces a spline with 6 basis functions: a cubic spline with 3 knots has seven degrees of freedon, and these are used up by an intercept and 6 basis functions.
 
@@ -266,13 +261,11 @@ wage %>%
     ggplot() +
     geom_jitter(data = wage, aes(age,wage), alpha = .1) +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fited - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
-```
-## Error in ns(age, df = 4): could not find function "ns"
-```
+![plot of chunk 11](figure/11-1.png)
 
 ### Smoothing Splines
 
@@ -322,8 +315,8 @@ wage %>%
     augment() %>%
     ggplot() +
     geom_line(aes(age, .fitted)) +
-    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2) +
-    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2)
+    geom_line(aes(age, .fitted + 2*.se.fit), linetype = 2, colour = 'red') +
+    geom_line(aes(age, .fitted - 2*.se.fit), linetype = 2, colour = 'red')
 ```
 
 ![plot of chunk 14](figure/14-1.png)
@@ -375,7 +368,25 @@ wage %>%
 ```
 
 ```
-## Error in ns(year, 4): could not find function "ns"
+## 
+## Call:
+## lm(formula = wage ~ ns(year, 4) + ns(age, 5) + education, data = .)
+## 
+## Coefficients:
+##                 (Intercept)                 ns(year, 4)1  
+##                      46.949                        8.625  
+##                ns(year, 4)2                 ns(year, 4)3  
+##                       3.762                        8.127  
+##                ns(year, 4)4                  ns(age, 5)1  
+##                       6.806                       45.170  
+##                 ns(age, 5)2                  ns(age, 5)3  
+##                      38.450                       34.239  
+##                 ns(age, 5)4                  ns(age, 5)5  
+##                      48.678                        6.557  
+##         education2. HS Grad     education3. Some College  
+##                      10.983                       23.473  
+##    education4. College Grad  education5. Advanced Degree  
+##                      38.314                       62.554
 ```
 
 We now fit the model with smoothing splines rather than natural splines. In order to fit more general sorts of GAMs using smoothing splines or other components than cannot be expressed in terms of basis functions, the `gam` library is used.
