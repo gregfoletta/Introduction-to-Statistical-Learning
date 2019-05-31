@@ -315,6 +315,38 @@ hr {
 
 <p>\[ f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle \]</p>
 
+<p>where there are \(n\) parameters \(\alpha_i\).</p>
+
+<ul>
+<li>To estimate the \(\alpha_i\) parameters and \(\beta_0\) all we need are the \({n}\choose{2}\) inner products \(\langle x_i, x_{i'} \rangle\) between all pairs of training observations.</li>
+</ul>
+
+<p>It turns out that \(\alpha_i\) is non-zero only for the support vectors in the solution. So if \(S\) is the collection of indicies of these support points, the solution can be re-written:</p>
+
+<p>\[ f(x) = \beta_0 + \sum_{i \in S} \alpha_i\langle x, x_i \rangle \]</p>
+
+<p>Now suppose that everytime an inner product appears, we replace it with a generalisation of the inner product:</p>
+
+<p>\[ K(x, x_i) \]</p>
+
+<p>where \(K\) is a function referred to as a <em>kernel</em>. The kernel quantifies the similarity of two observations.</p>
+
+<p>The kernel could be \(\sum_{j=1}^p x_{ij}x_{i'j}\) which gives us back the support vector classifier.</p>
+
+<p>Or something like:</p>
+
+<p>\[ K(x_i, x_{i'}) = (1 + \sum_{j=1}^p x_{ij} x_{i'j} )^d \]</p>
+
+<p>could be used, which is a polynomial kernel of degree \(d\). This would lead to a more flexible decision boundary. When the support vector classifier is used with a non-linear kernel, it is known as a support vector machine.</p>
+
+<h2>9.4 - SVMs with More than Two Classes</h2>
+
+<p>It turns out that the concept of separating hyperplanes does not lend itself naturally to more than two classes. The two most popular proposals are <em>one-verses-one</em> and <em>one-versus-all</em> methods.</p>
+
+<h3>9.4.1 - One Versus One</h3>
+
+<p>A one versus one approach with \(K > 2\) classes constructs </p>
+
 </body>
 
 </html>

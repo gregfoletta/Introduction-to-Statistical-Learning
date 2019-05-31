@@ -142,3 +142,34 @@ It can be shown that:
 * The linear support vector classifier can be represented as:
 
 $$ f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle $$
+
+where there are $n$ parameters $\alpha_i$.
+
+* To estimate the $\alpha_i$ parameters and $\beta_0$ all we need are the ${n}\choose{2}$ inner products $\langle x_i, x_{i'} \rangle$ between all pairs of training observations.
+
+It turns out that $\alpha_i$ is non-zero only for the support vectors in the solution. So if $S$ is the collection of indicies of these support points, the solution can be re-written:
+
+$$ f(x) = \beta_0 + \sum_{i \in S} \alpha_i\langle x, x_i \rangle $$
+
+
+Now suppose that everytime an inner product appears, we replace it with a generalisation of the inner product:
+
+$$ K(x, x_i) $$
+
+where $K$ is a function referred to as a *kernel*. The kernel quantifies the similarity of two observations.
+
+The kernel could be $\sum_{j=1}^p x_{ij}x_{i'j}$ which gives us back the support vector classifier.
+
+Or something like:
+
+$$ K(x_i, x_{i'}) = (1 + \sum_{j=1}^p x_{ij} x_{i'j} )^d $$
+
+could be used, which is a polynomial kernel of degree $d$. This would lead to a more flexible decision boundary. When the support vector classifier is used with a non-linear kernel, it is known as a support vector machine.
+
+## 9.4 - SVMs with More than Two Classes
+
+It turns out that the concept of separating hyperplanes does not lend itself naturally to more than two classes. The two most popular proposals are *one-verses-one* and *one-versus-all* methods.
+
+### 9.4.1 - One Versus One
+
+A one versus one approach with $K > 2$ classes constructs 
