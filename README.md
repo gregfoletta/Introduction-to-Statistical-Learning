@@ -73,5 +73,10 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 
 ## Chapter 9 - Support Vector Machines
 
+This chapter discusses classification using hyperplanes, leading to support vector machines.
+
 * [Notes](Chapter_9/notes.md)
 
+## Chapter 10 - Unsupervised Learning
+
+* [Notes](Chapter_10/notes.md)
