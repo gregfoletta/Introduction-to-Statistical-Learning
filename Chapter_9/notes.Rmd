@@ -178,4 +178,4 @@ A one versus one approach with $K > 2$ classes constructs ${K}\choose{2}$ SVMs, 
 
 We fit $K$ SVMs, each time comparing one of the $K$ classes to the remaining $K - 1$ classes.
 
-Let $\beta_{0k}, \beta_{1k}, \ldots, \beta_{pk}$ denote the parameters that result from fitting comparing the $k$th class to the others.
+Let $\beta_{0k}, \beta_{1k}, \ldots, \beta_{pk}$ denote the parameters that result from fitting comparing the $k$th class to the others. Let $x^*$ denote a test observation. The observation is assigned to the class for which $\beta_{0k}x_1^*, \beta_{1k}x_2^*, \ldots, \beta_{pk}x_p^*$ is largest.
