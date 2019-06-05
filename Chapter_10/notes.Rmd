@@ -148,3 +148,64 @@ Hierarchical clustering is an alternative approach which does not require us to 
 #### Interpreting a Dendrogram
 
 ![Dendrogram](dendrogram.png)
+
+Each leaf of the dendrogram represents one observation. As we move up the tree, these observations begin to fuse, which correspond to observations that are similar to each other. For any two observations, we can look for the point in the tree where their branches first fused. The height of this fusion indicates how different the observations are.
+
+An important point is that you can only draw conclusions about similarity based on the *fusion* point on the vertical axis. The horizontal axis is irrelevant.
+
+To identify clusters, horizontal cuts are made across the dendrogram. The distinct sets below the line are the clusters. Further cuts can be made to obtain any number of clusters. The height of the cuts servers the same role as the $K$ in K-means clustering.
+
+The term *hierarchical* refers to the fact that the clusters obtained by cutting the dendrogram are nested within the clusters obtained by cutting at any greater height. However on an arbitrary data set, the assumptions of a hierarchy may be unrealistic - i.e. consider people in two clusters split by gender, but split into three by nationality. Nationality is not a subset of gender. Due to situations like this. hierarchical clustering can lead to *worse* results than K-means.
+
+#### The Hierarchical Clustering Algorithm
+
+* We define a *dissimilarity measure* between each pair of observations (i.e. Euclidean distance). 
+* Each of the $n$ observations is treated as its own cluster. 
+* The two observations that are most similar are fused.
+    * The dissimilarity between the clusters indicates the heigh on the dendrogram where the fusion occurs.
+    * There are now $n-1$ clusters.
+* The process repeats until all of the observations belong to a single cluster.
+
+How is cluster $\{5, 7\}$ compared to $\{8\}$? The concept of dissimilarity needs to be extended to groups of observations.
+
+This is achieved with the concept of *linkage*. There are four common types of linkage:
+
+* **Complete** - Maximial intercluster dissimilarity. Compute all pairwise dissimilarities and record the *largest*.
+* **Single** - Minimal intercluster dissimilarity. Compute all pairwise dissimilarities and record the *smallest*.
+* **Average** - Mean intercluster dissimilarity.
+* **Centroid** - Dissimilarity between the *centroids* of the two clusters.
+    * Recall centroid is a mean vector of length $p$.
+    * Can lead to undesirable inversions - two clusters fused at a heigh *below* either of the individual clusters.
+
+#### Choice of Dissimilarity Measure
+
+We have discussed Euclidean distance, but other measures may be preferred, for example correlation between the features. Careful consideration should be taken with regard to the data and the scientific question at hand.
+
+One should also consider whether the variables should be scaled to have a standard deviation of one. This could be because of their frequency (e.g. how often something is purchased skewing the dissimilarity) or because their are measured in different scales.
+
+#### Practical Considerations
+
+##### Small Decisions / Big Consequences
+
+* Should the observations be standardised in some way?
+* With hierarchical clustering:
+    * What dissimilarity measure should be used?
+    * What type of linkage should be used?
+    * Where should we cut the dendrogram in order to obtain clusters?
+* In the case of K-means, how many clusters should we look for in the data?
+
+##### Validating Clusters Obtained
+
+We will always find clusters, but are they true sub-groups, or are we clustering the noise? There is no consensus on a single best approach.
+
+##### Other Considerations
+
+Both K-means and hierarchical clustering will assign observations into a cluster. Sometimes this is not appropriate. Consider some observations that are quite different from each other and from all other observations. Since the methods will assign every observation to a cluster, the clusters may be heavily distorted.
+
+Mixture models are an attractive approach - they amount to a *soft* version of K-means.
+
+Clustering methods are also not very robust to perterbations in the data. Consider clustering on $n$ observations, then removing 10% randomly. You would hope that the clusters are similar, but often they are not.
+
+#### A Tempered Approach to Interpretation
+
+Small changes (as described in 'Small Decisions / Big Consequences')can have big effects, so the key is to try different values and looking and the full set of results.

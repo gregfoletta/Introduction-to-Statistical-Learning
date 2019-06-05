@@ -62,7 +62,7 @@ for my $file_r (@rmd_files) {
 
 
     # Change to the directory the file is in.
-    #chdir $file_r->[DIR];
+    chdir $file_r->[DIR];
 
     my $R = Statistics::R->new;
 
@@ -112,8 +112,10 @@ sub files_to_knit {
 
         # Push the directory and the filename into an ARRAYREF
         push @files_to_knit, [$mtime_of_md_files{$file_without_suffix}{Rmd}{dir}, "$file_without_suffix.Rmd"];
+
     }
 
+        use Data::Printer; p @files_to_knit;
     return @files_to_knit;
 
 }
