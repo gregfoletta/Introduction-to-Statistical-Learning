@@ -1,0 +1,157 @@
+# Chapter 5 - Lab - Cross-validation and the Bootstrap
+
+```{r setup, message=F}
+library(broom)
+library(modelr)
+library(tidyverse)
+library(modelr)
+library(ISLR)
+library(ggdendro)
+```
+
+## 10.4 - Principal Component Analysis
+
+We will perform PCA on the `USArrests` data set. It contains the 50 states in alphabetical order, with the urban population, and the number of assaults, rapes and murders.
+
+```{r 1}
+(us_arrests <- as_tibble(USArrests, rownames = 'State'))
+```
+
+We take a look at the data, specifically the means and the variance for each variable:
+
+```{r 2}
+us_arrests %>%
+    gather(key = 'Key', value = 'Value', c(Murder, Assault, Rape, UrbanPop)) %>%
+    group_by(Key) %>%
+    summarise(average = mean(Value), variance = var(Value))
+```
+
+The variables have vastly different means and variances, meaning we will need to scale before PCA is performed. If we didn't, most of the principal components would be driver by the `Assault` variable since it has the largest mean and variance.
+
+By default `prcomp()` centers the variables with mean zero. The `scale` argument scales the standard deviations to one.
+
+```{r 3}
+arrests_pca <- us_arrests %>%
+    select(-State) %>%
+    prcomp(scale = T)
+
+arrests_pca
+```
+
+The rotation matrix provides the principal component loadings - each column is the loading vector for each principal component. It's called the rotation matrix because when we multiply it with $X$ we get the coordinates of the data in the rotated coordinate system.
+
+```{r 4}
+arrests_pca$rotation
+```
+
+We don't need to multiply these matrices ourselves - the rotated matrix is in `x`:
+
+```{r 5}
+arrests_pca$x[1:4,]
+```
+
+We plot the first two principal components:
+```{r 6}
+arrests_pca %>% biplot(scale = 0)
+```
+
+The `prcomp()` function also outputs the standard deviation. From this we can calculate the proportion of variance explained by each principal component.
+
+```{r 7}
+arrests_pca$sdev^2 / sum(arrests_pca$sdev^2)
+
+tibble(
+    pc = c('PC1', 'PC2', 'PC3', 'PC4'),
+    pve = arrests_pca$sdev^2 / sum(arrests_pca$sdev^2)
+) %>%
+    ggplot(aes(pc, pve, group = 1)) +
+    geom_line() +
+    geom_point()
+```
+
+## 10.5 - Clustering
+
+### 10.5.1 - K-means clustering
+
+The `kmeans()` function is used to perform K-means clustering. Let's create a random data set where 25 observations have a mean shift.
+
+```{r 8}
+set.seed(1)
+random_data <- tibble(x = rnorm(50), y = rnorm(50))
+
+random_data <- random_data %>%
+    mutate(x = x-3, y = y+6) %>%
+    sample_n(25) %>%
+    full_join(random_data, copy = T)
+
+data_kmeans <- kmeans(random_data, 2, nstart = 20)
+
+random_data %>%
+    mutate(group = as.factor(data_kmeans$cluster)) %>%
+    ggplot(aes(x,y)) +
+    geom_point(aes(colour = group))
+```
+
+The cluster assignments are in the `$cluster` variable. We can see that they have been perfectly separated into their groups.
+
+In real life we don't know how many clusters there are - let's try it with 3 groups.
+
+```{r 9}
+data_kmeans <- kmeans(random_data, 3, nstart = 20)
+
+random_data %>%
+    mutate(group = as.factor(data_kmeans$cluster)) %>%
+    ggplot(aes(x,y)) +
+    geom_point(aes(colour = group))
+```
+
+The `nstart` argument to `kmeans()` causes it to run with multiple random group assignments, and the function only reports the best results.
+
+The `$tot.withinss` variable is the total within cluster sum of squares which we're seeking to minimise: 
+
+$$ \text{minimise}_{C_1, \ldots, C_K} \bigg\{ \sum_{k=1}^K W(C_k) \bigg\} $$
+
+### 10.5.2 - Hierarchical Clustering
+
+The `hclust()` function implements hierarchical clustering. We begin by clustering our previous random data observations using complete linkage, and use the `dist()` function to compute the 50x50 inter-observation Euclidean distance matrix.
+
+```{r 10}
+h_clust_comp <- random_data %>%
+    dist() %>%
+    hclust(method = 'complete')
+
+h_clust_av <- random_data %>%
+    dist() %>%
+    hclust(method = 'average')
+
+h_clust_sngle <- random_data %>%
+    dist() %>%
+    hclust(method = 'single')
+```
+
+We use the `ggdendrogram()` function from the `ggdendro` library to render the dendrogram:
+
+```{r 11}
+ggdendrogram(h_clust_comp) + labs(title = "Complete Linkage")
+ggdendrogram(h_clust_av) + labs(title = "Average Linkage")
+ggdendrogram(h_clust_sngle) + labs(title = "Single Linkage")
+```
+
+To determine the the cluster labels you can use the `cutree()` function, which determines where on the dendrogam the cut should be made. The `k = ` argument determines the number of groups (like the K in k-means) or the `h = ` argument determines the heigh on the dendrogram. The first argument is `k`.
+
+```{r 12}
+h_clust_comp %>% cutree(2)
+h_clust_comp %>% cutree(3)
+```
+
+We should scale the variables before performing the clustering:
+
+```{r 13}
+random_data %>%
+    scale() %>%
+    dist() %>%
+    hclust() %>%
+    ggdendrogram() +
+    labs(title = 'Dendrogram with Scaling')
+```
+

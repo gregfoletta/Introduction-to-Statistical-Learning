@@ -68,6 +68,7 @@ for my $file_r (@rmd_files) {
 
     my @R_commands = (
         qq{ library(knitr) },
+        qq{ options(bitmapType = 'cairo') },
         qq{ getwd() },
         qq{ knit2html('$file_r->[FILE]') }
     );
