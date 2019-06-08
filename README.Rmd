@@ -80,3 +80,7 @@ This chapter discusses classification using hyperplanes, leading to support vect
 ## Chapter 10 - Unsupervised Learning
 
 * [Notes](Chapter_10/notes.md)
+
+### Exercises
+
+* [Lab](Chapter_10/lab.md)
