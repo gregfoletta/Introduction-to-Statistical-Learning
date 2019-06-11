@@ -174,7 +174,7 @@ We take a look at the proportion of variance explained and the cumulative varian
 
 ```{r 15}
 summary(nci_pca)$importance[2,] %>%
-    as.tibble() %>%
+    as_tibble() %>%
     mutate(n = row_number()) %>%
     ggplot(aes(n,value)) +
     geom_point() +
@@ -182,7 +182,7 @@ summary(nci_pca)$importance[2,] %>%
     labs(title = "Variance Explained")
 
 summary(nci_pca)$importance[3,] %>%
-    as.tibble() %>%
+    as_tibble() %>%
     mutate(n = row_number()) %>%
     ggplot(aes(n,value)) +
     geom_point() +
@@ -240,6 +240,6 @@ NCI60$data %>%
 ggdendrogram(nci_hc_pca)
 ```
 
-Not surprisingly the results are different. Sometimes performing clustering on the first few principal components can give better results. We might view the PCA step as 'de-noising' the data.
+    Not surprisingly the results are different. Sometimes performing clustering on the first few principal components can give better results. We might view the PCA step as 'de-noising' the data.
 
 
