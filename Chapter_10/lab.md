@@ -8,6 +8,7 @@ library(tidyverse)
 library(modelr)
 library(ISLR)
 library(ggdendro)
+library(ggfortify)
 ```
 
 ## 10.4 - Principal Component Analysis
@@ -258,4 +259,163 @@ h_clust_comp %>% cutree(3)
 ## [36] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
 ## [71] 3 3 3 3 3
 ```
+
+We should scale the variables before performing the clustering:
+
+
+```r
+random_data %>%
+    scale() %>%
+    dist() %>%
+    hclust() %>%
+    ggdendrogram() +
+    labs(title = 'Dendrogram with Scaling')
+```
+
+![plot of chunk 13](figure/13-1.png)
+
+
+### 10.6 - NCI60 Data Example
+
+Unsupervised techniques are often used in the analysis of genomic data. We take a look at the NCI60 cancer cell microarray data. It consists of gene expression measurements on cancer cells.
+
+We perform PCA on the data after scaling the variables, then visualise the first couple of principal components.
+
+
+```r
+nci_data <- NCI60$data
+nci_pca <- prcomp(nci_data)
+autoplot(nci_pca)
+```
+
+![plot of chunk 14](figure/14-1.png)
+
+```r
+autoplot(nci_pca, x = 2, y = 3)
+```
+
+![plot of chunk 14](figure/14-2.png)
+
+We take a look at the proportion of variance explained and the cumulative variance explained via the summary and graph it:
+
+
+```r
+summary(nci_pca)$importance[2,] %>%
+    as.tibble() %>%
+    mutate(n = row_number()) %>%
+    ggplot(aes(n,value)) +
+    geom_point() +
+    geom_line() +
+    labs(title = "Variance Explained")
+```
+
+```
+## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
+## This warning is displayed once per session.
+```
+
+![plot of chunk 15](figure/15-1.png)
+
+```r
+summary(nci_pca)$importance[3,] %>%
+    as.tibble() %>%
+    mutate(n = row_number()) %>%
+    ggplot(aes(n,value)) +
+    geom_point() +
+    geom_line() +
+    labs(title = 'Cumulative Variance Explained')
+```
+
+![plot of chunk 15](figure/15-2.png)
+
+
+
+### 10.6.2 - Clustering the NCI60 Data
+
+We now look at using hierarchical clustering on the NCI60 data. We first scale the observations to have a mean of 0 and a standard deviation of one.
+
+We then perform clustering with complete linkage, using Euclidian distance as the similarity measure.
+
+
+```r
+nci_scaled <- scale(NCI60$data)
+nci_hc <- nci_scaled %>% 
+    dist() %>% 
+    hclust()
+
+nci_hc %>% ggdendrogram()
+```
+
+![plot of chunk 16](figure/16-1.png)
+
+We then cut the dendrogram at a height that will yield four clusters.
+
+
+```r
+nci_hc %>% 
+    cutree(4) -> nci_four_cluster
+
+table( nci_four_cluster, NCI60$labs )
+```
+
+```
+##                 
+## nci_four_cluster BREAST CNS COLON K562A-repro K562B-repro LEUKEMIA
+##                1      2   3     2           0           0        0
+##                2      3   2     0           0           0        0
+##                3      0   0     0           1           1        6
+##                4      2   0     5           0           0        0
+##                 
+## nci_four_cluster MCF7A-repro MCF7D-repro MELANOMA NSCLC OVARIAN PROSTATE
+##                1           0           0        8     8       6        2
+##                2           0           0        0     1       0        0
+##                3           0           0        0     0       0        0
+##                4           1           1        0     0       0        0
+##                 
+## nci_four_cluster RENAL UNKNOWN
+##                1     8       1
+##                2     1       0
+##                3     0       0
+##                4     0       0
+```
+
+We can see some clear patterns, with `OVARIAN` and `LEUKEMIA` falling in the same category.
+
+Lets compare the K-means clustering against the hierarchical clustering:
+
+
+```r
+nci_kmeans <- NCI60$data %>% kmeans(4, nstart = 20)
+nci_kmeans_four_cluster <- nci_kmeans$cluster
+table( nci_kmeans_four_cluster, nci_four_cluster )
+```
+
+```
+##                        nci_four_cluster
+## nci_kmeans_four_cluster  1  2  3  4
+##                       1 23  7  0  0
+##                       2  0  0  8  0
+##                       3  8  0  0  9
+##                       4  9  0  0  0
+```
+
+We see diferences in the clustering allocations.
+
+Rather than perform hierarchical clustering on the entire matrix, we can perform it on the first few principal component scores.
+
+
+```r
+NCI60$data %>%
+    prcomp(scale = T) %>%
+    .$x %>% .[,1:5] %>%
+    dist() %>%
+    hclust() -> nci_hc_pca
+
+ggdendrogram(nci_hc_pca)
+```
+
+![plot of chunk 19](figure/19-1.png)
+
+Not surprisingly the results are different. Sometimes performing clustering on the first few principal components can give better results. We might view the PCA step as 'de-noising' the data.
+
 
