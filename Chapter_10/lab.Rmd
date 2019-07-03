@@ -173,18 +173,16 @@ autoplot(nci_pca, x = 2, y = 3)
 We take a look at the proportion of variance explained and the cumulative variance explained via the summary and graph it:
 
 ```{r 15}
-summary(nci_pca)$importance[2,] %>%
-    as_tibble() %>%
+tibble(var_exp = summary(nci_pca)$importance[2,]) %>%
     mutate(n = row_number()) %>%
-    ggplot(aes(n,value)) +
+    ggplot(aes(n,var_exp)) +
     geom_point() +
     geom_line() +
     labs(title = "Variance Explained")
 
-summary(nci_pca)$importance[3,] %>%
-    as_tibble() %>%
+tibble(cum_var = summary(nci_pca)$importance[3,]) %>%
     mutate(n = row_number()) %>%
-    ggplot(aes(n,value)) +
+    ggplot(aes(n,cum_var)) +
     geom_point() +
     geom_line() +
     labs(title = 'Cumulative Variance Explained')

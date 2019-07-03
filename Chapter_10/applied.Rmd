@@ -1,0 +1,294 @@
+# Chapter 5 - Applied
+
+```{r setup, message=F}
+library(ISLR)
+library(MASS)
+library(broom)
+library(modelr)
+library(tidyverse)
+library(ggdendro)
+library(ggfortify)
+```
+
+## 7)
+
+*In the chapter, we mentioned the use of correlation-based distance and Euclidean distance as dissimilarity measures for hierarchical clustering. It turns out that these two measures are almost equivalent: if each observation has been centered to have mean zero and standard deviation one, and if we let $r_{ij} denote the correlation between the $i$th and $j$th observations, then the quantity $1 - r_{ij}$ is proportional to the squared Euclidean distance between the ith and jth observations.*
+
+*On the `USArrests` data, show that this proportionality holds.*
+
+Scaling the USArrests data is easy, however the correlation requires some thought. The `cor()` function returns a correlation matrix between the columns of the matrix. In its original format this is between the features, however we want it between the observations. To do this we transpose the matrix so that each colunm is an observation.
+
+```{r 1}
+arrests_scaled <- scale(USArrests)
+
+# Calculate the sqaured distance
+arrests_dist <- dist(arrests_scaled)^2
+
+# Transpose the matrix and take the correlation 
+arrests_cor <- as.dist(1 -cor(t(arrests_scaled)))
+
+# A summary of the proportional matrix
+summary(arrests_cor / arrests_dist)
+```
+
+## 8)
+
+*In Section 10.2.3, a formula for calculating PVE was given in Equation 10.8. We also saw that the PVE can be obtained using the `sdev` output of the `prcomp()` function. On the `USArrests` data, calculate PVE in two ways:*
+
+### a) 
+
+*Using the `sdev` output of the `prcomp()` function.*
+
+```{r 2}
+arrests_pca <- USArrests %>%
+    prcomp(scale = T)
+
+arrests_pca$sdev^2 / sum(arrests_pca$sdev^2)
+```
+
+### b)
+
+*By applying Equation 10.8 directly.*
+
+The equation 10.8, which gives the *proportion of variance explained* of the $m$th principal component, is:
+
+$$ \frac{ \sum_{i=1}^n ( \sum_{j=1}^p \phi_{jm} x_{ij})^2 }{ \sum_{j=1}^p\sum_{i=1}^n x_{ij}^2 } $$
+
+```{r 3}
+# We create a function to scale the matrix
+standardise <- function(x) {
+    feature_means <- colMeans(x)
+    feature_sd <- sqrt( apply(x, 2, var) )
+
+    scaled <- x %>%
+        sweep(., 2, feature_means, '-') %>%
+        sweep(., 2, feature_sd, '/')
+
+    return( scaled )
+}
+
+# We take the matrix and multiply each column by each
+# element of the lading vector (the number of columns
+# and the number of elements will be the same.
+# We then sum the rows, square and sum. This is
+# The denomitator.
+# We then divide the element by the sum of the squares
+# of the original matrix
+pve <- function(x, pca, m) {
+    num <- x %>%
+        sweep(MARGIN = 2, pca$rotation[,m], '*') %>%
+        rowSums() %>%
+        .^2 %>%
+        sum()
+
+    pve <- num / sum(x^2)
+
+    return(pve)
+}
+
+map_dbl(1:4, ~pve(standardise(USArrests), arrests_pca, .x))
+```
+
+## 9)
+
+*Consider the USArrests data. We will now perform hierarchical clustering on the states.*
+
+### a)
+
+*Using hierarchical clustering with complete linkage and Euclidean distance, cluster the states.*
+
+```{r 4}
+arrests_hclust <- USArrests %>%
+    dist() %>%
+    hclust() 
+
+ggdendrogram(arrests_hclust)
+```
+
+### b)
+
+*Cut the dendrogram at a height that results in three distinct clusters. Which states belong to which clusters?*
+
+```{r 5}
+arrests_hclust %>% cutree(k = 3)
+
+arrests_hclust %>% cutree(k = 3) -> cluster_a
+
+table(cluster_a)
+```
+
+### c)
+
+```{r 6}
+arrests_scale_hclust <- USArrests %>%
+    scale() %>%
+    dist() %>%
+    hclust()
+
+ggdendrogram(arrests_scale_hclust)
+
+arrests_scale_hclust %>% cutree(k = 3) -> cluster_b
+
+table(cluster_b)
+
+table(cluster_a, cluster_b)
+```
+
+### d)
+
+*What effect does scaling the variables have on the hierarchical clustering obtained? In your opinion, should the variables be scaled before the inter-observation dissimilarities are computed? Provide a justification for your answer.*
+
+The scaling appears to increase the dissimilarity (in a relative sense) of the observations, as the linkages are higher up in the dendrogram. The variables should be scaled as the `UrbanPop` variable is in different units to the other variables.
+
+## 10)
+
+*In this problem, you will generate simulated data, and then perform PCA and K-means clustering on the data.*
+
+### a)
+
+*Generate a simulated data set with 20 observations in each of three classes (i.e. 60 observations total), and 50 variables.*
+
+```{r 7}
+set.seed(1)
+q10data <- matrix(rnorm(60 * 50), ncol = 50)
+q10data[21:40,] <- q10data[21:40,] + 60 * mean(q10data[21:40,])
+q10data[41:60,] <- q10data[41:60,] - 50 * mean(q10data[41:60,])
+q10data <- q10data %>%
+    as_tibble(.name_repair = ~make.names(1:50)) %>%
+    mutate(class = as.factor( flatten_int( map(1:3, ~rep(.x, 20) )) ))
+```
+
+### b)
+
+*Perform PCA on the 60 observations and plot the first two principal component score vectors. Use a different color to indicate the observations in each of the three classes.*
+
+```{r 8}
+q10pca <- q10data %>%
+    select(-class) %>%
+    prcomp() 
+
+q10pca %>% autoplot(data = q10data, colour = 'class')
+```
+
+### c)
+
+*Perform K-means clustering of the observations with K = 3. How well do the clusters that you obtained in K-means clustering compare to the true class labels?*
+
+```{r 9}
+set.seed(1)
+q10_kmeans <- q10data %>% kmeans(3, nstart = 20)
+
+q10data %>%
+    mutate(k_cluster = q10_kmeans$cluster) %>%
+    autoplot(q10pca, data = ., colour = 'class') +
+    geom_text(aes(label = k_cluster), nudge_y = .02)
+```
+
+### d)
+
+*Now perform K-means clustering with K = 2, and describe your results.*
+
+```{r 10}
+set.seed(1)
+q10_kmeans <- q10data %>% kmeans(2, nstart = 20)
+
+q10data %>%
+    mutate(k_cluster = q10_kmeans$cluster) %>%
+    autoplot(q10pca, data = ., colour = 'class') +
+    geom_text(aes(label = k_cluster), nudge_y = .02)
+```
+
+We see that groups 1 and 2 have been merged together into a single group, leaving the other group. The clustering has been accurate.
+
+### e)
+
+*Now perform K-means clustering with K = 4, and describe your results.*
+
+```{r 11}
+set.seed(1)
+q10_kmeans <- q10data %>% kmeans(4, nstart = 20)
+
+q10data %>%
+    mutate(k_cluster = q10_kmeans$cluster) %>%
+    autoplot(q10pca, data = ., colour = 'class') +
+    geom_text(aes(label = k_cluster), nudge_y = .02)
+```
+
+We now see groups 1 and 2 split into three, with the other group on the right still relatively stable.
+
+### f) 
+
+*Now perform K-means clustering with K = 3 on the first two principal component score vectors, rather than on the raw data.*
+
+*That is, perform K-means clustering on the 60 × 2 matrix of which the first column is the first principal component score vector, and the second column is the second principal component score vector. Comment on the results.*
+
+```{r 12}
+set.seed(1)
+q10f_kmeans <- kmeans(q10pca$x, 3)
+
+q10data %>%
+    mutate(k_cluster = q10f_kmeans$cluster) %>%
+    autoplot(q10pca, data = ., colour = 'class') +
+    geom_text(aes(label = k_cluster), nudge_y = .02)
+```
+
+We can see that the K-means on the PCA has switched some of the group 1 and 2 observations and the group 2 and 3 observations.
+
+### g)
+
+*Using the `scale()` function, perform K-means clustering with K = 3 on the data after scaling each variable to have standard deviation one. How do these results compare to those obtained in (b)? Explain.*
+
+```{r 13}
+set.seed(1)
+q10f_kmeans <- q10data %>%
+    scale() %>%
+    kmeans(3, nstart = 20)
+
+q10data %>%
+    mutate(k_cluster = q10f_kmeans$cluster) %>%
+    autoplot(q10pca, data = ., colour = 'class') +
+    geom_text(aes(label = k_cluster), nudge_y = .02)
+```
+
+The scaling appears to have negatively affected the clustering. This would be because it has changed the distance between the observations.
+
+
+## 11)
+
+*On the book website, www.StatLearning.com, there is a gene expression data set ( Ch10Ex11.csv ) that consists of 40 tissue samples with measurements on 1,000 genes. The first 20 samples are from healthy patients, while the second 20 are from a diseased group.*
+
+### a)
+
+*Load in the data*
+
+```{r 13}
+gene_data <- read_csv('http://www-bcf.usc.edu/~gareth/ISL/Ch10Ex11.csv', col_names = F)
+```
+
+### b)
+
+*Apply hierarchical clustering to the samples using correlationbased distance, and plot the dendrogram. Do the genes separate the samples into the two groups? Do your results depend on the type of linkage used?*
+
+Correlation is defined as one minus the Pearson correlation, which is the default of the `cor()` function.
+
+```{r 14}
+cor_distance <- as.dist(1 - cor(gene_data))
+
+cor_distance %>%
+    hclust() %>%
+    ggdendrogram()
+```
+
+We see a separation into two groups with complete linkage. If we use average, we get three distinct groups:
+
+```{r 15}
+cor_distance %>%
+    hclust(method = 'average') %>%
+    ggdendrogram()
+```
+
+### c)
+
+*Your collaborator wants to know which genes differ the most across the two groups. Suggest a way to answer this question, and apply it here.*
+
+We can define difference between genes by how high up on the dendrogram they meet.

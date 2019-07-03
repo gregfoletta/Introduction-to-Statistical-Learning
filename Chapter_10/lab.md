@@ -300,27 +300,20 @@ We take a look at the proportion of variance explained and the cumulative varian
 
 
 ```r
-summary(nci_pca)$importance[2,] %>%
-    as.tibble() %>%
+tibble(var_exp = summary(nci_pca)$importance[2,]) %>%
     mutate(n = row_number()) %>%
-    ggplot(aes(n,value)) +
+    ggplot(aes(n,var_exp)) +
     geom_point() +
     geom_line() +
     labs(title = "Variance Explained")
 ```
 
-```
-## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
-## This warning is displayed once per session.
-```
-
 ![plot of chunk 15](figure/15-1.png)
 
 ```r
-summary(nci_pca)$importance[3,] %>%
-    as.tibble() %>%
+tibble(cum_var = summary(nci_pca)$importance[3,]) %>%
     mutate(n = row_number()) %>%
-    ggplot(aes(n,value)) +
+    ggplot(aes(n,cum_var)) +
     geom_point() +
     geom_line() +
     labs(title = 'Cumulative Variance Explained')
@@ -416,6 +409,6 @@ ggdendrogram(nci_hc_pca)
 
 ![plot of chunk 19](figure/19-1.png)
 
-Not surprisingly the results are different. Sometimes performing clustering on the first few principal components can give better results. We might view the PCA step as 'de-noising' the data.
+    Not surprisingly the results are different. Sometimes performing clustering on the first few principal components can give better results. We might view the PCA step as 'de-noising' the data.
 
 
