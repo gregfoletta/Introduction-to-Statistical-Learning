@@ -1,0 +1,190 @@
+# Chapter 5 - Lab - Cross-validation and the Bootstrap
+
+```{r setup, message=F}
+library(broom)
+library(modelr)
+library(tidyverse)
+library(modelr)
+library(ISLR)
+library(ggdendro)
+library(ggfortify)
+```
+
+## 9.6 - Support Vector Machines
+
+We use the `e1071` library to demonstrate the support vector machines.
+
+```{r lib}
+library(e1071)
+```
+
+### 9.6.1 - Support Vector Classifier
+
+The `e1071` library contains implementations for a number of statistical learning methods. The `svm()` function can be used to fit a support vector classifier when the argument `kernel = linear` is used.
+
+We generate observations that are in two classes:
+
+```{r 1}
+set.seed(1)
+X <- tibble(
+    x1 = rnorm(20), 
+    x2 = rnorm(20), 
+    y = as.factor(c(rep(-1, 10), rep(1,10)))
+)
+
+X[1:10,1:2] = X[1:10,1:2] + 1
+
+X %>% ggplot(aes(x2,x1)) +
+    geom_point(aes(colour = y))
+```
+
+The classes are not linearly separable.
+
+We now fit the support vector classifier:
+
+```{r 2}
+X %>%
+    svm(y~., data = ., scale = F, cost = 10, kernel = 'linear') -> X_fit
+    plot(X_fit, data = X)
+```
+What we can see is hyperplane (in two dimensions) splitting the classes. The decision boundary between the two classes is linear because we used the `kernel = linear` argument.
+
+The support vectors are crosses and the other observations are circles. We can get their identities using `index`:
+```{r 3}
+X_fit$index
+```
+
+As usual, `summary()` can give us information on the classifier fit:
+```{r 4}
+X_fit %>% summary()
+```
+
+Lets use a smaller cost value:
+```{r 5}
+X %>%
+    svm(y~., data = ., scale = F, cost = .09, kernel = 'linear') %>%
+    plot(data = X)
+```
+
+The smaller cost means we obtain more support vectors because the margin is wider.
+
+The `e1071` library contains a `tune()` function to perform cross validaton. By default it performs ten-fold CV.
+
+```{r 6}
+tune(
+    svm, y ~ ., data = X, kernel = 'linear',
+    ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 100))
+) -> X_tune
+summary(X_tune)
+```
+We see that any of the larger costs result in the lowest cross-validation rate.
+
+The best model can be accessed using `$best.model`
+
+```{r 7}
+X_tune$best.model -> X_best
+X_best
+```
+
+The `predict()` function can work on the model to predict the class label. Let's generate a test data set:
+
+```{r 8}
+set.seed(2)
+X_testset <- tibble(
+    x1 = rnorm(20), 
+    x2 = rnorm(20), 
+    y = as.factor(c(rep(-1, 10), rep(1,10)))
+)
+
+X_testset[1:10,1:2] = X_testset[1:10,1:2] + 1
+
+X_testset %>% ggplot(aes(x2,x1)) +
+    geom_point(aes(colour = y))
+```
+
+Now we can predict the labels:
+
+```{r 9}
+X_testset %>%
+    mutate(class_pred = predict(X_best, X_testset)) -> X_testset
+
+table(real_class = X_testset$y, predicted_class = X_testset$class_pred)
+```
+
+Four of the observations have been misclassified.
+
+No we consider when the classes are linearly seperable. We alter our set:
+
+```{r 10}
+X[1:10,1:2] = X[1:10,1:2] + 1.2
+
+X %>% ggplot(aes(x2,x1)) +
+    geom_point(aes(colour = y))
+```
+
+We fit a support vector with a large cost so that no observations are misclassified:
+
+```{r 11}
+X %>% 
+    svm(y ~ ., data = ., kernel = 'linear', cost = 1e5) -> X_fit
+plot(X_fit, data = X)
+summary(X_fit)
+```
+
+### 9.6.2 - Support Vector Machines
+
+In order to fit a support vector machine using a non-linear kernel, we modify the `kernel = ''` parameter. We can use `polynomial` and `degree`, or `radial` for a radial kernel.
+
+We generate data with a non-linear boundary
+
+```{r 12}
+tibble(
+    x1 = rnorm(200),
+    x2 = rnorm(200),
+    y = as.factor( c(rep(1, 150), rep(2, 50)) )
+) -> A
+
+A[1:100,1:2] = A[1:100,1:2] + 2
+A[101:150,1:2] = A[101:150,1:2] - 2
+
+A %>%
+    ggplot(aes(x2, x1, colour = y)) +
+    geom_point()
+```
+We split the data into training and test groups, then fit the training data with `svm()`.
+
+```{r 13}
+set.seed(1)
+A %>% resample_partition(c(train = .5, test = .5)) -> A_sample
+
+A_train_svm <- svm(y~., data = A_sample$train, kernel = 'radial', gamma = 1, cost = 1)
+
+plot(A_train_svm, as_tibble(A_sample$train))
+summary(A_train_svm)
+```
+
+We can see there are a number of training errors in tehe SVM fit. If we increase the value of `cost`, we can reduce the number of training errors, however this comes at a cost of a more irregular decision boundary and we risk overfitting the data.
+
+We perform cross-validation using `tune()` to select the best `cost`.
+
+```{r 14}
+set.seed(1)
+A_tuned <- tune(svm, y ~ ., data = as_tibble(A_sample$train), kernel = 'radial',
+                ranges = list(
+                    cost = c(0.1, 1, 10, 100, 1000)
+                ),
+                gamma = c(0.5, 1, 2, 3, 4)
+)
+
+summary(A_tuned)
+```
+
+We can now view the test set predictions against the real test values.
+
+```{r 15}
+as_tibble(A_sample$test) %>%
+    mutate(y_prime = predict(A_tuned$best.model, newdata = tibble(x1 = x1, x2 = x2))) %>%
+    summarise(misclassified = (1 - mean(y == y_prime)) * nrow(.))
+```
+
+We have misclassified 13 observations in the test set.
