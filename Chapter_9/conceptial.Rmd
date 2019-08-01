@@ -1,0 +1,213 @@
+---
+title: "Chapter 5 - Conceptual"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ISLR)
+```
+
+## 1
+
+*This problem involves hyperplanes in two dimensions.*
+
+### a)
+
+*Sketch the hyperplane* $1 + 3X_1 - X_2 = 0$. *Indicate the set of points for which the formula is *$ < 0 $*and the set for which it is *$> 0$*.*
+
+We let $X_1$ be on the x-axis and $X_2$ be on the y-axis. We move $X_2$ around so we have $X_2 = 3_X1 + 1$.
+
+```{r 1.a_1}
+tibble(X1 = seq(-5, 5, .01), X2 = 3 * X1 + 1) %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(size = .1)
+```
+
+The set set of points above the line are when the formula is $< 0$, and the set of points above the line are when the formula $< 0$.
+
+### b)
+*On the same plot, sketch the hyperplane $-2 + X_1 + 2X_2 = 0$.
+
+Moving $X_2$ around we have $X_2 = 2 - \frac{X_1}{2}$
+
+```{r 1.b_1}
+tibble(
+    X1 = seq(-5, 5, .01), 
+    X2 = 3 * X1 + 1,
+    X2A = 2 - X1/2) %>%
+    ggplot() +
+    geom_point(aes(X1, X2), size = .1) +
+    geom_point(aes(X1, X2A), size = .1)
+```
+
+The points above the line are when the formula is $> 0$ and the points below this line are when the formula is $< 0$.
+
+## 2)
+
+*We have seen that in $p = 2$ dimensions, a linear decision boundary takes the form $\beta_0 + \beta_1X_1 + \beta_2X_2 = 0$. We now investigate a non-linear decison boundary.
+
+### a)
+
+*Sketch the curve $(1 + X_1)^2 + (2 - X_2)^2 = 4$.
+
+The formula is for a circle with radius 2 ($\sqrt{4}$) and the centre being at $(-1, 2)$.
+
+```{r 2.a}
+library(ggforce)
+ggplot() +
+    geom_segment(aes(x = -10, y = 0, xend = 10, yend = 0), arrow = arrow()) +
+    geom_segment(aes(x = 0, y = -10, xend = 0, yend = 10), arrow = arrow()) +
+    geom_circle(aes(x0 = -1, y0 = 2, r = 2))
+```
+
+### b)
+
+*Indicates the points that are $> 4$ and those which are $\le 4$.*
+
+The points inside and on the line of the circle are $le 4$ and those outside of the circle are $> 4$.
+
+### c)
+
+*Suppose that a classifier assigns an observation to the blue class if it's $> 4$ and to the red class otherwise. To what class are the following observations classified to:*
+
+
+```{r 2.c_1}
+classifier <- function(x) {
+    sum <- (1 + x[1])^2 + (2 - x[2])^2
+    return( ifelse(sum <= 4, "red", "blue") )
+}
+```
+* (0, 0)
+* (-1, 1)
+* (2, 2)
+* (3, 8)
+
+```{r 2.c_2}
+list(
+    c(0,0),
+    c(-1,1),
+    c(2,2),
+    c(3,8)
+) %>% map_chr(~classifier(.x))
+```
+
+### d)
+
+*Argue that while the decision boundary is not linear in terms of $X_1, X_2$, it is linear in terms of $X_1^2, X_2^2$.*
+
+We are enlarging the feature space with functions of the original features. The function in this case is a quadratic function. In this enlarged feature space the decision boundary is in fact linear: if we expand out the terms we end up with:
+
+$$
+(1 + 2X_1 + X_2^2) + (4 - 4X_2 + X_2^2) = 
+
+5 + 2X_1 + 4X_2 + X_1^2 + X_2^2
+$$
+However in the original feature space, the decision boundary is in the form of a quadratic: not linear.
+
+## 3)
+
+*We explaore the maximial margin classifier on a toy set*
+
+### a)
+
+*We are given $n = 7$ and $p = 2$ dimensions. For each observation there is an associated class label.
+
+```{r 3.a_1}
+data_3a <- tibble(
+    obs = 1:7,
+    X1 = c(3,2,4,1,2,4,4),
+    X2 = c(4,2,4,4,1,3,1),
+    Y = as.factor(c('Red', 'Red', 'Red', 'Red', 'Blue', 'Blue', 'Blue'))
+)
+```
+
+Sketch the observations:
+
+```{r 3.a_2}
+data_3a %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(shape = Y), size = 3)
+```
+
+### b)
+*Sketch the optimal separating plane and provide the equation*
+
+The optimal line looks to be around $\frac{1}{2} + \frac{7}{8}X_1 - X_2 = 0$
+
+```{r 3.b}
+data_3a %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(shape = Y), size = 2) +
+    geom_segment(aes(x = 0, y = -.5, xend = 4, yend = 3.5))
+```    
+
+### c)
+
+*Describe the classification rule for the MMC.*
+
+The maximal margin classifier is the separating hyperplane that is farthest from the observations.
+
+Our MMC is $\beta_0 + \beta_1X_1 + \beta_2X_2$, where $(\beta_0, \beta_1, \beta_2) = (-\frac{1}{2}, \frac{7}{8}, -1)$
+
+When the formula is < 0, we assign to Red, when it is > 0 we assign to Blue. 
+
+### d)
+
+*On your sketch, indicate the margin for the maximal margin hyperplane.*
+
+The margin is the minimal perpendicular distance from the closest observations to the hyperplane. A rouch sketch is:
+
+```{r 3.d}
+data_3a %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(shape = Y), size = 2) +
+    geom_segment(aes(x = 0, y = -.5, xend = 4, yend = 3.5)) +
+    geom_segment(aes(X1 - .5, y = X2 + .5, xend = X1 + .5, yend = X2 - .5)) +
+    theme(aspect.ratio = 1)
+
+```    
+
+### e)
+
+*Indicate the support vectors for the maximal margin classifier.*
+
+The support vectors look to be $(2,1),\ (2,2),\ (4,3) \text{ and } (4,4)$
+
+### f)
+
+*Argue that a slight movement of the seventh observation would not affect the maximal margin hyperplane.*
+
+The seventh observation is $(4,\ 1)$. This is not a support vector. The maximal margin hyperplane is only determined by the support vectors. This vector can be moved to anywhere outside the margin and it won't affect the classifier.
+
+If it's moved inside the current margin, it would affect the classifier.
+
+### g)
+
+*Sketch a hyperplane that is not the optimal separating hyperplane, and provide the equation for this hyperplane.*
+
+```{r 3.g}
+data_3a %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(shape = Y), size = 2) +
+    geom_segment(aes(x = .5, y = -.5, xend = 4, yend = 3.2))
+```    
+
+The equation for this plane is $\frac{1}{2} + \frac{4}{5} X_1 - X_2 = 0$
+
+### h)
+
+*Draw an additional observation on the plot so that the two classes are no longer separable by a hyperplane.
+
+```{r 3h}
+data_3a <- tibble(
+    obs = 1:8,
+    X1 = c(3,2,4,1,2,4,4,3),
+    X2 = c(4,2,4,4,1,3,1,1),
+    Y = as.factor(c('Red', 'Red', 'Red', 'Red', 'Blue', 'Blue', 'Blue', 'Red'))
+) %>% ggplot(aes(X1, X2)) +
+    geom_point(aes(shape = Y), size = 2) +
+    geom_segment(aes(x = 0, y = -.5, xend = 4, yend = 3.5))
+```
+

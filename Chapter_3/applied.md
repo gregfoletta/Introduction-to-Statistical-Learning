@@ -46,9 +46,9 @@ lm_auto %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.606         0.605  4.91      600. 7.03e-81     2 -1179. 2363. 2375.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 We in the `tidy()` output we can see the p-value for the intercept and the coefficient is very small, indicating a very low probability for the null hypothesis.A
@@ -134,7 +134,18 @@ augment(lm_auto) %>% ggplot(aes(.fitted, .resid)) + geom_point() + geom_smooth(m
 
 ```r
 library(GGally)
+```
+
+```
+## Error in library(GGally): there is no package called 'GGally'
+```
+
+```r
 library(corrplot)
+```
+
+```
+## Error in library(corrplot): there is no package called 'corrplot'
 ```
 
 ### a)
@@ -144,7 +155,9 @@ library(corrplot)
 auto %>% select(-'name') %>% ggpairs()
 ```
 
-![plot of chunk applied_mult_auto_pairs](figure/applied_mult_auto_pairs-1.png)
+```
+## Error in ggpairs(.): could not find function "ggpairs"
+```
 
 ### b)
 *Compute the matrix of correlations between the variables.*
@@ -153,7 +166,9 @@ auto %>% select(-'name') %>% ggpairs()
 auto %>% select(-'name') %>% cor() %>% corrplot(method = 'color')
 ```
 
-![plot of chunk applied_mult_auto_corr](figure/applied_mult_auto_corr-1.png)
+```
+## Error in corrplot(., method = "color"): could not find function "corrplot"
+```
 
 ### c)
 *Perform a multiple linear regression with `mpg` as the response and all other variables except `name` as the predictors.*
@@ -185,9 +200,9 @@ glance(lin_reg_auto)
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC
-## *     <dbl>         <dbl> <dbl>     <dbl>     <dbl> <int>  <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>     <dbl> <int>  <dbl> <dbl>
 ## 1     0.821         0.818  3.33      252. 2.04e-139     8 -1023. 2065.
-## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+## # … with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
 ```
 #### i)
 *Is there a relationship between the predictors and the response?*
@@ -294,9 +309,9 @@ lm(1/mpg ~ horsepower + weight*year, auto) %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared   sigma statistic   p.value    df logLik    AIC
-## *     <dbl>         <dbl>   <dbl>     <dbl>     <dbl> <int>  <dbl>  <dbl>
+##       <dbl>         <dbl>   <dbl>     <dbl>     <dbl> <int>  <dbl>  <dbl>
 ## 1     0.883         0.882 0.00572      731. 7.39e-179     5  1471. -2929.
-## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+## # … with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
 ```
 
 The last one looks quite good.
@@ -373,9 +388,9 @@ cs_regress %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.239         0.234  2.47      41.5 2.39e-23     4  -928. 1865. 1885.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 ```r
@@ -385,9 +400,9 @@ cs_regress_reduced %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.239         0.235  2.47      62.4 2.66e-24     3  -928. 1863. 1879.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 We see no increase in the R-sqaured value - but we do see an increase in the F-statistic, and a decrease in its p-value.
@@ -655,9 +670,9 @@ lm(y ~ poly(x,2), simulated) %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.820         0.816 0.246      220. 8.51e-37     3 -0.220  8.44  18.9
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 We can see that the R^2 has not changed, and the RSE has increased slightly with the x^2 regression. However the F-statistic has decreased significantly with the x^2 regression, indicating a decrease in the significance of the model.
@@ -684,9 +699,9 @@ lm(y ~ x, low_and_high_noise) %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared  sigma statistic  p.value    df logLik   AIC
-## *     <dbl>         <dbl>  <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl>
+##       <dbl>         <dbl>  <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl>
 ## 1     0.956         0.956 0.0963     2153. 1.64e-68     2   93.2 -180.
-## # ... with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
+## # … with 3 more variables: BIC <dbl>, deviance <dbl>, df.residual <int>
 ```
 
 ```r
@@ -720,9 +735,9 @@ lm(y1 ~ x1, low_and_high_noise) %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.574         0.570 0.495      132. 7.27e-20     2  -70.6  147.  155.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 Looking at the values, the low noise regression picks the exact coefficients that were used in the function. The R^2 is near 1 with a high F-statistic.
@@ -836,9 +851,9 @@ colin_data_reg %>% glance()
 ```
 ## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-## *     <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
+##       <dbl>         <dbl> <dbl>     <dbl>   <dbl> <int>  <dbl> <dbl> <dbl>
 ## 1     0.209         0.193  1.06      12.8 1.16e-5     3  -146.  300.  310.
-## # ... with 2 more variables: deviance <dbl>, df.residual <int>
+## # … with 2 more variables: deviance <dbl>, df.residual <int>
 ```
 
 *Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*

@@ -188,3 +188,112 @@ as_tibble(A_sample$test) %>%
 ```
 
 We have misclassified 13 observations in the test set.
+
+### 9.6.3 - ROC Curves
+
+First, a refresher on ROC curves. ROC stands for receiver operating characteristic, and it's used in evaluating and comparing predictive models.
+
+The ROC curver plots sensitivity (the probability that predicting a true positive will be a postive) against *1-specificity* (the probability of predicting a real negative will be a positive).
+
+A model that predicts at change will have a diagonal line:
+```{r roc_1}
+library(ROCR)
+
+prediction(
+    sample(c(0,1), 5000, replace = T),
+    sample(c(0,1), 5000, replace = T)
+) %>% 
+    performance(measure = 'tpr', x.measure = 'fpr') %>% 
+    plot()
+```
+
+The further the curve is from the diagonal line, the better the model is at discriminating between positives and negatives in general. Let's try with a simple logistic regression trying to predict the direction of the stock market:
+```{r roc_2}
+Weekly %>%
+    select(-Year, -Today, -Volume) %>%
+    mutate(dir_prime = predict(glm(Direction ~ ., data = ., family = 'binomial'))) %>%
+    {prediction(.$dir_prime, .$Direction)} %>%
+    performance('tpr', 'fpr') %>%
+    plot()
+```
+
+The `ROCR` package can be used to produce ROC curves. We first define a function to plot a ROC curve given a vector containing a numerical score for each prediction (`pred`) and a vector containing the class label for each observation (`truth`).
+
+The `prediction()` function from `ROCR` transforms the input data into a standardised format. The performance calculates different kinds of performance measures. In the function below we're measuring "true positive rate" against "false positive rate".
+
+```{r 18, message = F}
+plot_roc <- function(pred, truth) {
+    prediction(pred, truth) %>%
+    performance("tpr", "fpr") %>%
+    plot()
+}
+```
+
+SVMs and support vector classifiers output class labels for each observation. However it is also possible to obtain *fitted values* for each observation. These are the numerical scores used to determine the class labels.
+
+In the case of a support vector classifier, the fitted value for an observation $X = (X_1, X_2, \ldots, X_p)^T$ takes the form $\hat{\beta_0} + \hat{\beta_1}X_1 + \ldots + \hat{\beta_p}X_p$.
+
+We can use `decision.values = T` when using `svm()`. The `predict()` function then outputs the values.
+
+```{r 17}
+svm_fit <- svm(
+    y ~ ., 
+    data = as_tibble(A_sample$train), 
+    kernel = 'radial', 
+    gamma = 2, 
+    cost = 1, 
+    decision.values = T
+)
+
+
+attributes( 
+    predict(svm_fit, as_tibble(A_sample$train), decision.values = T)
+)$decision.values -> fitted_values
+
+plot_roc(fitted_values, as_tibble(A_sample$train)$y)
+```
+
+### 9.6.4 - SVM with Multiple Classes
+
+If the response vector contains more than two classes, the `svm()` function will perform multi-class classification by using the 'one-versus-one' approach.
+
+### 9.6.5 - Application to Gene Expression Data
+
+We now examine the `Khan` data set, which consists of a number of tissue samples corresponding to four different of small round blue cell tumors.
+
+For each tissue sample gene expression measurements are available. The data consists of training and test data.
+
+
+
+```{r 9.6.4_1} 
+names(Khan)
+dim(Khan$xtrain)
+dim(Khan$xtest)
+length(Khan$ytrain)
+length(Khan$ytest)
+```
+
+We will use a support vector approach to predict cancer subtype using gene expression measurements.
+
+```{r 9.6.4_2}
+khan_train <- as_tibble(Khan$xtrain, .name_repair = ~make.names(c(1:ncol(Khan$xtrain)))) %>%
+    mutate(y = as.factor(Khan$ytrain))
+
+khan_svm <- svm(y ~ ., data = khan_train, kernel = 'linear', cost = 10)
+summary(khan_svm)
+
+table(khan_svm$fitted, khan_train$y)
+```
+
+We can see there are no training errors - this is because there are a large number of features compared to the observations, making it is easy to find a separating hyperplane.
+
+Let's see how it works on the test data:
+
+```{r 9.6.4_3}
+khan_test <- as_tibble(Khan$xtest, .name_repair = ~make.names(c(1:ncol(Khan$xtest)))) %>%
+    mutate(y = Khan$ytest) %>%
+    mutate(y_prime = predict(khan_svm, newdata = .))
+
+table(khan_test$y, khan_test$y_prime)
+```
+Using `cost = 10` yields two test set errors on this data.

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Chapter 3 - Notes</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Chapter 3 - Notes</h1>
+
+<h2>3.1 - Simple Linear Regression</h2>
+
+<p>A simple linear regression predicts a response <code>Y</code> based on a single predictor variable <code>X</code>. </p>
+
+<pre><code>Y ≈ β_0 + β_1X
+</code></pre>
+
+<p>Once we have training data to produce estimates for the coefficients, we can predict values by computing:</p>
+
+<pre><code>ŷ = β̂ 0 + β̂ 1x
+</code></pre>
+
+<h3>3.1.1 - Estimating Coefficients</h3>
+
+<p>The goal is to obtain coefficients such that the linear model fits the data well - i.e. as close as possible to the data points. The most common approach involves minimising the <strong>least squares</strong> criterion.</p>
+
+<p>We let <code>e_i = y_i − ŷ_i</code>, which represents the <em>i*th **residual</em><em>. The **residual sum of squares</em>* or <strong>RSS</strong> is the sum of the squares of each of these residuals.</p>
+
+<p>An example in R - we generate a our predictions base on f(x) + e, and also have a &#39;guess&#39; at an f_hat(x). We calculate our y_i, and then calculate the RSS. </p>
+
+<pre><code class="r">library(tidyverse)
+</code></pre>
+
+<pre><code class="r">set.seed(1)
+x &lt;- 1:100
+f &lt;- function(x) 4 * x
+f_hat &lt;- function(x) 3.5 * x
+y_i &lt;- f(x) + rnorm(length(x), 0, .5)
+y_hat_i &lt;- f_hat(x)
+
+RSS &lt;- sum( (y_i - y_hat_i)^2 )
+</code></pre>
+
+<p>With some calculus, the RSS minimiser for <code>β̂ 1x</code> is the sum of the difference between <code>x</code> and the mean of <code>x</code> times by the difference between <code>y</code> and the mean of <code>y</code>, all divided by the sum of the square of the difference between <code>x</code> and the mean of <code>x</code>.</p>
+
+<pre><code class="r">beta_hat_1 &lt;- sum( (x - mean(x)) * (y_i - mean(y_i)) ) / sum( (x - mean(x))^2 )
+beta_hat_0 &lt;- mean(y_i) - (beta_hat_1 * mean(x))
+
+beta_hat_0
+</code></pre>
+
+<pre><code>## [1] 0.06583287
+</code></pre>
+
+<pre><code class="r">beta_hat_1
+</code></pre>
+
+<pre><code>## [1] 3.999774
+</code></pre>
+
+<h3>3.1.2 - Assessing the Accuracy of the Estimates</h3>
+
+<p>We take the analogy of μ̂, the <strong>sample mean</strong> being an estimate for μ, the <strong>population mean</strong>. The average sample mean over many data sets will be close to the population mean. In the code below, we create a population of 1,000,000 random variables, with very large standard deviation of 10,000. We see the mean is 10.46.</p>
+
+<p>We then take 200 samples of 100 of the population, and calculate the mean for each sample. We see that each mean can be a very long way away from the real mean of 10.046.</p>
+
+<p>We then take the mean of all of the sample means. We see this sample mean is 9.99, which is very close to the population mean.</p>
+
+<pre><code class="r">set.seed(1)
+population &lt;- rnorm(1000000, 10, 2)
+(mu &lt;- mean(population))
+</code></pre>
+
+<pre><code>## [1] 10.00009
+</code></pre>
+
+<pre><code class="r">(mu_hat &lt;- map_dbl(1:200, ~mean(sample(population, 100))) %&gt;% mean())
+</code></pre>
+
+<pre><code>## [1] 9.991291
+</code></pre>
+
+<p>How close is a single estimate? In general we answer this by computing the <strong>standard error</strong> of μ̂, written Se(μ̂). This is <code>σ/sqrt(n)</code>, where sigma is the population standard mean. The population deviation is seldom known, so the standard error of the mean is usually estimated as the <strong>sample standard deviation</strong>.</p>
+
+<p>The sample standard deviation is the sqaure root of the sum of the square of the difference between each x_i and the sample mean, divided by n - 1. Let&#39;s do this for our reponse variable:</p>
+
+<pre><code class="r">sd(y_i)
+</code></pre>
+
+<pre><code>## [1] 116.0403
+</code></pre>
+
+<pre><code class="r">sqrt( sum( (y_i - mean(y_i))^2 / (length(y_i) - 1) ) )
+</code></pre>
+
+<pre><code>## [1] 116.0403
+</code></pre>
+
+<p>The standard error estimate is known as the <strong>residual standard error</strong>, and is given by the formula <code>RSE = sqrt(RSS / (n - 2))</code>. </p>
+
+<p>Using our previous generated values of <code>y_i</code> and <code>y_hat_i</code>, lets calculate the RSE:</p>
+
+<pre><code class="r">RSE &lt;- sqrt( (sum((y_i - y_hat_i)^2)) / (length(y_i) - 2) )
+RSE
+</code></pre>
+
+<pre><code>## [1] 29.42717
+</code></pre>
+
+<p>The RSE for our &#39;guess&#39; is 29.42. </p>
+
+<p>The standard error can be used to calculate confidence intervals. A 95% confidence interval is defined as a range of values such that with 95% probability, the range will contain the true unknown value of the parameter, or that it is within 2 standard deviations of the mean. Therefore the 95% confidence interval is +/- 2 * SE(β̂ _1) and +/- 2 * SE(β̂ _0). Thus there is a 95% probability that the true value of the slope of the linear regression is between 3.5 + 2 * 29.42, and 3.5 - 2 * 29.42. This is very wide, so we can&#39;t be very &#39;confident&#39;. Of course our guess didn&#39;t minimise the RSS.</p>
+
+<h4>Hypothesis Tests</h4>
+
+<p>The standard errors are used to perform hypothesis tests. The most common is the null hypothesis <code>H_0</code> - &#39;there is no relationship between <code>X</code> and <code>Y</code> versus the <em>alternative hypthesis</em> - there is some relationship between <code>X</code> and <code>Y</code>&#39; (H_a : β_1  = 0). </p>
+
+<p>To test the null hypothesis, we need to derermine with the coefficient estimate is sufficiently far from zero that we can be confident that it&#39;s non-zero. How far is far enough? This depends on the accuracy of the coefficient.</p>
+
+<ul>
+<li>If the standard error is small, then even small values of the coefficient may be strong evidence against the null hypothesis.</li>
+<li>If the stanard error is large, the coefficient must be large  in absolute value in order for us to reject the null hypothesis.</li>
+</ul>
+
+<p>In practice, a <strong>t-statistic</strong> is calculated, where <code>t = β̂_1- 0 / SE(β̂_1)</code></p>
+
+<p>Let&#39;s take a look at the t-statistic for the slope of our linear regression:</p>
+
+<pre><code class="r">(t_stat &lt;- (3.5 - 0) / 29.42)
+</code></pre>
+
+<pre><code>## [1] 0.1189667
+</code></pre>
+
+<p>This measures how many standard deviations the coefficient is away from 0. If there is no relationship, then we expect that the formula will have a <strong>t-distribution</strong> with n - 2 degrees of freedom.</p>
+
+<p>We can then compute the probability of observing any value equal to |t| or larger, assuming β̂_1 = 0. We call this probability the <strong>p-value</strong>. Roughtly speaking, we interpret the p-value as follows: *a small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance.</p>
+
+<p>If we see a small p-value, then we can infer ther is an association between the predictor and the response. We <em>reject the null hypothesis</em>. Typical p-value cutoffs for rejecting the null hypothesis are 5% or 1%. When n = 30, these correspond to t-statistics of around 2 and 2.75 respectively.</p>
+
+<h3>3.1.3 - Assessing the Accuracy of the Model</h3>
+
+<p>The quality of the model is typically assessed using either the <strong>residual standard error (RSE)</strong> or the R<sup>2</sup> statistic.</p>
+
+<p>The RSE is considered a measure of the lack of fit of the model. However it&#39;s an absolute measure, with the same units as Y. This makes it difficult to determine what a &#39;good&#39; RSE is.A</p>
+
+<p>The R<sup>2</sup> is an alternative measure of fit, and is the <em>proportion</em> of variance explained. It takes on a value between 0 and 1. It is equal to 1 minus the RSS divided by the TSS.</p>
+
+<p>Let&#39;s look at it using our generated data - we re-calculate RSS from above for visibility.</p>
+
+<pre><code class="r">RSS &lt;- sum( (y_i - y_hat_i)^2 )
+TSS &lt;- sum( (y_i - mean(y_i))^2 )
+R_squared &lt;- 1 - (RSS / TSS)
+R_squared
+</code></pre>
+
+<pre><code>## [1] 0.9363395
+</code></pre>
+
+<p>The constituent parts can be thought of as such:</p>
+
+<ul>
+<li>The TSS is the amount of variability inherent in the response before the regression is performed.</li>
+<li>The RSS measures the amount of variability left unexplained after performing the regression.</li>
+<li>TSS - RSS is therefore the amount variability in the response that is explained by performing the regression. </li>
+<li>R<sup>2</sup> measures the <em>proportion</em> of variability in Y that can be explained using X.</li>
+</ul>
+
+<h2>3.2 - Multiple Linear Regression</h2>
+
+<p>Instead of fitting multiple linear regressions, the simple linear regression can be extended to accomodate multiple predictors. Each predictor is given its own slope coefficient.</p>
+
+<p>Each coefficient <code>j</code> is then the average effect on Y of a one unit increase in X_j while <em>holding all other predictors fixed</em>.</p>
+
+<h3>3.2.1 Estimating the Regressio Coefficients</h3>
+
+<p>The parameters are estimated using the same least squares approach, minimising RSS where <code>RSS = sum( (y_i - f_hat(x))^2 )</code>. Each <code>f_hat(x)</code> now has multiple slope coefficients.</p>
+
+<h3>3.2.2 Important Questions</h3>
+
+<h4>Is there a relationship between the response and the predictors?</h4>
+
+<p>In a simple linear regression we simply check whether the slope coefficient = 0. In the multiple regression settings with <code>p</code> predictors, we need to ask whether all of the regression coefficients are 0.</p>
+
+<p>This hypothesis test is performed by computing the <strong>F-statistic</strong>, which is the TSS minus the RSS divided by p, divided by the RSS divided by n minus p minus 1.</p>
+
+<pre><code>F = ( (TSS - RSS)/p ) / ( RSS / (n - p - 1) )
+</code></pre>
+
+<p>If the linear model assumptions are correct:</p>
+
+<ul>
+<li>E{ RSS / (n - p - 1) } = sigma<sup>2</sup></li>
+<li>E{ (TSS - RSS) / p } = sigma<sup>2</sup></li>
+</ul>
+
+<p>Thus if there is no relationship between the response and the predictors, one would expect the F-statistic to be close to 1.</p>
+
+<p>How large does the F-statistic need to be? This depends<strong>n</strong> - when n is large, an F-statistic just a little larger than 1 might still provide evidence against H_0.</p>
+
+<p>For any value of <code>n</code> and <code>p</code>, the p-value for the F-statistic can be calculated. Base on the p-value, we can determine whether or not to reject H_0.</p>
+
+<p>Given individual p-values for each coefficient, why look at the overall F-statistic? Consider p = 100 and H_0: beta_0 &hellip; beta_p = 0, so no variable is truly associated with the response. About 5% of the p-values will be below 0.05 by chance. Hence if we used individual t-statistics and p-values, there is an incorrect assumption.</p>
+
+<h4>Deciding on important variables.</h4>
+
+<p><strong>Forward selection</strong> - begin with the null model, and fit p simple linear regressions and add to the model the variable that results in the lowest RSS.
+<strong>Backward selection</strong> - start with all variables in the model, and remove the variable with the largest p-value. The new (p - 1) model is fit and the process continues.
+<strong>Moxed selecton</strong> - start with no variables, and add the best fit. The p-values for data may become larger as more predictors are added. If a p-value rises above a certain threshold, it is removed.</p>
+
+<h4>Model fit</h4>
+
+<p>The two most common numerical measures of model fit are RSE and R<sup>2.</sup> The R<sup>2</sup> always increases when more variables are added to the model.</p>
+
+<h4>Predictions</h4>
+
+<p>Once there is a model, it is straightforward to use it to predict. However there are three sorts of uncertainty associated with the prediction:
+1) The coefficient estimates are estimates for the true population regression plane. This inaccuracy is related to the <em>reducible error</em>. We compute a confidence interval in order to determine how close <code>Y_hat</code> will be to <code>f(X)</code>.
+2) Assuming linear <code>f(x)</code> is an approximation of reality, so there is another form of reducible error which is called <em>model bias</em>.
+3) Even if we knew <code>f(x)</code>, the response cannot be predicted perfectly because of the random error <code>e</code>. This is <em>irreducible error</em>. We use <strong>prediction intervals</strong> to answer how much <code>Y</code> varies from <code>Y_hat</code>. Prediction intervals are wider than confidence intevals, as they take into account the reducible and irreducible error.</p>
+
+<h2>3.3 - Other Regression Model Considerations</h2>
+
+<h3>3.3.1 - Qualitative Predictors</h3>
+
+<p>If a qualitative predcitor (factor) only has two levels, then it can be incorpoated into a model using a 0/1 encoding.</p>
+
+<p>When a qualitative predictor has more than two levels, additional dummy variables can be created. If there the three factors are {A,B,C}, then <code>x_i1</code> is 1 if the ith value is A, 0 if it&#39;s not A, and <code>x_i2</code> is 1 if the ith value is B, 0 if it&#39;s not B. If <code>x_i{1,2}</code> are both 0, then the value is C.</p>
+
+<p>It should be noted that while the final predictions will be the same regardless of the encoding, the p-values do depend on the choice. The F-test should be used to assess the statistical evidence as this does not depend on the dummy variable.</p>
+
+<h3>3.3.2 - Extensions of the Linear Model</h3>
+
+<h4>Removing the Additive Assumption</h4>
+
+<p>Interaction terms can be used by adding another predictor which includes the product of two of the predictors:</p>
+
+<pre><code>Y = β_0 + β_1*X_1 + β_2*X_2 + β_3*X_1*X_2 + e
+</code></pre>
+
+<p>A model with no interaction terms contains only <strong>main effects</strong>.</p>
+
+<p>The hierarchical principal states that <em>if we include an interaction in a model, we should also include the main effects, even if the p-values are not significant</em>.</p>
+
+<h3>3.3.3 - Potential Problems</h3>
+
+<h4>Non-linearity of Data</h4>
+
+<p>The linear model assumes that there is a straight line relationship between the predictors and the response.</p>
+
+<p><strong>Residual plots</strong> are a graphical tool for identifying non-linearity. The residuals (<code>y_i</code> - <code>y_hat_i</code>) are plotted against the predictor <code>x_i</code>. When there are multiple predictors, the residuals are plotted against the predicted values <code>y_hat_i</code>. Ideally the residual plot will show no discernible pattern.</p>
+
+<h4>Correlation of Error Terms</h4>
+
+<p>An important assumption of the linear regression model is that the error terms <code>e_1 .. e_n</code> are uncorrelated. If the error terms are correlated, the estimated <em>standard errors</em> will tend to underestimate the true standard errors. Thus p-values will be lower than they should be.</p>
+
+<p>These correlations frequently occur in time series data, where observations obtained at adjacent time points will have positively correlated errors.</p>
+
+<p>The residuals can be plotted against the time, and we can discern if there is <strong>tracking</strong> - i.e. adjacent rediduals with similar values.</p>
+
+<h4>Non-constant Variance of Error Terms</h4>
+
+<p>Another important assumption is that the error terms have a constant variance. This is called <strong>heteroscedasticity</strong>. In our examples above, we&#39;ve been using the <code>rnorm()</code> function to generate the error term. Let&#39;s take a look at the variance:</p>
+
+<pre><code class="r">map_dbl(1:100, ~var(rnorm(100000, 20, 20)))
+</code></pre>
+
+<pre><code>##   [1] 400.5794 401.7843 403.3706 401.0913 402.4892 399.4287 399.2752
+##   [8] 400.8022 398.8561 397.8668 401.2790 402.5496 400.1726 401.0600
+##  [15] 401.7985 398.8445 400.0047 399.2310 399.1589 400.3971 401.1763
+##  [22] 402.0269 401.0191 398.0338 400.9628 401.6388 399.3431 400.0818
+##  [29] 401.3423 400.9218 401.4045 403.5387 401.8456 399.7226 400.8080
+##  [36] 401.7852 399.6263 399.5969 402.1547 397.1904 399.9148 399.9557
+##  [43] 398.0415 403.0375 400.9467 402.3612 397.6241 400.0097 400.3207
+##  [50] 399.7602 399.0926 401.8214 396.8288 398.3107 396.1450 399.3080
+##  [57] 398.3512 401.4667 402.5210 399.0898 400.3633 399.6700 401.2397
+##  [64] 403.1933 399.9618 398.8730 401.4576 396.2424 399.1265 400.0040
+##  [71] 401.0410 401.1684 398.2647 401.3029 402.7823 400.3731 397.5561
+##  [78] 401.5841 400.4863 400.1814 398.5447 395.4242 400.2118 402.0072
+##  [85] 399.9087 401.5930 397.7700 401.2935 397.2999 399.7651 401.2909
+##  [92] 398.7801 398.4166 397.1909 399.8581 402.5306 397.3928 398.9701
+##  [99] 398.9821 402.4000
+</code></pre>
+
+<p>We see that the values are all ~400, which is 20<sup>2,</sup> so we&#39;re confident it&#39;s generating random values with constant variance.</p>
+
+<p>One can identify non-constant variances from the presence of a <em>funnel shape</em> in the residual plot (x = fitted, y = residuals).</p>
+
+<p>When faced with this issue, transforming the response with a concave function such as <code>sqrt(Y)</code> or <code>log(Y)</code> results in a greater amount of shrinkage of the larger values, leading to a reduction in heteroscedasticity.</p>
+
+<h4>Outliers</h4>
+
+<p>An outlier is a point for which <code>y_i</code> is far from the value predicted by the model. An outlier typically does not effect on the least squares fit, but it can have an impact on the RSE, and therefore the confidence intervals and p-values.</p>
+
+<p>Compute the studentised residuals, which are each residual <code>e_i</code> by its estimated standard error. Observations whose studentised residuals are greater than 3 in absolute value are possible outliers.</p>
+
+<p>If it&#39;s an error in data collection, the observation may be removed. However care must be taken since it may be a deficiency with the model.</p>
+
+<h4>High Leverage Points</h4>
+
+<p>Observations with <strong>high leverage</strong> have an unusual value for <code>x_i</code>. These observations have a large impact on the least squares line.</p>
+
+<p>In order to quantify an observations leverage, a <strong>leverage statistic</strong> for each observation is computed. For a simple linear regression it&#39;s <code>x_i</code> minus the mean of <code>x</code>, all squared, then divided by the TSS, then all divided by <code>n</code>. Let&#39;s generate some random data, then add an additional point with high leverage, then calculate its leverage statistic.</p>
+
+<pre><code class="r">set.seed(1)
+x_lev &lt;- c(rnorm(100), 30)
+lev_stat &lt;- (1/length(x_lev)) + ( (x_lev - mean(x_lev))^2 )/ ( sum((x_lev - mean(x_lev))^2) )
+lev_stat
+</code></pre>
+
+<pre><code>##   [1] 0.011003699 0.009951718 0.011496384 0.011370300 0.009906874
+##   [6] 0.011457626 0.009908062 0.010016296 0.009931287 0.010423978
+##  [11] 0.011171409 0.009901223 0.010992579 0.017015528 0.010438607
+##  [16] 0.010110731 0.010084780 0.010202201 0.010080745 0.009938050
+##  [21] 0.010175057 0.010048583 0.010014086 0.015844109 0.009948911
+##  [26] 0.010121302 0.010226869 0.013548306 0.010709355 0.009901168
+##  [31] 0.010844287 0.010168159 0.009901296 0.010119086 0.013193014
+##  [36] 0.010597855 0.010563101 0.010124357 0.010402061 0.010034121
+##  [41] 0.010237095 0.010350163 0.009989468 0.009924889 0.011140956
+##  [46] 0.011183815 0.009902670 0.010038132 0.010178315 0.010136171
+##  [51] 0.009901037 0.010973062 0.009905200 0.012341396 0.010997063
+##  [56] 0.012474746 0.010519006 0.012077787 0.009929176 0.010203203
+##  [61] 0.014034861 0.010105454 0.009985146 0.010048223 0.011267666
+##  [66] 0.009949384 0.014963921 0.011067518 0.009966615 0.013141026
+##  [71] 0.009906168 0.011189476 0.009944940 0.011759723 0.012752753
+##  [76] 0.009914321 0.010646791 0.010069990 0.010014239 0.010926133
+##  [81] 0.010883588 0.010203342 0.010520909 0.013756607 0.009938068
+##  [86] 0.009906348 0.010350245 0.010422206 0.009902247 0.009920661
+##  [91] 0.010831511 0.010569579 0.010492877 0.009991447 0.011349521
+##  [96] 0.009925467 0.012832256 0.010892889 0.012653823 0.010700683
+## [101] 0.918010868
+</code></pre>
+
+<p>The average leverage for all the observations is <code>(p + 1) / n</code>, so if a given observation has a leverage statistic that greatly exceeds this, we may suspect the coressponding point has high leverage.</p>
+
+<h4>Collinearity</h4>
+
+<p><strong>Collinearity</strong> refers to the situation where two or more predictor values are closely related to one another. It can be difficult to separate the individual effects of collinear variables on the response.</p>
+
+<p>Collinearity reduces the accuracy of the coefficient estimates, and causes the standard error of <code>beta_j</code> to grow. The <em>t-statistic</em> is the coefficient divided by the standard error, therefore collinearity results in a decline in the <em>t-statistic</em>.</p>
+
+<p>Looking at the correlation matrix is a way to see if there is collinearity. However with <em>multicollinearity</em> it could exist between 3 or 4 variables. The <strong>variance inflation factor</strong> calculates the ratio of the variance of <code>beta_j</code> with the full model to <code>beta_j</code> fit on its own. The smallest <strong>VIF</strong> is 1. In general a VIF over 5 or 10 indicates a problematic amount of collinearity.</p>
+
+<h2>3.5 - Linear Regression with K-Nearest Neighbours</h2>
+
+<p>The KNN regression is closely related to the KNN classifier. Given a value for <code>K</code> and a prediction point <code>x_0</code>, KNN regression identifies <code>K</code> training observations that are closest to <code>x_0</code>, represented by <code>N_0</code>. It then estimates <code>f(x_0)</code> using the average of all the training responses.</p>
+
+<p>As the number of dimensions increases (<code>p</code> gets bigger) it is typical for the MSE of KNN to increase. This results from the fact that in higher dimensions there is effectively a reduction in sample sizse. This is called the <strong>curse of dimensionality</strong>: The <code>K</code> observations nearest to <code>x_0</code> may be far away in p-dimensional space when p is large. </p>
+
+<p>As a general rule, parametric methods outperform non-parametric methods when p is high.</p>
+
+</body>
+
+</html>

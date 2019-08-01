@@ -12,6 +12,11 @@ library(MASS)
 boston <- as.tibble(Boston)
 ```
 
+```
+## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
+## This warning is displayed once per session.
+```
+
 Calculate the linear regression of lstat (lower status of population) on to medv (median value of owner-occupied homes).
 
 
@@ -74,19 +79,19 @@ augment(lm_boston)
 
 ```
 ## # A tibble: 506 x 9
-##     medv lstat .fitted .se.fit  .resid    .hat .sigma   .cooksd .std.resid
-##  * <dbl> <dbl>   <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
-##  1  24    4.98   29.8    0.406  -5.82  0.00426   6.22   1.89e-3    -0.939 
-##  2  21.6  9.14   25.9    0.308  -4.27  0.00246   6.22   5.82e-4    -0.688 
-##  3  34.7  4.03   30.7    0.433   3.97  0.00486   6.22   1.00e-3     0.641 
-##  4  33.4  2.94   31.8    0.467   1.64  0.00564   6.22   1.98e-4     0.264 
-##  5  36.2  5.33   29.5    0.396   6.71  0.00406   6.21   2.38e-3     1.08  
-##  6  28.7  5.21   29.6    0.399  -0.904 0.00413   6.22   4.40e-5    -0.146 
-##  7  22.9 12.4    22.7    0.276   0.155 0.00198   6.22   6.20e-7     0.0250
-##  8  27.1 19.2    16.4    0.374  10.7   0.00362   6.20   5.44e-3     1.73  
-##  9  16.5 29.9     6.12   0.724  10.4   0.0136    6.20   1.94e-2     1.68  
-## 10  18.9 17.1    18.3    0.326   0.592 0.00274   6.22   1.25e-5     0.0954
-## # ... with 496 more rows
+##     medv lstat .fitted .se.fit  .resid    .hat .sigma    .cooksd .std.resid
+##    <dbl> <dbl>   <dbl>   <dbl>   <dbl>   <dbl>  <dbl>      <dbl>      <dbl>
+##  1  24    4.98   29.8    0.406  -5.82  0.00426   6.22    1.89e-3    -0.939 
+##  2  21.6  9.14   25.9    0.308  -4.27  0.00246   6.22    5.82e-4    -0.688 
+##  3  34.7  4.03   30.7    0.433   3.97  0.00486   6.22    1.00e-3     0.641 
+##  4  33.4  2.94   31.8    0.467   1.64  0.00564   6.22    1.98e-4     0.264 
+##  5  36.2  5.33   29.5    0.396   6.71  0.00406   6.21    2.38e-3     1.08  
+##  6  28.7  5.21   29.6    0.399  -0.904 0.00413   6.22    4.40e-5    -0.146 
+##  7  22.9 12.4    22.7    0.276   0.155 0.00198   6.22    6.20e-7     0.0250
+##  8  27.1 19.2    16.4    0.374  10.7   0.00362   6.20    5.44e-3     1.73  
+##  9  16.5 29.9     6.12   0.724  10.4   0.0136    6.20    1.94e-2     1.68  
+## 10  18.9 17.1    18.3    0.326   0.592 0.00274   6.22    1.25e-5     0.0954
+## # … with 496 more rows
 ```
 
 Using this, we can generate a plot with:
@@ -223,6 +228,13 @@ mult_lm_boston <- lm(medv ~ .-age, boston)
 
 ```r
 library(car)
+```
+
+```
+## Error in library(car): there is no package called 'car'
+```
+
+```r
 vif(mult_lm_boston) %>% 
     as.tibble() %>% 
     mutate(var = names(vif(mult_lm_boston))) %>% 
@@ -230,7 +242,9 @@ vif(mult_lm_boston) %>%
     geom_bar(stat = "identity")
 ```
 
-![plot of chunk vif](figure/vif-1.png)
+```
+## Error in vif(mult_lm_boston): could not find function "vif"
+```
 
 ## Interaction Terms
 

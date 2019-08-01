@@ -1,0 +1,93 @@
+---
+title: "Chapter 9 - Applied"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(modelr)
+library(ISLR)
+library(e1071)
+library(kableExtra)
+```
+
+## 4)
+
+*Generate a simulated two-class data set with 100 observations and two features in which there is a visible but non-linear separation between the two classes. Show that in this setting, a support vector machine with a polynomial kernel (with degree greater than 1) or a radial kernel will outperform a support vector classifier on the training data. Which technique performs best on the test data? Make plots and report training and test error rates in order to back up your assertions.*
+
+We first create the data set:
+
+```{r 4.1}
+set.seed(1)
+q4_data <- tibble(
+    X1 = rnorm(100),
+    X2 = rnorm(100)
+)
+```
+
+We then create our class separation:
+
+```{r 4.1.1}
+q4_data %>%
+    mutate(
+        class = as.factor(ifelse(-X1 + X2 - (X1 + X2)^2 < 0, 'A', 'B'))
+    ) -> q4_data_class
+
+q4_data_class %>%
+    ggplot() +
+    geom_point(aes(X1, X2, colour = class))
+```
+
+We split our observations into train and test sets, run a SVC and a polynomial SVM of degree 2 of over the training data:
+
+
+```{r 4.2}
+set.seed(1)
+q4_data_partition <- q4_data_class %>% resample_partition(c(test = .5, train = .5))
+
+q4_data_partition$train %>%
+    svm(class ~ ., data = ., scale = F, cost = 10, kernel = 'linear') -> svc_fit
+
+svc_fit %>% plot(data = as_tibble(q4_data_partition$train))
+
+q4_data_partition$train %>%
+        svm(class ~ ., data = ., scale = F, cost = 10, kernel = 'polynomial', degree = 2) -> svm_poly_fit
+
+svm_poly_fit %>% plot(data = as_tibble(q4_data_partition$train))
+```
+
+Let's take a look at the training and test error rates between the SVC and the polynomial SVM:
+
+```{r 4.3}
+q4_data_partition$train %>%
+    as_tibble() %>%
+    mutate(
+        svc_pred = predict(svc_fit, data = .),
+        svm_pred = predict(svm_poly_fit, data = .)
+    ) %>%
+    summarise(
+        'SVC Training Error Rate' = mean(class != svc_pred) * 100,
+        'SVM Training Error Rate' = mean(class != svm_pred) * 100
+    ) %>%
+    kable() %>% kable_styling()
+
+q4_data_partition$test %>%
+    as_tibble() %>%
+    mutate(
+        svc_pred = predict(svc_fit, newdata = .),
+        svm_pred = predict(svm_poly_fit, newdata = .)
+    ) %>%
+    summarise(
+        'SVC Test Error Rate' = mean(class != svc_pred) * 100,
+        'SVM Test Error Rate' = mean(class != svm_pred) * 100
+    ) %>%
+    kable() %>% kable_styling()
+```
+
+Interestingly the linear SVC has a lower error rate over the training data, however the SVM does much better across the test data.
+
+## 5)
+
+*We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.*

@@ -68,10 +68,19 @@ Create a scatterplot matrix of the first ten variables.
 
 ```r
 	library(GGally)
+```
+
+```
+## Error in library(GGally): there is no package called 'GGally'
+```
+
+```r
 	college %>% ggpairs(columns = 1:10)
 ```
 
-![plot of chunk college_ggpairs](figure/college_ggpairs-1.png)
+```
+## Error in ggpairs(., columns = 1:10): could not find function "ggpairs"
+```
 
 ### iii)
 
@@ -107,7 +116,7 @@ college %>% mutate(Elite = factor(ifelse(Top10perc > 50, "Yes", "No")))
 ##  8 Yes      1899   1720    489        37        68        1594          32
 ##  9 Yes      1038    839    227        30        63         973         306
 ## 10 Yes       582    498    172        21        44         799          78
-## # ... with 767 more rows, and 11 more variables: Outstate <dbl>,
+## # … with 767 more rows, and 11 more variables: Outstate <dbl>,
 ## #   Room.Board <dbl>, Books <dbl>, Personal <dbl>, PhD <dbl>,
 ## #   Terminal <dbl>, S.F.Ratio <dbl>, perc.alumni <dbl>, Expend <dbl>,
 ## #   Grad.Rate <dbl>, Elite <fct>
@@ -120,7 +129,7 @@ summary(college['Elite'])
 ```
 
 ```
-## Error: Column `Elite` not found
+## Can't find column `Elite` in `.data`.
 ```
 
 ### v)
@@ -157,7 +166,27 @@ college %>% ggplot + geom_histogram(aes(PhD), binwidth = 1)
 
 ```r
 auto <- as.tibble(mtcars)
+```
+
+```
+## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
+## This warning is displayed once per session.
+```
+
+```r
 auto %>% summarise_at(vars(mpg, disp, hp, wt), funs(min, max))
+```
+
+```
+## Warning: funs() is soft deprecated as of dplyr 0.8.0
+## please use list() instead
+## 
+## # Before:
+## funs(name = f(.)
+## 
+## # After: 
+## list(name = ~f(.))
+## This warning is displayed once per session.
 ```
 
 ```
