@@ -2,39 +2,39 @@
 
 ## 2.1 - Statistical Learning 
 
-**Statistical Learning** - a set of approaches for estimating a function f(X) from a set of data.
+**Statistical Learning** - a set of approaches for estimating a function $f(X)$ from a set of data.
 
-### 2.1.1 - Why estimate `f`? 
+### 2.1.1 - Why estimate $f$? 
 
 Either for prediction or inference.
 
 **Prediction**
-The set of inputs `X` are readily available, but the output `Y` cannot easily be obtained. We wish to predict what `Y` will be given a set of inputs `X`.
+The set of inputs $X$ are readily available, but the output $Y$ cannot easily be obtained. We wish to predict what $Y$ will be given a set of inputs $X$.
 
-The accuracy of the prediction depends on two quantities - the *reducible* and the *irreducible* error. The estimate `f_hat(x)` will not be a perfect estimate for the true `f(x)`. We can reduce the error by using better statistical learning techniques.
+The accuracy of the prediction depends on two quantities - the *reducible* and the *irreducible* error. The estimate $\hat{f}(X)$ will not be a perfect estimate for the true $f(X)$. We can reduce the error by using better statistical learning techniques.
 
-However the variability of `e` also affects the accuracy of the predictions. This is the irreducible error.
+However the variability of $\epsilon$ also affects the accuracy of the predictions. This is the irreducible error.
 
 **Inference**
 
-We are often interested in the way that `Y` is affected by changes in `X`. We need to estimate `f(x)`, but we don't want to predict `Y`. We instead want to understand the relationship betrween `X` and `Y`.
+We are often interested in the way that $Y$ is affected by changes in $X$. We need to estimate $f(X)$, but we don't want to predict $Y$. We instead want to understand the relationship betrween $X$ and $Y$.
 
 ### 2.1.2 - Estimating f(...) 
 
 **Parametric methods** of estimating `f(...)` involve a two-step approach:
 
 1. Make an assumption about the functional form (linear, quadratic, logarithmic, etc)
-2. Fit or train the model.
+1. Fit or train the model.
 
-This reduces the problem of estimating `f` down to estimating a set of parameters.
+This reduces the problem of estimating $f$ down to estimating a set of parameters.
 
-**Non-parametric methods** do not make explicit assumptions about the functional form. The disadvantage is that as they don't reduce the problem of estimating `f` to a small number of parameters, a very large number of observations is required to obtain an accurate estimate for `f`.
+**Non-parametric methods** do not make explicit assumptions about the functional form. The disadvantage is that as they don't reduce the problem of estimating $f$ to a small number of parameters, a very large number of observations is required to obtain an accurate estimate for $f$.
 
 ### 2.1.4 - Supervised vs Unsupervised Learning
 
-**Supervised Learning** - For each observation of the predictor measurements x_i, i = 1,...,n there is an associated response measurement y_i. We fit a model that relates the response to the predictors.
+**Supervised Learning** - For each observation of the predictor measurements $x_i, i \in 1,\ldots,n$ there is an associated response measurement $y_i$. We fit a model that relates the response to the predictors.
 
-**Unsupervised Learning** - For each observation i = 1,...,n we observce x_i, but no associated response y_i. A model cannot be fit since there is no response variable. Instead we seek to understand the relationsips between the variables.
+**Unsupervised Learning** - For each observation $i \in 1,\ldots,n$ we observe $x_i$, but no associated response $y_i$. A model cannot be fit since there is no response variable. Instead we seek to understand the relationsips between the variables.
 
 ### 2.1.5 - Regression vs Classification
 
@@ -50,22 +50,30 @@ To quantify the extent to which a model's predictions match the observed data, w
 
 The MSE is small if the predicted responses are very close to the true responses.
 
-For example, imagine we have 5 actual responses to predictions (`y_i`), and 5 predictions given by our model (`f_hat_of_x`).
+For example, imagine we have 5 actual responses to predictions $y_i$, and 5 predictions given by our model $\hat{f}(X)$.
 ```{r setup, message = F}
 library(tidyverse)
+library(knitr)
+library(kableExtra)
 ```
 ```{r 2.2.1_2}
 set.seed(1)
-y_i <- rnorm(5)
-f_hat_of_x <- rnorm(5)
-sum((y_i - f_hat_of_x)^2)/length(y_i)
+q2_data <- tibble(
+    y = rnorm(5),
+    fX = rnorm(5)
+)
+
+q2_data %>%
+    summarise(MSE = sum((y - fX)^2) / n()) %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We don't usually care about the *training MSE*, but moreso in the *test MSE*.
 
 ### 2.2.2 - Bias / Variance Trade-off
 
-**Variance** refers to the amount by which `f_hat` would change if we estimated it using a different set of training data. In general, more flexible statistical methods have higher variance.
+**Variance** refers to the amount by which $\hat{f}(X)$ would change if we estimated it using a different set of training data. In general, more flexible statistical methods have higher variance.
 
 **Bias** refers to the error that is introduced by approximating a real life problem with a simpler model. More flexible methds result in less bias.
 
@@ -73,7 +81,7 @@ As a general rule, as we use more flexible methods, the variance will increase a
 
 ### 2.2.3 - The Classification Setting
 
-The **training error rate** is the most common approach for quantifying the accuracy of `f_hat` when `y_i` is no longer quantitative but qualitative. It is the sum of the *indicator variable* `I(y_i != f_hat_of_x)` divided by the number of observations. The indicator variable is 1 when `y_i != f_hat_of_x`, and 0 when it does. If the indicator variable is 0, our classifier correctly classified the response. 
+The **training error rate** is the most common approach for quantifying the accuracy of $\hat{f}(X)$ when $y_i$ is no longer quantitative but qualitative. It is the sum of the *indicator variable* $I(y_i \ne \hat{f}(x))$ divided by the number of observations. The indicator variable is 1 when $y_i \ne \hat{f}(x)$, and $0$ when it does. If the indicator variable is 0, our classifier correctly classified the response. 
 
 We can show this in R:
 ```{r 2.2.3_2}
@@ -88,18 +96,17 @@ We see that our training error rate in this instance is 0.66, or 66%.
 
 #### The Bayes Classifier
 
-The **test error rate** is minimised, on average, by a simple classifier that *assigns each observation to the most likely class, given its predictor values*. Thus we should assign a test observation with a predictor vector `x_0` to the class `j` for which `Pr(Y = k|X = x_0)`. This is the probability that Y = j given the observed vector x_0. This very simple classifier is called the *Bayes classifer*.
+The **test error rate** is minimised, on average, by a simple classifier that *assigns each observation to the most likely class, given its predictor values*. Thus we should assign a test observation with a predictor vector $x_0$ to the class $j$ for which $Pr(Y = k|X = x_0)$. This is the probability that $Y = j$ given the observed vector $x_0$. This very simple classifier is called the *Bayes classifer*.
 
 #### K-nearest Neighbours 
 
-In theory we would always like to predict qualitative responses using the Bayes classifier, but for real data we don't know the conditional distribution of `Y` given `X`. Therefore the Bayes classifier is an unattainable gold standard.
+In theory we would always like to predict qualitative responses using the Bayes classifier, but for real data we don't know the conditional distribution of $Y$ given $X$. Therefore the Bayes classifier is an unattainable gold standard.
 
-The KNN classifier takes a positive integer `K` and a test observation `x_0`. It identifies `K` points in the training data that are closest to `x_0`, represented by `N_0`. It then estimates the conditional probability for class `j` as the fraction of points in `N_0` whose responses equal `j`. 
-```
-Pr(Y = j|X = x_0) = 1/K * sum(I(y_i = j))
-```
-It then applies the Bayes rule and classifies the test observation `x_0` to the class with the largest probability.
+The KNN classifier takes a positive integer $K$ and a test observation $x_0$. It identifies $K$ points in the training data that are closest to $x_0$, represented by $\mathcal{N}_0$. It then estimates the conditional probability for class $j$ as the fraction of points in $N_0$ whose responses equal $j$.
 
-The value of `K` determines the flexibility of the classifier. A lower `K` is more flexible with low bias and high variance, higher `K` is less flexible with higher bias and lower variance.
+$$
+Pr(Y = j|X = x_0) = \frac{1}{K} \sum_{i \in \mathcal{N_0}} I(y_i = j)
+$$
+It then applies the Bayes rule and classifies the test observation $x_0$ to the class with the largest probability.
 
-
+The value of $K$ determines the flexibility of the classifier. A lower $K$ is more flexible with low bias and high variance, higher $K$ is less flexible with higher bias and lower variance.
