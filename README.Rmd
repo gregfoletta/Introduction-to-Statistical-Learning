@@ -69,7 +69,15 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 
 ## Chapter 8 - Tree-based Methods
 
+This chapter discusses regression and classification trees, as well as bagging, random forrests, and boosting.
+
 * [Notes](Chapter_8/notes.md)
+
+### Exercises
+
+* [Lab](Chapter_8/lab.md)
+* [Conceptual](Chapter_8/conceptual.md)
+* [Applied](Chapter_8/applied.md)
 
 ## Chapter 9 - Support Vector Machines
 
@@ -77,10 +85,20 @@ This chapter discusses classification using hyperplanes, leading to support vect
 
 * [Notes](Chapter_9/notes.md)
 
+### Exercises
+
+* [Lab](Chapter_9/lab.md)
+* [Conceptual](Chapter_9/conceptual.md)
+* [Applied](Chapter_9/applied.md)
+
 ## Chapter 10 - Unsupervised Learning
+
+This chapter discusses unsupervised learning techniques including PCA and hierarchical clustering.
 
 * [Notes](Chapter_10/notes.md)
 
 ### Exercises
 
 * [Lab](Chapter_10/lab.md)
+* [Conceptual](Chapter_10/conceptual.md)
+* [Applied](Chapter_10/applied.md)

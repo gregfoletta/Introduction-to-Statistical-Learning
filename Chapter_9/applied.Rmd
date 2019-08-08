@@ -64,8 +64,8 @@ Let's take a look at the training and test error rates between the SVC and the p
 q4_data_partition$train %>%
     as_tibble() %>%
     mutate(
-        svc_pred = predict(svc_fit, data = .),
-        svm_pred = predict(svm_poly_fit, data = .)
+        svc_pred = predict(svc_fit, newdata = .),
+        svm_pred = predict(svm_poly_fit, newdata = .)
     ) %>%
     summarise(
         'SVC Training Error Rate' = mean(class != svc_pred) * 100,
@@ -91,3 +91,474 @@ Interestingly the linear SVC has a lower error rate over the training data, howe
 ## 5)
 
 *We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.*
+
+### a)
+
+*Generate a data set with $n = 500$ and $p = 2$, such that the observations belong to two classes with a quadratic decision boundary between them.*
+
+```{r 5.1}
+q5_data <- tibble(
+    X1 = rnorm(500) - 0.5,
+    X2 = rnorm(500) - 0.5,
+    Y = as.factor(ifelse(X1^2 - X2^2 > 0, 1, 0))
+)
+```
+
+### b)
+
+*Plot the observations*
+
+```{r 5.2}
+q5_data %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(colour = Y))
+```
+
+### c)
+
+*Fit a logistic regression model to the data, using $X_1$ and $X_2$ as predictors*
+
+```{r 5.3}
+q5_data_partition <- q5_data %>% resample_partition(c(test = .5, train = .5))
+
+q5_lr <- q5_data_partition$train %>%
+    glm(Y ~ ., data = ., family = 'binomial')
+```
+
+### d)
+
+*Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be linear.*
+
+```{r 5.d}
+q5_data_partition$train %>%
+    as_tibble() %>%
+    mutate(
+        Y_prime = as.factor(ifelse(predict(q5_lr, newdata = ., type = 'response') < .5, 0, 1))
+    ) %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(colour = Y_prime))
+```
+
+We can see the clear linear decision boundary.
+
+### e)
+
+*Now fit a logistic regression model to the data using non-linear functions of $X_1$ and $X_2$ as predictors.*
+
+```{r 5.e}
+q5_poly_lr <- q5_data_partition$train %>%
+    glm(Y ~ poly(X1,2) - poly(X2,2), data = ., family = 'binomial')
+```
+
+### f)
+
+*Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be obviously non-linear.*
+
+```{r 5.f}
+q5_data_partition$train %>%
+    as_tibble() %>%
+    mutate(
+        Y_prime = as.factor(
+            ifelse(predict(q5_poly_lr, newdata = ., type = 'response') < .5, 0, 1)
+        )
+    ) %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(colour = Y_prime))
+```
+
+We can see a clear non-linear decision boundary.
+
+### g)
+
+*Fit a support vector classifier to the data with $X_1$ and $X_2$ as predictors.*
+
+```{r 5.g}
+q5_svc <- q5_data_partition$train %>%
+    svm(Y ~ ., data = ., scale = F, cost = 10, kernel = 'linear')
+
+q5_data_partition$train %>%
+    as_tibble() %>%
+    mutate(
+        Y_prime = predict(q5_svc, newdata = .)
+    ) %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(colour = Y_prime))
+```
+
+### h)
+
+*Fit a SVM using a non-linear kernel to the data. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.*
+
+```{r 5.h}
+q5_svm_radial <- q5_data_partition$train %>%
+    svm(Y ~ ., data = ., scale = F, cost = 10, kernel = 'radial')
+
+q5_data_partition$train %>%
+    as_tibble() %>%
+    mutate(
+        Y_prime = predict(q5_svm_radial, newdata = .)
+    ) %>%
+    ggplot(aes(X1, X2)) +
+    geom_point(aes(colour = Y_prime))
+```
+
+### i) 
+
+*Comment on your results.*
+
+We see that we can gain a non-linear decision boundary by using non-linear kernels within our logistic regressions and SVCs.
+
+## 6)
+
+*It is claimed that in the case of data that is just barely linearly separable, a support vector classifier with a small value of cost that misclassifies a couple of training observations may perform better on test data than one with a huge value of cost that does not misclassify any training observations. You will now investigate this claim.*
+
+### a)
+
+*Generate two-class data with $p = 2$ in such a way that the classes are just barely linearly separable.*
+
+```{r 6.a}
+# Generate training data
+set.seed(1)
+q6_train_data <- tibble(
+    X1 = rnorm(100),
+    X2 = rnorm(100),
+    Y = as.factor( ifelse(X1 - X2 > 0, 'A', 'B') )
+)
+
+q6_train_data %>%
+    ggplot() +
+    geom_point(aes(X1, X2, colour = Y))
+```
+
+
+### b)
+
+*Compute the cross-validation error rates for support vector classifiers with a range of `cost` values. How many training errors are misclassified for each value of `cost` considered, and howdoes this relate to the cross-validation errors obtained?*
+
+We can use the `tune()` function to perform the cross validation.
+
+```{r 6.b}
+tune(
+    svm, Y ~ ., data = q6_train_data, kernel = 'linear',
+    ranges = list(cost = c(0.001, 0.01, 0.1, 1, 10, 20, 40, 100))
+) -> q6_cv
+
+summary(q6_cv)
+
+tibble(cost = c(0.001, 0.01, 0.1, 1, 10, 20, 40, 100), train = nest(q6_train_data)) %>%
+    mutate(
+        svm_model = map2(cost, train$data, ~svm(Y ~ ., data = .y, scale = F, cost = .x, kernel = 'linear')),
+        pred = map(svm_model, ~predict(.x))
+    ) %>%
+    unnest(pred, train$data) %>%
+    group_by(cost) %>%
+    summarise(train_error = mean(Y != pred) * 100) -> train_errors
+```
+
+333 c)
+
+*Generate an appropriate test data set, and compute the test errors corresponding to each of the values of cost considered. Which value of cost leads to the fewest test errors, and how does this compare to the values of cost that yield the fewest training errors and the fewest cross-validation errors?*
+
+
+```{r 6.c}
+# Generate test data
+set.seed(5435)
+q6_test_data <- tibble(
+    X1 = rnorm(100),
+    X2 = rnorm(100),
+    Y = as.factor( ifelse(X1 - X2 > 0, 'A', 'B') )
+)
+
+tibble(
+    cost = c(0.001, 0.01, 0.1, 1, 10, 20, 40, 100), 
+    train = nest(q6_train_data),
+    test = nest(q6_test_data)
+) %>%
+    mutate(
+        svm_model = map2(cost, train$data, ~svm(Y ~ ., data = .y, scale = F, cost = .x, kernel = 'linear')),
+        pred = map2(svm_model, test$data, ~predict(.x, newdata = .y))
+    ) %>%
+    unnest(pred, train$data) %>%
+    group_by(cost) %>%
+    summarise(test_error = mean(Y != pred) * 100) -> test_errors
+
+test_errors
+
+left_join(train_errors, test_errors, by = 'cost') %>%
+    gather(error_type, rate, c(train_error, test_error)) %>%
+    ggplot(aes(cost, rate, colour = error_type)) +
+    geom_point() +
+    geom_line()
+```
+
+
+### d) Discuss
+
+What we see is the bias/variance tradeoff. As the cost is increased, the model becomes more 'flexible' and the training error goes down. With the test data, as the flexibility increases we see a decrease in errors until it reaches an inflection point. After this point the model is overfitting and the test error increases.
+
+## 7)
+
+*In this problem, you will use support vector approaches in order to predict whether a given car gets high or low gas mileage based on the `Auto` data set.*
+
+### a)
+
+*Create a binary variable that takes on a 1 for cars with gas mileage above the median, and a 0 for cars with gas mileage below the median.*
+
+```{r 7.a}
+Auto %>%
+    as_tibble() %>%
+    mutate(above_median = as.factor( ifelse(mpg >= median(mpg), 1, 0) ) ) ->
+    auto
+```
+
+### b)
+
+*Fit a support vector classifier to the data with various values of cost , in order to predict whether a car gets high or low gas mileage. Report the cross-validation errors associated with different values of this parameter. Comment on your results.*
+
+```{r 7.b}
+set.seed(1)
+    auto %>%
+    tune(
+        svm, above_median ~ ., data = ., kernel = 'linear',
+        ranges = list(cost = c(0.01, 0.1, 1, 10, 100))
+    ) -> auto_svc
+
+summary(auto_svc)
+```
+We see the lowest error when `cost = 1`.
+
+### c)
+
+*Now repeat with radial and polynomial basis kernels and different values of `gamma` and `degree`. Comment on your results.
+
+```{r 7.c}
+set.seed(1)
+auto %>%
+    tune(
+        svm, above_median ~ ., data = ., kernel = 'radial',
+        ranges = list(gamma = c(0.01, 0.1, 1, 10, 100), cost = c(.01, .1, 1, 10))
+    ) -> auto_svm_radial
+
+summary(auto_svm_radial)
+
+auto %>%
+    tune(
+        svm, above_median ~ ., data = ., kernel = 'polynomial',
+        ranges = list(degree = seq(2, 5), cost = c(.01, .1, 1, 10))
+    ) -> auto_svm_poly
+
+summary(auto_svm_poly)
+```
+For a radial kernel, we see a minimisation of ther error when `gamma = 0.01` and `cost = 10`. With the polynomial kernel the lowest error is with `degree = 2` and `cost = 10`.
+
+### d)
+
+*Make some plots to back up your assertions*
+
+```{r 7.d}
+svm_linear <- svm(above_median ~ ., data = auto, kernel = 'linear', cost = 1)
+svm_poly <- svm(above_median ~ ., data = auto, kernel = 'polynomial', degree = 2, cost = 10)
+svm_radial <- svm(above_median ~ ., data = auto, kernel = 'radial', gamma = 0.01, cost = 10)
+
+plot_pairs <- function(fit, data, dependent, independents) {
+    for (independent in independents) {
+        formula = as.formula( str_c( dependent, '~', independent) )
+        plot(fit, data, formula)
+    }
+}
+
+plot_pairs(svm_linear, auto, 'mpg', c('acceleration', 'displacement', 'horsepower'))
+plot_pairs(svm_poly, auto, 'mpg', c('acceleration', 'displacement', 'horsepower'))
+plot_pairs(svm_radial, auto, 'mpg', c('acceleration', 'displacement', 'horsepower'))
+```
+
+## 8)
+
+*This problem involves the OJ data set which is part of the ISLR package.*
+
+### a)
+
+*Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.*
+
+```{r 8.a}
+set.seed(1)
+oj_samples <-
+    OJ %>%
+    resample_partition(c(train = .8, test = .2))
+```
+
+### b)
+
+*Fit a support vector classifier to the training data using `cost = 0.01`, with `Purchase` as the response and the other variables as predictors. Use the `summary()` function to produce summary statistics, and describe the results obtained.
+
+```{r 8.b}
+oj_linear_svc <- svm(Purchase ~ ., data = oj_samples$train, kernel = 'linear', cost = 0.01)
+
+summary(oj_linear_svc)
+```
+
+### c) 
+
+*What are the training and test error rates?*
+
+```{r 8.c}
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_linear_svc, newdata = .)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_linear_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+```
+
+### d)
+
+*Use the `tune()` function to select an optimal cost . Consider values in the range 0.01 to 10.*
+
+```{r 8.d}
+set.seed(1)
+tune(
+    svm,
+    Purchase ~ .,
+    data = as_tibble( oj_samples$train ),
+    kernel = 'linear',
+    ranges = list(cost = 2^seq(-8,4))
+) -> oj_svc_tune
+
+summary(oj_svc_tune)
+```
+
+### e)
+
+*Compute the training and test error rates using this new value for `cost`.*
+
+```{r 8.e}
+oj_linear_svc <- svm(
+    Purchase ~ .,
+    data = oj_samples$train,
+    kernel = 'linear',
+    cost = oj_svc_tune$best.parameters$cost
+)
+
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_linear_svc)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_linear_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+```
+
+### f)
+
+*Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for `gamma`.*
+
+```{r 8.f}
+oj_radial_svc <- svm(
+    Purchase ~ .,
+    data = oj_samples$train,
+    kernel = 'radial'
+)
+
+summary(oj_radial_svc)
+
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_radial_svc, newdata = .)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_radial_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+
+set.seed(1)
+tune(
+    svm,
+    Purchase ~ .,
+    data = as_tibble( oj_samples$train ),
+    kernel = 'radial',
+    ranges = list(cost = 2^seq(-8,4))
+) -> oj_radial_tune
+
+summary(oj_radial_tune)
+
+oj_radial_svc <- svm(
+    Purchase ~ .,
+    data = oj_samples$train,
+    kernel = 'linear',
+    cost = oj_radial_tune$best.parameters$cost
+)
+
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_radial_svc)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_radial_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+```
+
+### g)
+
+*Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set `degree = 2`.*
+
+```{r 8.g}
+oj_poly_svc <- svm(
+    Purchase ~ .,
+    data = oj_samples$train,
+    kernel = 'polynomial',
+    degree = 2
+)
+
+summary(oj_poly_svc)
+
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_poly_svc, newdata = .)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_poly_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+
+set.seed(1)
+tune(
+    svm,
+    Purchase ~ .,
+    data = as_tibble( oj_samples$train ),
+    kernel = 'polynomial',
+    ranges = list(cost = 2^seq(-8,4)),
+    degree = 2
+) -> oj_poly_tune
+
+summary(oj_poly_tune)
+
+oj_poly_svc <- svm(
+    Purchase ~ .,
+    data = oj_samples$train,
+    kernel = 'polynomial',
+    cost = oj_poly_tune$best.parameters$cost
+)
+
+oj_samples$train %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_poly_svc)) %>%
+    summarise('Train Error Rate' = mean(Purchase != Purchase_prime))
+
+oj_samples$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_poly_svc, newdata = .)) %>%
+    summarise('Test Error Rate' = mean(Purchase != Purchase_prime))
+```
+
+### h)
+
+The radial kernel appears to give the best results on the test data.
