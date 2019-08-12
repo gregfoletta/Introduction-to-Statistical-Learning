@@ -4,7 +4,7 @@
 
 This chapter discusses statistical learning and assessing model accuracy.
 
-* [Notes](Chapter_2/notes.md)
+* [Notes](Chapter_2/notes.html)
 
 ### Exercises 
 
@@ -71,13 +71,11 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 
 This chapter discusses regression and classification trees, as well as bagging, random forrests, and boosting.
 
-* [Notes](Chapter_8/notes.md)
+* [Notes](Chapter_8/notes.html)
 
 ### Exercises
 
-* [Lab](Chapter_8/lab.md)
-* [Conceptual](Chapter_8/conceptual.md)
-* [Applied](Chapter_8/applied.md)
+* [Lab](Chapter_8/lab.html)
 
 ## Chapter 9 - Support Vector Machines
 

@@ -1,12 +1,168 @@
-# Chapter 8 - Lab
+---
+title: "Tree-Based Methods - Lab"
+output: html_document
+---
 
-```{r setup, message = F}
-library(ISLR)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
 library(broom)
+library(modelr)
 library(tidyverse)
-library(rpart)
+library(ISLR)
+library(MASS)
+library(tree)
+```
+ 
+# 8.3.1 - Fitting Classification Trees
+ 
+The `tree` library is isued to construct classification and regression trees.
+We use classification trees to analyse the `Carseat` data. We recode the continuous variable `Sales` 
+ 
+```{r lab.2}
+Carseats %>%
+    as_tibble() %>%
+    mutate(High = as.factor( ifelse(Sales <= 8, 'No', 'Yes') )) -> carseats
 ```
 
-## Fitting Classification Trees
+We now use `tree()` to fit a classification tree.
 
-Use classification trees to analyse the `Carseats` data.
+```{r lab.3}
+carseat_tree <- tree(High ~ . -Sales, data = carseats)
+
+summary(carseat_tree)
+```
+
+We see the training error rate is 9%. For classification trees, the error rate reported by `summary()` is given by:
+
+$$ -2 \sum_m \sum_k n_{mk} log\hat{p}_mk $$
+
+Where $n_{mk}$ is the number of observations in the $m$th terminal node that belong to the $k$th class. The residual mean deviance is the deviance divided by $n - \mid T_0 \mid$, where $\mid T_0 \mid$ is the number of terminal nodes.
+
+We can plot the tree:
+
+```{r lab.4}
+plot(carseat_tree)
+text(carseat_tree, pretty = 0, cex = .7)
+```
+
+The most important factor appears to be shelving location since the first branch differentiates `Good` from `Bad` and `Medium`.
+
+The object's print function outputs the branches:
+
+```{r lab.5}
+carseat_tree
+```
+
+Each split shows the split criterion, the number of observations in the branch, the deviance, the overall prediction for the branch, and the fraction of observations in the branch that take on the values. Branches to terminal nodes are indicated with an asterisk.
+
+Let's split the data into a training and test set to gauge the predictive power of the tree.
+
+```{r lab.6}
+set.seed(1)
+carseat_smpl <- carseats %>% resample_partition(c(train = .5, test = .5))
+
+carseat_tree <- tree(High ~ .-Sales, carseat_smpl$train)
+
+carseat_smpl$test %>%
+    as_tibble() %>%
+    mutate(High_prime = predict(carseat_tree, newdata = ., type = 'class')) %>%
+    summarise('Error Rate' = mean(High != High_prime) * 100) %>%
+    kable() %>%
+    kable_styling(position = 'left')
+```
+
+We now test whether pruning the tree enhances its predictive capabilities. The function `cv.tree()` performs cross-validation. The argument `FUN = prune.misclass` in order to let the classification rate guide the cross-validation and pruning process rather than the default, which is *deviance*.
+
+```{r lab.7}
+carseat_cv <- cv.tree(carseat_tree, FUN = prune.misclass)
+carseat_cv
+```
+
+The `size` attribute shows the number of terminal nodes of each tree considered, `dev` is the error rate (in this case cross-validation error), and `k` is the cost-complexity parameter $\alpha$.
+
+The tree with 14 terminal nodes had the lowest CV error. We plot `size` against `dev`
+
+```{r lab.8}
+tibble(
+    size = carseat_cv$size,
+    cv_error = carseat_cv$dev
+) %>%
+ggplot(aes(size, cv_error)) +
+    geom_point() +
+    geom_line() +
+    labs(x = 'Terminal Nodes', y = 'Cross-Validation Error Rate')
+```
+
+We apply the `prune.misclass()` function in order to prune to the 14 node tree.
+
+```{r lab.9}
+carseat_prune <- prune.misclass(carseat_tree, best = 9)
+plot(carseat_prune)
+text(carseat_prune, cex = .7)
+```
+
+Let's see how this performs on the test data.
+
+```{r lab.10}
+carseat_smpl$test %>%
+    as_tibble() %>%
+    mutate(High_prime = predict(carseat_prune, newdata = ., type = 'class')) %>%
+    summarise('Error Rate' = mean(High != High_prime) * 100) %>%
+    kable() %>%
+    kable_styling(position = 'left')
+```
+
+The error rate has decreased from 29.35% to 27.86%.
+
+# 8.3.2 - Fitting Regression Trees.
+
+We fit a regression tree on the `Boston` data set. We first fit the tree to the training data.
+
+```{r lab.11}
+set.seed(1)
+Boston %>%
+    as_tibble() %>%
+    resample_partition(c(train = .5, test = .5)) -> boston_smpl
+
+boston_tree <- tree(medv ~ ., data = boston_smpl$train)
+summary(boston_tree)
+
+plot(boston_tree)
+text(boston_tree, cex = .7, pretty = 0)
+```
+
+Note that only 5 of the variables have been used in constructing the tree.
+
+We use `cv.tree()` to see if pruning the tree will improve performance.
+
+```{r lab.12}
+boston_cv <- cv.tree(boston_tree)
+
+tibble(size = as.integer(boston_cv$size), deviance = boston_cv$dev) %>%
+    ggplot(aes(size, deviance)) +
+    geom_point() +
+    geom_line()
+```
+
+We pick 6 as the point to cut where the knee of the graph appears to be.
+
+```{r lab.13}
+boston_prune <- prune.tree(boston_tree, best = 5)
+
+plot(boston_prune)
+text(boston_prune, cex = .7, pretty = 0)
+
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_prune, newdata = .)) %>%
+    summarise('MSE' = mean((medv - medv_prime)^2)) %>%
+    kable() %>% kable_styling(position = 'left')
+```
+
+The MSE is around 27, therefore the root mean squred error is $\sqrt(27) \approx 5.2$, so this model leads to predictions which are within $5,200 of the true median of the house price `medv`.
+
+# Bagging and Random Forests
+
+TBC

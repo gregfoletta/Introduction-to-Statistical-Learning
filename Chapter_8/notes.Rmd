@@ -18,9 +18,9 @@ Players with `Years >= 4.5` are placed in the right branch, and then subdivided 
 
 $$ 
 
-R_1 = { X | Years < 4.5 }
-R_2 = { X | Years >=4.5, Hits < 117.5 }
-R_3 = { X | Years >=4.5, Hits >= 117.5 }
+R_1 = \{\ X | Years < 4.5\ \} \\
+R_2 = \{\ X | Years >=4.5,\ Hits < 117.5\ \} \\
+R_3 = \{\ X | Years >=4.5,\ Hits >= 117.5\ \}
 
 $$
 

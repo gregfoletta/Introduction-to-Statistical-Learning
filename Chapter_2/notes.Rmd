@@ -66,7 +66,7 @@ q2_data <- tibble(
 q2_data %>%
     summarise(MSE = sum((y - fX)^2) / n()) %>%
     kable() %>%
-    kable_styling()
+    kable_styling(full_width = F, position = 'left')
 ```
 
 We don't usually care about the *training MSE*, but moreso in the *test MSE*.
@@ -89,7 +89,10 @@ set.seed(1)
 y_i <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
 f_hat_of_x <- c(rep('a', 100), rep('b', 100), rep('c', 100)) %>% sample(100)
 
-sum(y_i != f_hat_of_x) / length(y_i)
+tibble(y = y_i, x = f_hat_of_x) %>%
+    summarise('Error Rate' = mean(y != x)) %>%
+    kable() %>%
+    kable_styling(full_width = F, position = 'left')
 ```
 
 We see that our training error rate in this instance is 0.66, or 66%. 
