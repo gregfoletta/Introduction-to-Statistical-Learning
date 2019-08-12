@@ -4,7 +4,7 @@
 
 This chapter discusses statistical learning and assessing model accuracy.
 
-* [Notes](Chapter_2/notes.md)
+* [Notes](Chapter_2/notes.html)
 
 ### Exercises 
 
@@ -69,14 +69,34 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 
 ## Chapter 8 - Tree-based Methods
 
-* [Notes](Chapter_8/notes.md)
+This chapter discusses regression and classification trees, as well as bagging, random forrests, and boosting.
+
+* [Notes](Chapter_8/notes.html)
+
+### Exercises
+
+* [Lab](Chapter_8/lab.html)
 
 ## Chapter 9 - Support Vector Machines
 
 This chapter discusses classification using hyperplanes, leading to support vector machines.
 
-* [Notes](Chapter_9/notes.md)
+* [Notes](Chapter_9/notes.html)
+
+### Exercises
+
+* [Lab](Chapter_9/lab.html)
+* [Conceptual](Chapter_9/conceptual.html)
+* [Applied](Chapter_9/applied.html)
 
 ## Chapter 10 - Unsupervised Learning
 
+This chapter discusses unsupervised learning techniques including PCA and hierarchical clustering.
+
 * [Notes](Chapter_10/notes.md)
+
+### Exercises
+
+* [Lab](Chapter_10/lab.md)
+* [Conceptual](Chapter_10/conceptual.md)
+* [Applied](Chapter_10/applied.md)
