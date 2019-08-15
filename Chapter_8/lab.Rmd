@@ -13,6 +13,8 @@ library(tidyverse)
 library(ISLR)
 library(MASS)
 library(tree)
+library(randomForest)
+library(gbm)
 ```
  
 # 8.3.1 - Fitting Classification Trees
@@ -57,9 +59,13 @@ carseat_tree
 
 Each split shows the split criterion, the number of observations in the branch, the deviance, the overall prediction for the branch, and the fraction of observations in the branch that take on the values. Branches to terminal nodes are indicated with an asterisk.
 
-Let's split the data into a training and test set to gauge the predictive power of the tree.
+Let's split the data into a training and test set to gauge the predictive power of the tree. We also create a function to format our output table.
 
 ```{r lab.6}
+print_table <- function(x) {
+    x %>% kable(align = 'l') %>% kable_styling()
+}
+
 set.seed(1)
 carseat_smpl <- carseats %>% resample_partition(c(train = .5, test = .5))
 
@@ -69,8 +75,7 @@ carseat_smpl$test %>%
     as_tibble() %>%
     mutate(High_prime = predict(carseat_tree, newdata = ., type = 'class')) %>%
     summarise('Error Rate' = mean(High != High_prime) * 100) %>%
-    kable() %>%
-    kable_styling(position = 'left')
+    print_table()
 ```
 
 We now test whether pruning the tree enhances its predictive capabilities. The function `cv.tree()` performs cross-validation. The argument `FUN = prune.misclass` in order to let the classification rate guide the cross-validation and pruning process rather than the default, which is *deviance*.
@@ -110,8 +115,7 @@ carseat_smpl$test %>%
     as_tibble() %>%
     mutate(High_prime = predict(carseat_prune, newdata = ., type = 'class')) %>%
     summarise('Error Rate' = mean(High != High_prime) * 100) %>%
-    kable() %>%
-    kable_styling(position = 'left')
+    print_table()
 ```
 
 The error rate has decreased from 29.35% to 27.86%.
@@ -121,7 +125,7 @@ The error rate has decreased from 29.35% to 27.86%.
 We fit a regression tree on the `Boston` data set. We first fit the tree to the training data.
 
 ```{r lab.11}
-set.seed(1)
+set.seed(20)
 Boston %>%
     as_tibble() %>%
     resample_partition(c(train = .5, test = .5)) -> boston_smpl
@@ -146,7 +150,7 @@ tibble(size = as.integer(boston_cv$size), deviance = boston_cv$dev) %>%
     geom_line()
 ```
 
-We pick 6 as the point to cut where the knee of the graph appears to be.
+We pick 5 as the point to cut where the knee of the graph appears to be.
 
 ```{r lab.13}
 boston_prune <- prune.tree(boston_tree, best = 5)
@@ -158,11 +162,130 @@ boston_smpl$test %>%
     as_tibble() %>%
     mutate(medv_prime = predict(boston_prune, newdata = .)) %>%
     summarise('MSE' = mean((medv - medv_prime)^2)) %>%
-    kable() %>% kable_styling(position = 'left')
+    print_table()
 ```
 
-The MSE is around 27, therefore the root mean squred error is $\sqrt(27) \approx 5.2$, so this model leads to predictions which are within $5,200 of the true median of the house price `medv`.
+The MSE is around 28, therefore the root mean squred error is $\sqrt(27) \approx 5.3$, so this model leads to predictions which are within $5,300 of the true median of the house price `medv`.
 
 # Bagging and Random Forests
 
-TBC
+The `randomForest` library is used to perform random forests and bagging. We recal that bagging is a random forest with $m = p$, so the `randomForest()` function can be used for both scenarios.
+
+```{r lab.13.1}
+boston_bag <- randomForest(medv ~ ., data = boston_smpl$train, mtry = 13, importance = T)
+boston_bag
+```
+
+The `mtry = 13` indicates that all 13 predictors should be considered for each split of the tree - ie. bagging should be done.
+
+Let's take a look at how it performs:
+```{r lab.14}
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_bag,  newdata = .)) %>%
+    summarise(MSE = mean((medv - medv_prime)^2)) %>%
+    print_table()
+```
+The test MSE is over that of the pruned tree.
+
+The number of trees grown can be changed with the `ntree` argument.
+
+```{r lab.15}
+boston_bag <- randomForest(medv ~ ., data = boston_smpl$train, mtry = 13, ntree = 25)
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_bag,  newdata = .)) %>%
+    summarise(MSE = mean((medv - medv_prime)^2)) %>%
+    print_table()
+```
+Growing a random forest is exactly the same, except a smaller value of `mtry` is used. By default `randomForest()` uses
+* $p/3$ variables when building a random forest of regression trees.
+* $\sqrt{p}$ variables when building a random forest of classification trees.
+
+```{r lab.16}
+boston_frst <- randomForest(medv ~ ., data = boston_smpl$train, mtry = 6, importance = T)
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_frst,  newdata = .)) %>%
+    summarise(MSE = mean((medv - medv_prime)^2)) %>%
+    print_table()
+```
+
+The random forest has slightly increased the test MSE as opposed to bagging.
+
+The `importance()` function shows us the importance of each variable:
+
+```{r lab.17}
+importance(boston_frst)
+```
+The two measures of importance are:
+* %IncMSE - the mean decrease of accuracy in predictions on the out of bag samples when a given variable is excluded from the model.
+* IncNodePurity - Measure of the total decrease in node impurity that results from splits over that variable, averaged over all trees.
+
+The `varImpPlot()` function can be used to plot these importance measures:
+
+```{r lab.18}
+varImpPlot(boston_frst)
+```
+The results show that across all trees considered in the random forest, wealth of the community (`lstat`) and house size (`rm`) are the two most important variables.
+
+# 8.3.4 - Boosting
+
+We use the `gbm` package and the `gbm()` function to fit boosted regression trees to the `Boston` data set. We use the `distribution = 'gaussian'` argument as this is a regression problem. If it were a binary classification problem we would use `distribution = 'bernoulli'`. The argument `n.trees = 5000` indicates we want 5000 trees, and `interaction.depth = 4` limits the depth of each tree.
+
+```{r lab.19}
+boston_boost <- gbm(
+    medv ~ .,
+    data = boston_smpl$train,
+    distribution = 'gaussian',
+    n.trees = 5000,
+    interaction.depth = 4
+)
+```
+
+The `summary()` function produces a relative influence plot and statistics
+
+```{r lab.20}
+summary(boston_boost)
+```
+Again we see that `lstat` and `rm` are the most important variables.
+
+We can produce *partial dependence plots* for these two variables. This illustrates the marginal effect of these two variables on the response after *integrating* out the other variables.
+
+```{r lab.21}
+par(mfrow = c(1,2))
+plot(boston_boost, i ="rm")
+plot(boston_boost, i ="lstat")
+```
+
+We use the boosted model to predict `medv`.
+
+```{r lab.22}
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_boost, n.trees = 5000, newdata = .)) %>%
+    summarise('MSE' = mean( (medv - medv_prime)^2 )) %>%
+    print_table()
+```
+
+The test MSE is better than the bagging and the random forest. We can boost with a slightly different shrinkage parameter $\lambda$. Let's try $\lambda = .02$.
+
+```{r lab.23}
+boston_boost <- gbm(
+    medv ~ .,
+    data = boston_smpl$train,
+    distribution = 'gaussian',
+    n.trees = 5000,
+    interaction.depth = 4,
+    shrinkage = 0.2,
+    verbose = F
+)
+
+boston_smpl$test %>%
+    as_tibble() %>%
+    mutate(medv_prime = predict(boston_boost, n.trees = 5000, newdata = .)) %>%
+    summarise('MSE' = mean( (medv - medv_prime)^2 )) %>%
+    print_table()
+```
+
+In this instance it raises our test MSE - however we could use cross-validation to find the best shrinkage factor.
