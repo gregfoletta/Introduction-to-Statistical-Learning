@@ -1,0 +1,23 @@
+---
+title: "Tree Based Methods - Applied Exercises"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+library(broom)
+library(modelr)
+library(tidyverse)
+library(ISLR)
+library(MASS)
+library(tree)
+library(randomForest)
+library(gbm)
+library(data.tree)
+```
+
+# 7)
+
+

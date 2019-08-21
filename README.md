@@ -76,6 +76,7 @@ This chapter discusses regression and classification trees, as well as bagging, 
 ### Exercises
 
 * [Lab](Chapter_8/lab.html)
+* [Conceptual](Chapter_8/conceptual.html)
 
 ## Chapter 9 - Support Vector Machines
 
