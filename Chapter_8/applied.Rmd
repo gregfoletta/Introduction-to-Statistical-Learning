@@ -20,4 +20,99 @@ library(data.tree)
 
 # 7)
 
+*In the lab, we applied random forests to the `Boston` data using `mtry = 6` and using `ntree = 25` and `ntree = 500`. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree . You can model your plot after Figure 8.10. Describe the results obtained.*
 
+
+```{r 7}
+set.seed(1)
+boston_sample <- Boston %>% resample_partition(c(train = .5, test = .5))
+
+tibble(vars = seq(1, ncol(Boston), by = 2)) %>%
+    mutate(
+        trained_forest = map(vars, ~randomForest(
+            medv ~ ., 
+            data = boston_sample$train, ntree = 700, mtry = .x,
+            ytest = as_tibble(boston_sample$test)[['medv']],
+            xtest = as_tibble(boston_sample$test)[,-14]
+            )
+        ),
+        trees = map(trained_forest, ~{1:.x$ntree}),
+        mse = map(trained_forest, ~{.x$test$mse})
+    ) %>%
+    unnest(mse, trees) %>%
+    ggplot() +
+    geom_line(aes(trees, mse, colour = as.factor(vars))) +
+    labs(x = 'Number of Trees', y = 'Test MSE', colour = 'Features')
+```
+
+
+# 8)
+
+*In the lab, a classification tree was applied to the `Carseats` data set after converting `Sales` into a qualitative response variable. Now we will seek to predict `Sales` using regression trees and related approaches, treating the response as a quantitative variable.*
+
+## a)
+
+*Split the data set into a training set and a test set.*
+
+```{r 8.a}
+set.seed(1)
+carseats_smpl <- Carseats %>% resample_partition(c(train = .5, test = .5))
+```
+
+## b)
+
+*Fit a regression tree to the training set. Plot the tree, and interpret the results. What test error rate do you obtain?*
+
+```{r 8.b}
+carseats_tree <- tree(Sales ~ ., data = carseats_smpl$train)
+summary(carseats_tree)
+plot(carseats_tree)
+text(carseats_tree, pretty = 0, cex = .7)
+```
+We see that the two major determinators of `Sales` are `ShelveLoc` and `Price`.
+
+Let's take a look at the test MSE:
+
+```{r 8.b.2}
+carseat_smpl$test %>%
+    as_tibble() %>%
+    mutate(Sales_prime = predict(carseats_tree, newdata = .)) %>%
+    summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+## c) 
+
+*Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test error rate?*
+
+```{r 8.c}
+set.seed(1)
+carseats_tree_cv <- cv.tree(carseats_tree, FUN = prune.tree)
+
+tibble(
+    tree_size = carseats_tree_cv$size,
+    deviance = carseats_tree_cv$dev
+) %>%
+    ggplot(aes(tree_size, deviance)) +
+    geom_line() +
+    geom_point()
+```
+
+Optimum tree size appears to be 6. We now check the test MSE.
+
+```{r 8.c.2}
+carseats_prune <- prune.tree(carseats_tree, best = 6)
+
+plot(carseats_prune)
+text(carseats_prune, cex = .7, pretty = 0)
+
+carseat_smpl$test %>%
+    as_tibble() %>%
+    mutate(Sales_prime = predict(carseats_prune, newdata = .)) %>%
+    summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+This has slightly reduced the test MSE.
