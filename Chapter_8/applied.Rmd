@@ -1,6 +1,10 @@
 ---
 title: "Tree Based Methods - Applied Exercises"
-output: html_document
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +20,7 @@ library(tree)
 library(randomForest)
 library(gbm)
 library(data.tree)
+library(glmnet)
 ```
 
 # 7)
@@ -74,7 +79,7 @@ We see that the two major determinators of `Sales` are `ShelveLoc` and `Price`.
 Let's take a look at the test MSE:
 
 ```{r 8.b.2}
-carseat_smpl$test %>%
+carseats_smpl$test %>%
     as_tibble() %>%
     mutate(Sales_prime = predict(carseats_tree, newdata = .)) %>%
     summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
@@ -107,7 +112,7 @@ carseats_prune <- prune.tree(carseats_tree, best = 6)
 plot(carseats_prune)
 text(carseats_prune, cex = .7, pretty = 0)
 
-carseat_smpl$test %>%
+carseats_smpl$test %>%
     as_tibble() %>%
     mutate(Sales_prime = predict(carseats_prune, newdata = .)) %>%
     summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
@@ -116,3 +121,467 @@ carseat_smpl$test %>%
 ```
 
 This has slightly reduced the test MSE.
+
+## d)
+*Use the bagging approach in order to analyze this data. What test error rate do you obtain? Use the importance() function to determine which variables are most important.*
+
+```{r 8.d}
+carseats_bag <- randomForest(Sales ~ ., data = carseats_smpl$train, mtry = 10, ntree = 500, importance = T)
+
+carseats_smpl$test %>%
+    as_tibble() %>%
+    mutate(Sales_prime = predict(carseats_bag, newdata = .)) %>%
+    summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+
+importance(carseats_bag)
+
+varImpPlot(carseats_bag)
+```
+
+## e)
+
+*Use random forests to analyze this data. What test error rate do you obtain? Use the `importance()` function to determine which variables are most important. Describe the effect of $m$, the number of variables considered at each split, on the error rate obtained.*
+
+```{r 8.e}
+# randomForest will use sqrt(p) as mtry if not specified
+carseats_randf <- randomForest(Sales ~ ., data = carseats_smpl$train)
+
+carseats_smpl$test %>%
+    as_tibble() %>%
+    mutate(Sales_prime = predict(carseats_randf, newdata = .)) %>%
+    summarise(MSE = mean((Sales - Sales_prime)^2)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+We see a very large drop in the test MSE. When using bagging, all variables are considered at each split. If there is a strong predictor and other moderately strong predictors in the data, most of the trees will use these predictors as the first split. All the bagged trees will then look similar. Averaging these similar trees will not have a significant reduction in the variance.
+
+Random forests overcome this by forcing the split to consider only a subset of predictors.
+
+# 9)
+
+*This problem involves the `OJ` data set which is part of the `ISLR` package.*
+
+## a)
+
+*Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.*
+
+```{r 9.a}
+set.seed(1)
+oj_sample <- OJ %>% resample_partition(c(train = 800/nrow(OJ), test = 1-800/nrow(OJ)))
+```
+
+## b)
+
+*Fit a tree to the training data, with `Purchase` as the response and the other variables except for `Buy` as predictors. Use the `summary()` function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?*
+
+```{r 9.b}
+oj_tree <- tree(Purchase ~ ., data = oj_sample$train)
+
+summary(oj_tree)
+```
+From the `summary()` function we can see that the misclassification rate is 15.7%, and the tree has 8 terminal nodes.
+
+### c)
+
+*Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.*
+
+```{r 9.c}
+oj_tree
+```
+
+We look at the following line:
+```
+24) ListPriceDiff < 0.235 75  101.70 MM ( 0.41333 0.58667 ) *
+```
+
+The terminal node is split on `ListPriceDiff` when the variable is less than 0.165. There are 27 observations in this terminal node. The deviance is 22.65, the `Purchase` prediction is MM, and 14.8% of values in the branch take on that value.
+
+## d)
+
+*Create a plot of the tree, and interpret the results.*
+
+```{r 9.d}
+plot(oj_tree)
+text(oj_tree, cex = .7, pretty = 0)
+```
+The `LoyalCH` (Customer brand loyalty for CH) and `PriceDiff` (Sale price of MM less sale price of CH) are the strongest features.
+
+## e)
+
+*Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels. What is the test error rate?*
+
+```{r 9.e}
+oj_test <- oj_sample$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_tree, newdata = ., type = 'class'))
+
+# Confusion matrix
+oj_test %>%
+    count(Purchase, Purchase_prime) %>%
+    spread(Purchase_prime, n)
+
+# Error rate
+oj_test %>%
+    summarise(Error_rate = mean(Purchase != Purchase_prime))
+```
+
+## f)
+
+*Apply the `cv.tree()` function to the training set in order to determine the optimal tree size.*
+
+```{r 9.f}
+set.seed(1)
+oj_cv <- cv.tree(oj_tree, FUN = prune.misclass)
+
+```
+
+## g)
+
+*Produce a plot with tree size on the x-axis and cross-validated classification error rate on the y-axis.*
+
+```{r 9.g}
+tibble(
+    size = oj_cv$size,
+    deviance = oj_cv$dev
+) %>%
+    ggplot(aes(size, deviance)) +
+    geom_line() +
+    geom_point() +
+    labs(x = 'Tree Size', y = 'Deviance')
+```
+
+## h)
+
+*Which tree size corresponds to the lowest cross-validated classification error rate?*
+
+Tree sizes 9 and 8 correspond to the lowest error rate.
+
+## i)
+
+*Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with five terminal nodes.*
+
+We will prune to eight nodes.
+
+```{r 9.i}
+oj_pruned <- prune.tree(oj_tree, best = 8)
+```
+
+## j)
+
+*Compare the training error rates between the pruned and unpruned trees. Which is higher?*
+
+```{r 9.j}
+summary(oj_pruned)
+```
+Pruned tree has a misclassification error rate of 15.02%, the same as the full tree.
+
+## k)
+
+*Compare the test error rates between the pruned and unpruned trees. Which is higher?*
+
+```{r 9.k}
+oj_sample$test %>%
+    as_tibble() %>%
+    mutate(Purchase_prime = predict(oj_pruned, newdata = ., type = 'class')) %>%
+    summarise('Error Rate' = mean(Purchase != Purchase_prime)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+The test error rate is the same for the eight node tree as it is for the nine node tree.
+
+# 10)
+
+*We now use boosting to predict Salary in the Hitters data set.*
+
+## a)
+
+*Remove the observations for whom the salary information is unknown, and then log-transform the salaries.*
+
+```{r 10.a}
+Hitters %>%
+    as_tibble() %>%
+    filter(!is.na(Salary)) %>%
+    mutate(Salary = log(Salary)) -> hitters
+```
+
+## b)
+
+*Create a training set consisting of the first 200 observations, and a test set consisting of the remaining observations.*
+
+Rather than taking the first 200 observations, we take a random sample.
+```{r 10.b}
+set.seed(1)
+p <- 200/nrow(hitters)
+hitters_smpl <- hitters %>% resample_partition(c(train = p, test = 1-p))
+rm(p)
+```
+
+## c)
+
+*Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter $\lambda$. Produce a plot with different shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.*
+
+```{r 10.c}
+tibble(lambda = 10^seq(-10, 0, by = 0.1)) %>%
+    mutate(
+        boost = map(lambda, ~gbm(
+            Salary ~ .,
+            data = hitters_smpl$train,
+            distribution = 'gaussian',
+            n.trees = 1000,
+            shrinkage = .x
+        ))
+    ) -> hitters_boosts
+
+hitters_boosts %>%
+    mutate(
+        Salary_Prime = map(boost, ~predict(.x, newdata = hitters_smpl$train, n.trees = 1000)),
+        MSE = map_dbl(Salary_Prime, ~mean( (as_tibble(hitters_smpl$train)$Salary - .x)^2 ))
+    ) %>%
+    ggplot(aes(lambda, MSE)) +
+    geom_line() +
+    geom_point() +
+    labs(x = 'Shrinkage (Lambda)', y = 'Mean Squared Error')
+```
+
+## d)
+
+*Produce a plot with different shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.*
+
+```{r 10.d}
+hitters_boosts %>%
+    mutate(
+        Salary_Prime = map(boost, ~predict(.x, newdata = hitters_smpl$test, n.trees = 1000)),
+        MSE = map_dbl(Salary_Prime, ~mean( (as_tibble(hitters_smpl$test)$Salary - .x)^2 ))
+    ) -> hitters_test
+
+hitters_test %>%
+    ggplot(aes(lambda, MSE)) +
+    geom_line() +
+    geom_point() +
+    labs(x = 'Shrinkage (Lambda)', y = 'Mean Squared Error')
+
+hitters_test %>%
+    top_n(-1, MSE)
+```
+
+We see a minimum in the test MSE when $\lambda \approx 0.03$.
+
+## e)
+
+*Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.*
+
+We first try a linear regression:
+
+```{r 10.e}
+hitters_lm <- lm(Salary ~ ., data = hitters_smpl$train)
+
+hitters_smpl$test %>%
+    as_tibble() %>%
+    mutate(Salary_Prime = predict(hitters_lm, newdata = .)) %>%
+    summarise(MSE = mean( (Salary - Salary_Prime)^2 )) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+The linear regression gives us a MSE of .52. We now try a ridge regression:
+
+```{r 10.e.2}
+hitters_rr <- glmnet(
+    x = model.matrix(Salary ~ ., hitters_smpl$train),
+    y = as_tibble(hitters_smpl$train)$Salary,
+    alpha = 0
+)
+
+hitters_smpl$test %>%
+    as_tibble() %>%
+    mutate(Salary_Prime = predict(hitters_rr, newx = model.matrix(Salary ~ ., .), s = 2)) %>%
+    summarise(MSE = mean( (Salary - Salary_Prime)^2 )) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+The ridge regression with $\lambda = 2$ gives us an MSE of .50.
+
+## f)
+
+*Which variables appear to be the most important predictors in the boosted model?*
+
+```{r 10.f}
+gbm(
+    Salary ~ .,
+    data = hitters_smpl$train,
+    n.trees = 1000,
+    shrinkage = 0.03,
+    distribution = 'gaussian'
+) %>% summary()
+```
+
+## g)
+
+*Now apply bagging to the training set. What is the test set MSE for this approach?*
+
+```{r 10.g}
+randomForest(
+    Salary ~ .,
+    data = as_tibble(hitters_smpl$train),
+    mtry = ncol(hitters_smpl$train) - 1,
+    importance = T
+) -> hitters_bag
+
+hitters_smpl$test %>%
+    as_tibble() %>%
+    mutate(Salary_Prime = predict(hitters_bag, newdata = .)) %>%
+    summarise(MSE = mean( (Salary - Salary_Prime)^2 )) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+Test MSE for bagging is 0.18, less than the .22 the boosting gave us.
+
+# 11)
+
+*This question uses the `Caravan` data set.*
+
+## a)
+
+*Create a training set consisting of the first 1,000 observations, and a test set consisting of the remaining observations.*
+
+```{r 11.a}
+p <- 1000/nrow(Caravan)
+caravan_smpl <- Caravan %>%
+    mutate(Purchase = ifelse(Purchase == 'Yes', 1, 0)) %>%
+    resample_partition(c(train = p, test = 1-p))
+
+rm(p)
+```
+
+## b)
+
+*Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?*
+
+```{r 11.b}
+caravan_boost <- gbm(
+    Purchase ~ ., 
+    data = caravan_smpl$train,
+    distribution = 'bernoulli',
+    n.trees = 1000,
+    shrinkage = 0.01
+)
+
+caravan_boost %>% summary()
+```
+
+The `MINK7512` and `PPERSAUT` variables appear to be the most important.
+
+## c)
+
+*Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated probability of purchase is greater than 20 %. Form a confusion matrix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set?*
+
+```{r 11.c}
+caravan_smpl$test %>%
+    as_tibble() %>%
+    mutate(
+        Purchase_Prob = predict(
+            caravan_boost,
+            newdata = .,
+            type = 'response',
+            n.trees = 1000
+        ),
+        Purchase_Prime = ifelse(Purchase_Prob > .2, 1, 0)
+    ) -> caravan_test_result 
+
+# Categorisation error
+caravan_test_result %>%
+    summarise(Error = mean(Purchase != Purchase_Prime)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+
+# Confusion matrix
+caravan_test_result %>%
+    count(Purchase, Purchase_Prime) %>%
+    spread(Purchase_Prime, n)
+```
+
+We now apply a logistic regression.
+
+```{r 11.c.2}
+# Logistic regression
+caravan_logistic <- caravan_smpl$train %>% glm(Purchase ~ ., data = ., family = 'binomial')
+
+caravan_smpl$test %>%
+    as_tibble() %>%
+    mutate(
+        Purchase_Prob = predict(
+            caravan_logistic,
+            newdata = .,
+            type = 'response',
+        ),
+        Purchase_Prime = ifelse(Purchase_Prob > .2, 1, 0)
+    ) %>%
+    summarise(Error = mean(Purchase != Purchase_Prime)) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+We see the categorisation error is $\approx 14%$.
+
+# 12)
+
+*Apply boosting, bagging, and random forests to a data set of your choice. Be sure to fit the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance?*
+
+We are going to try a boosting on Medicare Benefits Schedule (MBS) data. We are going to try and try and predict the gender of the person based on the data in the report.
+
+```{r 12}
+mbs_data <- read_csv(
+    'https://data.gov.au/dataset/8a19a28f-35b0-4035-8cd5-5b611b3cfa6f/resource/492b39de-8c97-4bbf-880e-e97d933daa9c/download/mbs-demographics-2016-qtr-3-july.csv',
+    col_names = c('year', 'month', 'item', 'state', 'age_range', 'gender', 'services', 'benefit'),
+    col_types = list(col_factor(), col_factor(), col_factor(), col_factor(), col_factor(), col_factor(), col_integer(), col_integer()),
+    skip = 1
+)
+
+mbs_data <- mbs_data %>% mutate(gender = ifelse(gender == 'F', 1, 0))
+```
+
+
+We perform boosting with 1000 trees.
+
+```{r 12.boost}
+set.seed(1)
+mbs_smpl <- mbs_data %>% resample_partition(c(test = .5, train = .5))
+
+# Boosting
+mbs_boost <- mbs_smpl$train %>%
+    as_tibble() %>%
+    dplyr::select(-c('year', 'month', 'item')) %>%
+    gbm(gender ~ ., data = ., n.trees = 1000, distribution = 'bernoulli')
+
+summary(mbs_boost)
+```
+
+We now use our test data to determine the accuracy of our predictions:
+```{r 12.2}
+mbs_smpl$test %>%
+    as_tibble() %>%
+    mutate(
+        gender_response = predict(mbs_boost, newdata = ., n.trees = 1000, type = 'response'),
+        gender_prime = ifelse(gender_response < .5, 0, 1)
+    ) %>%
+    summarise(Error_Rate = mean((gender != gender_prime))) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+
+Our error rate is 48%, which is only slightly better than guessing the gender. As an example, let's see what the error rate is for a 'coin toss' model:
+
+```{r 12.coin_toss}
+set.seed(1)
+mbs_data %>%
+    mutate(gender_prime = rbinom(nrow(.), 1, .5)) %>%
+    summarise(Error_Rate = mean((gender != gender_prime))) %>%
+    kable(align = 'left') %>%
+    kable_styling()
+```
+We see that our 'coin toss' model is only marginally better than our boosting model at predicting the gender.
