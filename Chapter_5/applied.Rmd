@@ -1,4 +1,12 @@
-# Chapter 5 - Applied
+---
+title: "Chapter 5 - Resampling Methods - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ```{r setup, message=F}
 library(ISLR)

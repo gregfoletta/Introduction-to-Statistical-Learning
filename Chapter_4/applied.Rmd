@@ -1,4 +1,12 @@
-# Chapter 4 - Applied
+---
+title: "Chapter 4 - Classification - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ```{r setup, message = F, echo = F}
 library(broom)

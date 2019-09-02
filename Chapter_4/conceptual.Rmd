@@ -1,4 +1,12 @@
-# Chapter 4 - Conceptual
+---
+title: "Chapter 4 - Classification - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ## 1) Logistic
 

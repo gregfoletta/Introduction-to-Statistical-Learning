@@ -1,4 +1,12 @@
-# Chapter 4 - Resampling Methods
+---
+title: "Chapter 5 - Resampling Methods - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 Resampling involves repeatedly drawing samples from a training set and refitting a model of interest on each sample.
 

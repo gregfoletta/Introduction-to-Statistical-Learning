@@ -1,7 +1,12 @@
 ---
-title: "Tree-Based Methods - Lab"
-output: html_document
+title: "Chapter 8 - Moving Beyond Linearity - Lab Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

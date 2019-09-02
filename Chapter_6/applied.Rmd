@@ -1,4 +1,11 @@
-# Applied
+---
+title: "Chapter 6 - Linear Model Selection and Regularization - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ```{r setup, message = F}
 library(tidyverse)

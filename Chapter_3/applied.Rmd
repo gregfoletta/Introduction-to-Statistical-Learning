@@ -1,4 +1,11 @@
-# Chapter 3 - Applied
+---
+title: "Chapter 3 - Linear Regression - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 8) Auto data set
 
@@ -6,6 +13,7 @@
 library(tidyverse)
 library(broom)
 library(ISLR)
+library(corrplot)
 ```
 
 ### a)

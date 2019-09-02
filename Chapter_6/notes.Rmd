@@ -1,4 +1,12 @@
-# Chapter 6 - Linear Model Selection and Regularization
+---
+title: "Chapter 6 - Linear Model Selection and Regularization - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 This chapter, and the chapters that follow, extend the linear model framework. We discuss how the linear model can be improved by replacing the least squares with alternative fitting provedures.
 

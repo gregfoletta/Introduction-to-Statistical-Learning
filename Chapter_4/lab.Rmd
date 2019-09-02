@@ -1,4 +1,12 @@
-# Chapter 4 - Lab - Logistic Regression, LDA, QDA, and KNN
+---
+title: "Chapter 4 - Classification - Lab Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ## 4.6.1 - Stock Market Data
 

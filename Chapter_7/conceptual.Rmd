@@ -1,4 +1,12 @@
-# Chapter 7 - Conceptual
+---
+title: "Chapter 7 - Moving Beyond Linearity - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ## 1)
 

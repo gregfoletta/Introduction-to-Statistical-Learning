@@ -1,5 +1,5 @@
 ---
-title: "Tree Based Methods - Applied Exercises"
+title: "Chapter 9 - Tree Based Methods - Applied Exercises"
 author: "Greg Foletta"
 output:
   html_document:

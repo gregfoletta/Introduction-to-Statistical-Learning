@@ -1,4 +1,11 @@
-# Chapter 3 - Conceptual
+---
+title: "Chapter 3 - Linear Regression - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 1) Null Hypothesis
 

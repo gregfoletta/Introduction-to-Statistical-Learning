@@ -1,6 +1,10 @@
 ---
-title: "Chapter 5 - Conceptual"
-output: html_document
+title: "Chapter 9 - Support Vector Machines - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}

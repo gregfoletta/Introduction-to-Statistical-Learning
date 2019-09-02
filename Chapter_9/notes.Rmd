@@ -1,4 +1,11 @@
-# 9 - Support Vector Machines
+---
+title: "Chapter 9 - Support Vector Machines - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 The *support vector machine* is an approach for **classification** that was developed in the computer science community in the 1990s. The are often considered one of the best 'out of the box' classifiers.
 

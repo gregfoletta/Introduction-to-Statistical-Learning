@@ -1,4 +1,11 @@
-# 4 - Classification
+---
+title: "Chapter 4 - Classification - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 In many situations, the response variable in a regression may be qualitative instead of quantitative. These are often referred to as **categorical**.
 

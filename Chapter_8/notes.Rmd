@@ -1,4 +1,11 @@
-# 8 - Tree-Based Methods
+---
+title: "Chapter 8 - Tree Based Methods - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 This chapter discusses tree-based methods for regression and classification. These involve **stratifying** or **segmenting** the predictor space into a number of simple regions. These types of approaches are known as **decision tree* methods**.
 

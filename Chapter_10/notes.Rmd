@@ -1,4 +1,11 @@
-# 10 - Unsupervised Learning
+---
+title: "Chapter 10 - Unsupervised Learning - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 Previous chapters have discussed *supervised learning* such as regression and classification. In this setting we have access to $p$ features measured on $n$ observations, and a response $Y$. The goal is to predict $Y$ based on the observations.
 

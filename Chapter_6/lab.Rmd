@@ -1,4 +1,11 @@
-# Chapter 6 - Lab
+---
+title: "Chapter 6 - Linear Model Selection and Regularization - Lab Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ```{r setup, message = F}
 library(broom)

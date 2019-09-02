@@ -1,4 +1,12 @@
-# Chapter 5 - Lab - Cross-validation and the Bootstrap
+---
+title: "Chapter 5 - Resampling Methods - Resampling Methods"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
 
 ```{r setup, message=F}
 library(broom)

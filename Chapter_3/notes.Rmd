@@ -1,29 +1,37 @@
-# Chapter 3 - Notes
+---
+title: "Chapter 3 - Linear Regression - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 3.1 - Simple Linear Regression
 
-A simple linear regression predicts a response `Y` based on a single predictor variable `X`. 
-```
-Y ≈ β_0 + β_1X
-```
+A simple linear regression predicts a response $Y$ based on a single predictor variable $X$. 
+
+$$ Y \approx \beta_0 + \beta_1 X $$
 
 Once we have training data to produce estimates for the coefficients, we can predict values by computing:
-```
-ŷ = β̂ 0 + β̂ 1x
-```
+
+$$ \hat{y} = \beta_0 + \beta_1x$$
 
 ### 3.1.1 - Estimating Coefficients
 
 The goal is to obtain coefficients such that the linear model fits the data well - i.e. as close as possible to the data points. The most common approach involves minimising the **least squares** criterion.
 
-We let `e_i = y_i − ŷ_i`, which represents the *i*th **residual**. The **residual sum of squares** or **RSS** is the sum of the squares of each of these residuals.
+We let $ e_i = y_i − \hat{y}_i $, which represents the *i*th **residual**. The **residual sum of squares** or **RSS** is the sum of the squares of each of these residuals.
 
 An example in R - we generate a our predictions base on f(x) + e, and also have a 'guess' at an f_hat(x). We calculate our y_i, and then calculate the RSS. 
 
 
 ```{r 3.1.1 setup, message = F}
 library(tidyverse)
+library(knitr)
+library(kableExtra)
 ```
+
 ```{r 3.1.1_1}
 set.seed(1)
 x <- 1:100
@@ -33,9 +41,27 @@ y_i <- f(x) + rnorm(length(x), 0, .5)
 y_hat_i <- f_hat(x)
 
 RSS <- sum( (y_i - y_hat_i)^2 )
+
+RSS %>% kable(align = 'left') %>% kable_styling()
 ```
 
-With some calculus, the RSS minimiser for `β̂ 1x` is the sum of the difference between `x` and the mean of `x` times by the difference between `y` and the mean of `y`, all divided by the sum of the square of the difference between `x` and the mean of `x`.
+With some calculus, the RSS minimisers are:
+
+$$
+\hat{\beta}_1 = \frac
+{
+    \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})
+} 
+{ 
+    \sum_{i=1}^n (x_i - \bar{x})^2
+}
+$$
+and
+
+$$
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}
+$$
+where $\bar{x}$ and $\bar{y}$ are the sample means.
 
 ```{r 3.1.1_2}
 beta_hat_1 <- sum( (x - mean(x)) * (y_i - mean(y_i)) ) / sum( (x - mean(x))^2 )
@@ -47,20 +73,22 @@ beta_hat_1
 
 ### 3.1.2 - Assessing the Accuracy of the Estimates
 
-We take the analogy of μ̂, the **sample mean** being an estimate for μ, the **population mean**. The average sample mean over many data sets will be close to the population mean. In the code below, we create a population of 1,000,000 random variables, with very large standard deviation of 10,000. We see the mean is 10.46.
-
-We then take 200 samples of 100 of the population, and calculate the mean for each sample. We see that each mean can be a very long way away from the real mean of 10.046.
-
-We then take the mean of all of the sample means. We see this sample mean is 9.99, which is very close to the population mean.
+We take the analogy of $\hat{\mu}$ the **sample mean** being an estimate for $\mu$, the **population mean**. The average sample mean over many data sets will be close to the population mean. In the code below, we create a population of 1,000,000 random variables, with very large standard deviation of 500.
 
 ```{r 3.1.2_1}
 set.seed(1)
-population <- rnorm(1000000, 10, 2)
+population <- rnorm(1000000, 10, 500)
 (mu <- mean(population))
-(mu_hat <- map_dbl(1:200, ~mean(sample(population, 100))) %>% mean())
+mean(sample(population, 100))
+(mu_hat <- map_dbl(1:2000, ~mean(sample(population, 100))) %>% mean())
 ```
+We see the population mean is 10.02.
 
-How close is a single estimate? In general we answer this by computing the **standard error** of μ̂, written Se(μ̂). This is `σ/sqrt(n)`, where sigma is the population standard mean. The population deviation is seldom known, so the standard error of the mean is usually estimated as the **sample standard deviation**.
+We take the mean of of a single sample, we see that this is a long way from the population mean.
+
+However when we take the mean of 2000 sample means, we get a result that is very close to the population mean.
+
+How close is a single estimate? In general we answer this by computing the **standard error** of $\hat{\mu}$ written $SE(\mu)$. This is `σ/sqrt(n)`, where sigma is the population standard mean. The population deviation is seldom known, so the standard error of the mean is usually estimated as the **sample standard deviation**.
 
 The sample standard deviation is the sqaure root of the sum of the square of the difference between each x_i and the sample mean, divided by n - 1. Let's do this for our reponse variable:
 

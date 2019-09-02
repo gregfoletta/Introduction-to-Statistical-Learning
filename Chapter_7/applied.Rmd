@@ -1,4 +1,11 @@
-# Chapter 7- Applied
+---                                                                                                                                                                                    
+title: "Chapter 7 - Moving Beyond Linearity - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 6)
 
@@ -16,6 +23,7 @@ library(gam)
 library(splines)
 library(corrplot)
 library(leaps)
+library(broom)
 ```
 
 ```{r 6.a.1}
@@ -48,6 +56,8 @@ wage_poly %>%
 We see that using cross-validation, a degree 4 polynomial provides the best fit of the data. This lines up with the ANOVA where the p-value between the cubic to quartic is very large.
 
 ```{r 6.a.2}
+wage_model <- lm(wage ~ poly(age, 4), data = Wage)
+
 tibble(age = range(wage$age)[1]:range(wage$age)[2]) %>%
     mutate(wage = predict(wage_model, newdata = .)) %>%
     ggplot(aes(age, wage)) +

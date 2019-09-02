@@ -1,6 +1,10 @@
 ---
-title: "Chapter 2 - Conceptual"
-output: html_document
+title: "Chapter 2 - Statistical Learning - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}
@@ -43,17 +47,28 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **The x-axis is the amount of flexibility in the model, and the y-axis represents the values for each curve.**
 
-```{r 3}
-tibble(
+As flexibility of a model increases:
 
-4) Statistical Learning
+* The bias decreases.
+* The variance increases.
+* The training error decreases.
+* The test error decreases, then increases.
+* The irreducible error is a constant.
+* Bayes error rate is used in classification. It's between 0 and 1 and is the ratio of classified observations that are on the 'wrong' side of the decision boundary.
+
+## 4)
 
 * Describe three real life applications for classification, including the response and the predictors. Inference or prediction?
-    * Classifying malicious network traffic. Response is malicious / non-malicious, predictors are the ports and protocols used. Inference.
+    * Classifying malicious network traffic. Response is malicious / non-malicious, predictors are the ports and protocols used: **Inference**.
 * Describe three real life applications for regression, including the response and the predictors. Inference or prediction?
-    * Analysing network bandwidth. Response is the bandwidth, predicitor is the time of day. Prediction.
+    * Analysing network bandwidth. Response is the bandwidth, predicitor is the time of day. **Prediction**.
 * Describe three real life applications for cluster analysis.
-    * 
+    * Groups of voters.
+    * Groups of different customers.
+    * Different types of genes.
 
-5) What are the advantages and disadvantages of a very flexible approach? When is flexibility preferred over infexibility and vice verse?
+## 5) 
 
+**What are the advantages and disadvantages of a very flexible approach? When is flexibility preferred over infexibility and vice versa?**
+
+A flexible approach may be closer to the 'true' model and provide a better fit to the data and provide a more accurate prediction. However if too flexible a model is used it may overfit the data. It's predictive powers are then reduced as its variance increases.

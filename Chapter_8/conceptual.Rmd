@@ -1,7 +1,12 @@
 ---
-title: "Tree Based Methods - Conceptual Exercises"
-output: html_document
+title: "Chapter 8 - Tree Based Methods - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

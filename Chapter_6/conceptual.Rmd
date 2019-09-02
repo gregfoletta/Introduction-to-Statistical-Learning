@@ -1,4 +1,11 @@
-# Conceptual
+---
+title: "Chapter 6 - Linear Model Selection and Regularization - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 1)
 *We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain $p + 1$ models, containing $0, 1, 2,\ldots,p$ predictors. Explain your answers:*

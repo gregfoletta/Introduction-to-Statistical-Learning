@@ -1,4 +1,11 @@
-# Conceptual
+---
+title: "Chapter 10 - Unsupervised Learning - Conceptual Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ```{r setup, message=F}
 library(tidyverse)

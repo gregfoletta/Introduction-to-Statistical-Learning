@@ -1,4 +1,11 @@
-# Chapter 5 - Applied
+---
+title: "Chapter 10 - Unsupervised Learning - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ```{r setup, message=F}
 library(ISLR)
@@ -261,7 +268,7 @@ The scaling appears to have negatively affected the clustering. This would be be
 
 *Load in the data*
 
-```{r 13}
+```{r 13.1}
 gene_data <- read_csv('http://www-bcf.usc.edu/~gareth/ISL/Ch10Ex11.csv', col_names = F)
 ```
 

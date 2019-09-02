@@ -1,4 +1,11 @@
-# Chapter 2 - Notes
+---
+title: "Chapter 2 - Statistical Learning - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## 2.1 - Statistical Learning 
 

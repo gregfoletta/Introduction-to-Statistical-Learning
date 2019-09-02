@@ -1,6 +1,10 @@
 ---
-title: "Chapter 9 - Applied"
-output: html_document
+title: "Chapter 9 - Support Vector Machines - Applied Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}

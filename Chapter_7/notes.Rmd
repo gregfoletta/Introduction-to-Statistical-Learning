@@ -1,4 +1,11 @@
-# Chapter 7 - Moving Beyond Linearity
+---
+title: "Chapter 7 - Moving Beyond Linearity - Notes"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 In the previous chapters we have discussed linear models. Standard linear regression can have limited predictive power. This is because the linearity assumption is almost always an approximation.
 

@@ -1,4 +1,11 @@
-# Chapter 3 - Lab
+---
+title: "Chapter 3 - Linear Regression - Lab Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ## Simple Linear Regression
 

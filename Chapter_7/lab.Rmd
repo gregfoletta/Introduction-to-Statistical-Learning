@@ -1,4 +1,11 @@
-# Chapter 7 - Lab
+---                                                                                                                                                                                    
+title: "Chapter 7 - Moving Beyond Linearity - Lab Exercises"
+author: "Greg Foletta"
+output:
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
 
 ```{r setup, message = F}
 library(ISLR)
