@@ -171,7 +171,7 @@ q10data <- q10data %>%
 
 ```{r 8}
 q10pca <- q10data %>%
-    select(-class) %>%
+    dplyr::select(-class) %>%
     prcomp() 
 
 q10pca %>% autoplot(data = q10data, colour = 'class')
@@ -248,6 +248,7 @@ We can see that the K-means on the PCA has switched some of the group 1 and 2 ob
 ```{r 13}
 set.seed(1)
 q10f_kmeans <- q10data %>%
+    dplyr::select(-class) %>%
     scale() %>%
     kmeans(3, nstart = 20)
 
@@ -269,7 +270,7 @@ The scaling appears to have negatively affected the clustering. This would be be
 *Load in the data*
 
 ```{r 13.1}
-gene_data <- read_csv('http://www-bcf.usc.edu/~gareth/ISL/Ch10Ex11.csv', col_names = F)
+gene_data <- read_csv('http://faculty.marshall.usc.edu/gareth-james/ISL/Ch10Ex11.csv', col_names = F)
 ```
 
 ### b)

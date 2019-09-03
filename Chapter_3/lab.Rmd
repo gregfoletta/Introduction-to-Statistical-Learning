@@ -7,6 +7,11 @@ output:
     highlight: tango
 ---
 
+```{r cairo, show = F}
+library(knitr)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
+
 ## Simple Linear Regression
 
 Load the required libraries, and convert the the Boston data to a tibble:
@@ -15,7 +20,7 @@ library(tidyverse)
 library(broom)
 library(MASS)
 
-boston <- as.tibble(Boston)
+boston <- as_tibble(Boston)
 ```
 
 Calculate the linear regression of lstat (lower status of population) on to medv (median value of owner-occupied homes).
@@ -42,7 +47,9 @@ Using this, we can generate a plot with:
 * Segments linking the actual and predicted values of medv.
 
 ```{r medv_lstat_plot}
-augment(lm_boston) %>% ggplot(aes(lstat, medv)) + 
+lm_boston %>%
+    augment() %>%
+    ggplot(aes(lstat, medv)) + 
     geom_smooth(method = 'lm') + 
     geom_point(alpha = .4) + 
     geom_point(aes(lstat, .fitted), shape = 1) + 
