@@ -9,16 +9,16 @@ output:
 
 
 ## 1)
-*Using basic statistical properties of the variance, as well as single-variable calculus, derive (5.6). In other words, prove that α given by (5.6) does indeed minimize Var(αX + (1 − α)Y ).*
+**Using basic statistical properties of the variance, as well as single-variable calculus, derive (5.6). In other words, prove that α given by (5.6) does indeed minimize Var(αX + (1 − α)Y ).**
 
 The formula 5.6 is:
 $$ \alpha = \frac{\sigma^2_Y - \sigma_{XY}}{\sigma^2_X + \sigma^2_Y - 2\sigma_{XY}} $$
 
 
 ## 2_
-*We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of n observations.*
+**We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of n observations.**
 
 ### a) 
-*What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer.*
+**What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer.**
 
 There is a 1/n chance that the observation is in

@@ -15,14 +15,14 @@ output:
 
 Either for prediction or inference.
 
-**Prediction**
+***Prediction***
 The set of inputs $X$ are readily available, but the output $Y$ cannot easily be obtained. We wish to predict what $Y$ will be given a set of inputs $X$.
 
 The accuracy of the prediction depends on two quantities - the *reducible* and the *irreducible* error. The estimate $\hat{f}(X)$ will not be a perfect estimate for the true $f(X)$. We can reduce the error by using better statistical learning techniques.
 
 However the variability of $\epsilon$ also affects the accuracy of the predictions. This is the irreducible error.
 
-**Inference**
+***Inference***
 
 We are often interested in the way that $Y$ is affected by changes in $X$. We need to estimate $f(X)$, but we don't want to predict $Y$. We instead want to understand the relationship betrween $X$ and $Y$.
 

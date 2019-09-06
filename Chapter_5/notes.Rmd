@@ -18,7 +18,7 @@ We consider a class of methods that estimate the test error rate by *holding out
 
 It involves randomly dividing the available set of observations into two parts: the *training set* and the *validation set*. The validation set error rate provides an estimate of the test error rate.
 
-**Drawbacks**
+***Drawbacks***
 * The validation estimate of the test error rate can be highly variable, depending on which observations are included in the training set.
 * Only a subset of the observations are used to fit the model. Since statistical methods perform worse with fewer observations, the validation set error rate may overestimate the test error rate.
 
@@ -46,7 +46,7 @@ $$ CV_{(k)} = \frac{1}{k}\sum_{i=1}^kMSE_i $$
 
 LOOCV is therefore a special case of k-fold where k = n.
 
-*Advantages:*
+**Advantages:**
 * Computational - fit the model only k times, not n.
 
 #### Bias-Variance Trade-off

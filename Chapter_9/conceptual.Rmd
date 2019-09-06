@@ -21,11 +21,11 @@ library(ISLR)
 
 ## 1
 
-*This problem involves hyperplanes in two dimensions.*
+**This problem involves hyperplanes in two dimensions.**
 
 ### a)
 
-*Sketch the hyperplane* $1 + 3X_1 - X_2 = 0$. *Indicate the set of points for which the formula is *$ < 0 $*and the set for which it is *$> 0$*.*
+**Sketch the hyperplane* $1 + 3X_1 - X_2 = 0$. *Indicate the set of points for which the formula is *$ < 0 $*and the set for which it is *$> 0$*.**
 
 We let $X_1$ be on the x-axis and $X_2$ be on the y-axis. We move $X_2$ around so we have $X_2 = 3_X1 + 1$.
 
@@ -74,13 +74,13 @@ ggplot() +
 
 ### b)
 
-*Indicates the points that are $> 4$ and those which are $\le 4$.*
+**Indicates the points that are $> 4$ and those which are $\le 4$.**
 
 The points inside and on the line of the circle are $le 4$ and those outside of the circle are $> 4$.
 
 ### c)
 
-*Suppose that a classifier assigns an observation to the blue class if it's $> 4$ and to the red class otherwise. To what class are the following observations classified to:*
+**Suppose that a classifier assigns an observation to the blue class if it's $> 4$ and to the red class otherwise. To what class are the following observations classified to:**
 
 
 ```{r 2.c_1}
@@ -105,7 +105,7 @@ list(
 
 ### d)
 
-*Argue that while the decision boundary is not linear in terms of $X_1, X_2$, it is linear in terms of $X_1^2, X_2^2$.*
+**Argue that while the decision boundary is not linear in terms of $X_1, X_2$, it is linear in terms of $X_1^2, X_2^2$.**
 
 We are enlarging the feature space with functions of the original features. The function in this case is a quadratic function. In this enlarged feature space the decision boundary is in fact linear: if we expand out the terms we end up with:
 
@@ -118,7 +118,7 @@ However in the original feature space, the decision boundary is in the form of a
 
 ## 3)
 
-*We explaore the maximial margin classifier on a toy set*
+**We explaore the maximial margin classifier on a toy set**
 
 ### a)
 
@@ -142,7 +142,7 @@ data_3a %>%
 ```
 
 ### b)
-*Sketch the optimal separating plane and provide the equation*
+**Sketch the optimal separating plane and provide the equation**
 
 The optimal line looks to be around $\frac{1}{2} + \frac{7}{8}X_1 - X_2 = 0$
 
@@ -155,7 +155,7 @@ data_3a %>%
 
 ### c)
 
-*Describe the classification rule for the MMC.*
+**Describe the classification rule for the MMC.**
 
 The maximal margin classifier is the separating hyperplane that is farthest from the observations.
 
@@ -165,7 +165,7 @@ When the formula is < 0, we assign to Red, when it is > 0 we assign to Blue.
 
 ### d)
 
-*On your sketch, indicate the margin for the maximal margin hyperplane.*
+**On your sketch, indicate the margin for the maximal margin hyperplane.**
 
 The margin is the minimal perpendicular distance from the closest observations to the hyperplane. A rouch sketch is:
 
@@ -181,13 +181,13 @@ data_3a %>%
 
 ### e)
 
-*Indicate the support vectors for the maximal margin classifier.*
+**Indicate the support vectors for the maximal margin classifier.**
 
 The support vectors look to be $(2,1),\ (2,2),\ (4,3) \text{ and } (4,4)$
 
 ### f)
 
-*Argue that a slight movement of the seventh observation would not affect the maximal margin hyperplane.*
+**Argue that a slight movement of the seventh observation would not affect the maximal margin hyperplane.**
 
 The seventh observation is $(4,\ 1)$. This is not a support vector. The maximal margin hyperplane is only determined by the support vectors. This vector can be moved to anywhere outside the margin and it won't affect the classifier.
 
@@ -195,7 +195,7 @@ If it's moved inside the current margin, it would affect the classifier.
 
 ### g)
 
-*Sketch a hyperplane that is not the optimal separating hyperplane, and provide the equation for this hyperplane.*
+**Sketch a hyperplane that is not the optimal separating hyperplane, and provide the equation for this hyperplane.**
 
 ```{r 3.g}
 data_3a %>%

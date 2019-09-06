@@ -98,7 +98,7 @@ do.call(anova, .)
 ```
 As an alternative to ANOVA we could choose the polynomial degree using cross-validation.
 
-***
+*****
 
 Next we consider the task of predicting whether an individual earns over 250,000 a year. We create a logical variable for whether the earning is above 250k, and perform a logistical regression with a quartic polynomial.
 

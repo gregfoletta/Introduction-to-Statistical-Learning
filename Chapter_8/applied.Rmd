@@ -31,7 +31,7 @@ library(glmnet)
 
 # 7)
 
-*In the lab, we applied random forests to the `Boston` data using `mtry = 6` and using `ntree = 25` and `ntree = 500`. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree . You can model your plot after Figure 8.10. Describe the results obtained.*
+**In the lab, we applied random forests to the `Boston` data using `mtry = 6` and using `ntree = 25` and `ntree = 500`. Create a plot displaying the test error resulting from random forests on this data set for a more comprehensive range of values for mtry and ntree . You can model your plot after Figure 8.10. Describe the results obtained.**
 
 
 ```{r 7}
@@ -59,11 +59,11 @@ tibble(vars = seq(1, ncol(Boston), by = 2)) %>%
 
 # 8)
 
-*In the lab, a classification tree was applied to the `Carseats` data set after converting `Sales` into a qualitative response variable. Now we will seek to predict `Sales` using regression trees and related approaches, treating the response as a quantitative variable.*
+**In the lab, a classification tree was applied to the `Carseats` data set after converting `Sales` into a qualitative response variable. Now we will seek to predict `Sales` using regression trees and related approaches, treating the response as a quantitative variable.**
 
 ## a)
 
-*Split the data set into a training set and a test set.*
+**Split the data set into a training set and a test set.**
 
 ```{r 8.a}
 set.seed(1)
@@ -72,7 +72,7 @@ carseats_smpl <- Carseats %>% resample_partition(c(train = .5, test = .5))
 
 ## b)
 
-*Fit a regression tree to the training set. Plot the tree, and interpret the results. What test error rate do you obtain?*
+**Fit a regression tree to the training set. Plot the tree, and interpret the results. What test error rate do you obtain?**
 
 ```{r 8.b}
 carseats_tree <- tree(Sales ~ ., data = carseats_smpl$train)
@@ -95,7 +95,7 @@ carseats_smpl$test %>%
 
 ## c) 
 
-*Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test error rate?*
+**Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test error rate?**
 
 ```{r 8.c}
 set.seed(1)
@@ -129,7 +129,7 @@ carseats_smpl$test %>%
 This has slightly reduced the test MSE.
 
 ## d)
-*Use the bagging approach in order to analyze this data. What test error rate do you obtain? Use the importance() function to determine which variables are most important.*
+**Use the bagging approach in order to analyze this data. What test error rate do you obtain? Use the importance() function to determine which variables are most important.**
 
 ```{r 8.d}
 carseats_bag <- randomForest(Sales ~ ., data = carseats_smpl$train, mtry = 10, ntree = 500, importance = T)
@@ -148,7 +148,7 @@ varImpPlot(carseats_bag)
 
 ## e)
 
-*Use random forests to analyze this data. What test error rate do you obtain? Use the `importance()` function to determine which variables are most important. Describe the effect of $m$, the number of variables considered at each split, on the error rate obtained.*
+**Use random forests to analyze this data. What test error rate do you obtain? Use the `importance()` function to determine which variables are most important. Describe the effect of $m$, the number of variables considered at each split, on the error rate obtained.**
 
 ```{r 8.e}
 # randomForest will use sqrt(p) as mtry if not specified
@@ -168,11 +168,11 @@ Random forests overcome this by forcing the split to consider only a subset of p
 
 # 9)
 
-*This problem involves the `OJ` data set which is part of the `ISLR` package.*
+**This problem involves the `OJ` data set which is part of the `ISLR` package.**
 
 ## a)
 
-*Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.*
+**Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.**
 
 ```{r 9.a}
 set.seed(1)
@@ -181,7 +181,7 @@ oj_sample <- OJ %>% resample_partition(c(train = 800/nrow(OJ), test = 1-800/nrow
 
 ## b)
 
-*Fit a tree to the training data, with `Purchase` as the response and the other variables except for `Buy` as predictors. Use the `summary()` function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?*
+**Fit a tree to the training data, with `Purchase` as the response and the other variables except for `Buy` as predictors. Use the `summary()` function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?**
 
 ```{r 9.b}
 oj_tree <- tree(Purchase ~ ., data = oj_sample$train)
@@ -192,7 +192,7 @@ From the `summary()` function we can see that the misclassification rate is 15.7
 
 ### c)
 
-*Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.*
+**Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.**
 
 ```{r 9.c}
 oj_tree
@@ -207,7 +207,7 @@ The terminal node is split on `ListPriceDiff` when the variable is less than 0.1
 
 ## d)
 
-*Create a plot of the tree, and interpret the results.*
+**Create a plot of the tree, and interpret the results.**
 
 ```{r 9.d}
 plot(oj_tree)
@@ -217,7 +217,7 @@ The `LoyalCH` (Customer brand loyalty for CH) and `PriceDiff` (Sale price of MM 
 
 ## e)
 
-*Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels. What is the test error rate?*
+**Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels. What is the test error rate?**
 
 ```{r 9.e}
 oj_test <- oj_sample$test %>%
@@ -236,7 +236,7 @@ oj_test %>%
 
 ## f)
 
-*Apply the `cv.tree()` function to the training set in order to determine the optimal tree size.*
+**Apply the `cv.tree()` function to the training set in order to determine the optimal tree size.**
 
 ```{r 9.f}
 set.seed(1)
@@ -246,7 +246,7 @@ oj_cv <- cv.tree(oj_tree, FUN = prune.misclass)
 
 ## g)
 
-*Produce a plot with tree size on the x-axis and cross-validated classification error rate on the y-axis.*
+**Produce a plot with tree size on the x-axis and cross-validated classification error rate on the y-axis.**
 
 ```{r 9.g}
 tibble(
@@ -261,13 +261,13 @@ tibble(
 
 ## h)
 
-*Which tree size corresponds to the lowest cross-validated classification error rate?*
+**Which tree size corresponds to the lowest cross-validated classification error rate?**
 
 Tree sizes 9 and 8 correspond to the lowest error rate.
 
 ## i)
 
-*Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with five terminal nodes.*
+**Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with five terminal nodes.**
 
 We will prune to eight nodes.
 
@@ -277,7 +277,7 @@ oj_pruned <- prune.tree(oj_tree, best = 8)
 
 ## j)
 
-*Compare the training error rates between the pruned and unpruned trees. Which is higher?*
+**Compare the training error rates between the pruned and unpruned trees. Which is higher?**
 
 ```{r 9.j}
 summary(oj_pruned)
@@ -286,7 +286,7 @@ Pruned tree has a misclassification error rate of 15.02%, the same as the full t
 
 ## k)
 
-*Compare the test error rates between the pruned and unpruned trees. Which is higher?*
+**Compare the test error rates between the pruned and unpruned trees. Which is higher?**
 
 ```{r 9.k}
 oj_sample$test %>%
@@ -301,11 +301,11 @@ The test error rate is the same for the eight node tree as it is for the nine no
 
 # 10)
 
-*We now use boosting to predict Salary in the Hitters data set.*
+**We now use boosting to predict Salary in the Hitters data set.**
 
 ## a)
 
-*Remove the observations for whom the salary information is unknown, and then log-transform the salaries.*
+**Remove the observations for whom the salary information is unknown, and then log-transform the salaries.**
 
 ```{r 10.a}
 Hitters %>%
@@ -316,7 +316,7 @@ Hitters %>%
 
 ## b)
 
-*Create a training set consisting of the first 200 observations, and a test set consisting of the remaining observations.*
+**Create a training set consisting of the first 200 observations, and a test set consisting of the remaining observations.**
 
 Rather than taking the first 200 observations, we take a random sample.
 ```{r 10.b}
@@ -328,7 +328,7 @@ rm(p)
 
 ## c)
 
-*Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter $\lambda$. Produce a plot with different shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.*
+**Perform boosting on the training set with 1,000 trees for a range of values of the shrinkage parameter $\lambda$. Produce a plot with different shrinkage values on the x-axis and the corresponding training set MSE on the y-axis.**
 
 ```{r 10.c}
 tibble(lambda = 10^seq(-10, 0, by = 0.1)) %>%
@@ -355,7 +355,7 @@ hitters_boosts %>%
 
 ## d)
 
-*Produce a plot with different shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.*
+**Produce a plot with different shrinkage values on the x-axis and the corresponding test set MSE on the y-axis.**
 
 ```{r 10.d}
 hitters_boosts %>%
@@ -378,7 +378,7 @@ We see a minimum in the test MSE when $\lambda \approx 0.03$.
 
 ## e)
 
-*Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.*
+**Compare the test MSE of boosting to the test MSE that results from applying two of the regression approaches seen in Chapters 3 and 6.**
 
 We first try a linear regression:
 
@@ -414,7 +414,7 @@ The ridge regression with $\lambda = 2$ gives us an MSE of .50.
 
 ## f)
 
-*Which variables appear to be the most important predictors in the boosted model?*
+**Which variables appear to be the most important predictors in the boosted model?**
 
 ```{r 10.f}
 gbm(
@@ -428,7 +428,7 @@ gbm(
 
 ## g)
 
-*Now apply bagging to the training set. What is the test set MSE for this approach?*
+**Now apply bagging to the training set. What is the test set MSE for this approach?**
 
 ```{r 10.g}
 randomForest(
@@ -449,11 +449,11 @@ Test MSE for bagging is 0.18, less than the .22 the boosting gave us.
 
 # 11)
 
-*This question uses the `Caravan` data set.*
+**This question uses the `Caravan` data set.**
 
 ## a)
 
-*Create a training set consisting of the first 1,000 observations, and a test set consisting of the remaining observations.*
+**Create a training set consisting of the first 1,000 observations, and a test set consisting of the remaining observations.**
 
 ```{r 11.a}
 p <- 1000/nrow(Caravan)
@@ -466,7 +466,7 @@ rm(p)
 
 ## b)
 
-*Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?*
+**Fit a boosting model to the training set with Purchase as the response and the other variables as predictors. Use 1,000 trees, and a shrinkage value of 0.01. Which predictors appear to be the most important?**
 
 ```{r 11.b}
 caravan_boost <- gbm(
@@ -484,7 +484,7 @@ The `MINK7512` and `PPERSAUT` variables appear to be the most important.
 
 ## c)
 
-*Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated probability of purchase is greater than 20 %. Form a confusion matrix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set?*
+**Use the boosting model to predict the response on the test data. Predict that a person will make a purchase if the estimated probability of purchase is greater than 20 %. Form a confusion matrix. What fraction of the people predicted to make a purchase do in fact make one? How does this compare with the results obtained from applying KNN or logistic regression to this data set?**
 
 ```{r 11.c}
 caravan_smpl$test %>%
@@ -536,7 +536,7 @@ We see the categorisation error is $\approx 14%$.
 
 # 12)
 
-*Apply boosting, bagging, and random forests to a data set of your choice. Be sure to fit the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance?*
+**Apply boosting, bagging, and random forests to a data set of your choice. Be sure to fit the models on a training set and to evaluate their performance on a test set. How accurate are the results compared to simple methods like linear or logistic regression? Which of these approaches yields the best performance?**
 
 We are going to try a boosting on Medicare Benefits Schedule (MBS) data. We are going to try and try and predict the gender of the person based on the data in the report.
 

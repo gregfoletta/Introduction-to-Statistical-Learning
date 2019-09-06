@@ -18,7 +18,7 @@ library(tidyverse)
 ## 10) 'Weekly' Data Set
 
 ### a)
-*Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?*
+**Produce some numerical and graphical summaries of the Weekly data. Do there appear to be any patterns?**
 
 ```{r 10_a_1}
 weekly <- as_tibble(Weekly)
@@ -27,7 +27,7 @@ weekly %>% ggplot() + geom_bar(aes(Direction))
 
 
 ### b)
-*Use the full data set to perform a logistic regression with Direction as the response and the five lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically significant? If so, which ones?*
+**Use the full data set to perform a logistic regression with Direction as the response and the five lag variables plus Volume as predictors. Use the summary function to print the results. Do any of the predictors appear to be statistically significant? If so, which ones?**
 
 ```{r 10_b_1}
 glm_weekly <- weekly %>% 
@@ -40,7 +40,7 @@ glm_weekly %>% tidy()
 The Lag2 variable is the only variable with a statistically significant p-value (0.025).
 
 ### c)
-*Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.*
+**Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.**
 
 ```{r 10_c_1}
 weekly %>% 
@@ -52,7 +52,7 @@ weekly %>%
 We can see that the logistic regression does well to predict when the market goes up, but not when the market goes down.
 
 ### d)
-*Now fit the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).*
+**Now fit the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).**
 
 ```{r 10_d_1}
 glm_weekly_90_08 <- weekly %>% 
@@ -67,7 +67,7 @@ weekly %>%
 ```
 
 ### e)
-*Repeat (d) using LDA.*
+**Repeat (d) using LDA.**
 
 ```{r 10_e_1}
 lda_weekly_90_08 <- weekly %>% 
@@ -82,7 +82,7 @@ weekly %>%
 ```
 
 ### f)
-*Repeat (d) using QDA.*
+**Repeat (d) using QDA.**
 
 ```{r 10_f_1}
 qda_weekly_90_08 <- weekly %>% 
@@ -106,7 +106,7 @@ weekly %>% dplyr::filter(Year > 2008) %>% mutate(Prediction = knn(weekly_train, 
 ```
 
 ### h)
-*Which of these methods appears to provide the best results on this data?*
+**Which of these methods appears to provide the best results on this data?**
 
 The error rates are:
 * Logistic: (34 + 5) / 104 = 37.5%
@@ -117,19 +117,19 @@ The error rates are:
 THe logistic regression provides the bes
 
 ### i)
-*Experiment with different combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the heldout data. Note that you should also experiment with values for K in the KNN classifier.*
+**Experiment with different combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the heldout data. Note that you should also experiment with values for K in the KNN classifier.**
 
 ## 11) Auto Data Set
 
 ### a)
-*Create a binary variable, mpg01 , that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may find it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.*
+**Create a binary variable, mpg01 , that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may find it helpful to use the data.frame() function to create a single data set containing both mpg01 and the other Auto variables.**
 
 ```{r 11_a_1}
 auto <- as_tibble(Auto) %>% mutate(mpg01 = ifelse(mpg >= median(mpg), 1, 0))
 ```
 
 ### b)
-*Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01 ? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.*
+**Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01 ? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.**
 
 ```{r 11_b_1}
 library(corrplot)
@@ -140,7 +140,7 @@ auto %>% ggplot() + geom_point(aes(horsepower, displacement, colour = as.factor(
 We see a strong negative correlation between mpg01 and cylinders, displacement, horsepower and weight.
 
 ### c)
-*Split the data into a training set and a test set.*
+**Split the data into a training set and a test set.**
 
 We keep all the data in the same tibble, but use a random binomial to split the set:
 ```{r 11_c_1}
@@ -149,7 +149,7 @@ auto <- auto %>% dplyr::mutate(training_set = rbinom(n = n(), 1, .5) == 1)
 ```
 
 ### d)
-*Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+**Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?**
 
 ```{r 11_d_1}
 mpg.lda <- auto %>% dplyr::filter(training_set) %>% lda(mpg01 ~ cylinders+displacement+horsepower+weight, .)
@@ -160,7 +160,7 @@ auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, Prediction) %>% tally(
 The test error is 14 + 6 /  212 or 9.4%
 
 ### e)
-*Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+**Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?**
 
 ```{r 11_e_1}
 mpg.qda <- auto %>% qda(mpg01 ~ cylinders+displacement+horsepower+weight, .)
@@ -171,7 +171,7 @@ auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, qda_prediction) %>% ta
 The test error is 9 + 10 / 212 or 8.9%
 
 ### f)
-*Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?*
+**Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?**
 
 ```{r 11_f_1}
 mpg.logistic <- auto %>% glm(mpg01 ~ cylinders+displacement+horsepower+weight, ., family = binomial)
@@ -182,7 +182,7 @@ auto %>% dplyr::filter(!training_set) %>% group_by(mpg01, lgstc_prediction) %>% 
 The test error is 12 + 10 / 212 or 10%.
 
 ### g)
-*Perform KNN on the training data, with several values of K, in order to predict mpg01 . Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?*
+**Perform KNN on the training data, with several values of K, in order to predict mpg01 . Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?**
 
 ```{r 11_g_1}
 auto_knn_train <- auto %>% 
@@ -221,12 +221,12 @@ Test error rates:
 ## 12) Writing Functions
 
 ### a)
-*Write a function, Power() , that prints out the result of raising 2 to the 3rd power.*
+**Write a function, Power() , that prints out the result of raising 2 to the 3rd power.**
 
 Trivial - skipping
 
 ### b)
-*Create a new function, Power2() , that allows you to pass any two numbers, x and a , and prints out the value of x^a .*
+**Create a new function, Power2() , that allows you to pass any two numbers, x and a , and prints out the value of x^a .**
 
 ```{r 12_b_1}
 to_power <- function(x, y) { return(x^y) }
@@ -234,7 +234,7 @@ print(to_power(2,3))
 ```
 
 ### c)
-*Using the Power2() function that you just wrote, compute 10pow3, 8pow17, and 131pow3.*
+**Using the Power2() function that you just wrote, compute 10pow3, 8pow17, and 131pow3.**
 ```{r 12_c_1}
 print(to_power(10,3))
 print(to_power(8,17))
@@ -242,12 +242,12 @@ print(to_power(131,3))
 ```
 
 ### d) 
-*Now create a new function, Power3() , that actually returns the result x^a as an R object*
+**Now create a new function, Power3() , that actually returns the result x^a as an R object**
 
 Trivial - skipping
 
 ### e)
-*Now using the Power3() function, create a plot of f (x) = xpow2*
+**Now using the Power3() function, create a plot of f (x) = xpow2**
 
 ```{r 12_e_1}
 tibble(x = -100:100, y = to_power(x, 2)) %>% ggplot(aes(x,y)) + geom_line()
@@ -255,7 +255,7 @@ tibble(x = -100:100, y = to_power(x, 2)) %>% ggplot(aes(x,y)) + geom_line()
 
 
 ### f) 
-*Create a function, PlotPower() , that allows you to create a plot of x against y*
+**Create a function, PlotPower() , that allows you to create a plot of x against y**
 
 ```{r 12_f_1}
 plot_power <- function(x,y) {
@@ -270,7 +270,7 @@ plot_power(-100:100, 4)
 
 ## 13) Boston Data Set
 
-*Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.*
+**Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.**
 
 Let's create a function which let's us run the logistic, LDA and QDA in one go. It takes the data frame, the formula, and the fraction of the table to use for training. It returns the data frame with prediction columns added.
 

@@ -15,11 +15,11 @@ knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
 
 ## 6)
 
-*In this exercise, you will further analyze the Wage data set considered throughout this chapter.*
+**In this exercise, you will further analyze the Wage data set considered throughout this chapter.**
 
 ### a)
 
-*Perform polynomial regression to predict wage using age . Use cross-validation to select the optimal degree d for the polynomial. What degree was chosen, and how does this compare to the results of hypothesis testing using ANOVA? Make a plot of the resulting polynomial fit to the data.*
+**Perform polynomial regression to predict wage using age . Use cross-validation to select the optimal degree d for the polynomial. What degree was chosen, and how does this compare to the results of hypothesis testing using ANOVA? Make a plot of the resulting polynomial fit to the data.**
 
 ```{r setup, message = F}
 library(tidyverse)
@@ -74,7 +74,7 @@ tibble(age = range(wage$age)[1]:range(wage$age)[2]) %>%
 
 ### b)
 
-*Fit a step function to predict wage using age , and perform crossvalidation to choose the optimal number of cuts. Make a plot of the fit obtained.*
+**Fit a step function to predict wage using age , and perform crossvalidation to choose the optimal number of cuts. Make a plot of the fit obtained.**
 
 ```{r 6.b.1}
 set.seed(2)
@@ -98,7 +98,7 @@ wage_cut %>%
 
 ## 7)
 
-*The `Wage` data set contains a number of other features not explored in this chapter, such as marital status ( `maritl` ), job class ( `jobclass` ), and others. Explore the relationships between some of these other predictors and wage , and use non-linear fitting techniques in order to fit flexible models to the data. Create plots of the results obtained, and write a summary of your findings.*
+**The `Wage` data set contains a number of other features not explored in this chapter, such as marital status ( `maritl` ), job class ( `jobclass` ), and others. Explore the relationships between some of these other predictors and wage , and use non-linear fitting techniques in order to fit flexible models to the data. Create plots of the results obtained, and write a summary of your findings.**
 
 Let's take a look at marital status and job class versus wage:
 
@@ -128,7 +128,7 @@ tibble(formula = list(
 
 ## 8)
 
-*Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.*
+**Fit some of the non-linear models investigated in this chapter to the Auto data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer.**
 
 In this section we're going to fit natural splines, smoothing splines and local regression.
 
@@ -264,11 +264,11 @@ tibble(displacement = min(auto$displacement):max(auto$displacement)) %>%
 
 ## 9)
 
-*This question uses the variables `dis` (the weighted mean of distances to five Boston employment centers) and `nox` (nitrogen oxides concentration in parts per 10 million) from the `Boston` data. We will treat dis as the predictor and nox as the response.*
+**This question uses the variables `dis` (the weighted mean of distances to five Boston employment centers) and `nox` (nitrogen oxides concentration in parts per 10 million) from the `Boston` data. We will treat dis as the predictor and nox as the response.**
 
 ### a) 
 
-*Use the `poly()` function to fit a cubic polynomial regression to predict `nox` using `dis` . Report the regression output, and plot the resulting data and polynomial fits.*
+**Use the `poly()` function to fit a cubic polynomial regression to predict `nox` using `dis` . Report the regression output, and plot the resulting data and polynomial fits.**
 
 ```{r 9_setup, message = F}
 library(MASS)
@@ -316,7 +316,7 @@ boston_poly_models %>%
 
 ### c)
 
-*Perform cross-validation or another approach to select the optimal degree for the polynomial, and explain your results.*
+**Perform cross-validation or another approach to select the optimal degree for the polynomial, and explain your results.**
 
 ```{r 9.c.1}
 boston_poly_crossv <- tibble(degree = 1:8, data = list(boston)) %>%
@@ -345,7 +345,7 @@ We see that a third degree polynomial (cubic) provides the minimal test error.
 
 ### d)
 
-*Use the `bs()` function to fit a regression spline to predict `nox` using `dis` . Report the output for the fit using four degrees of freedom. How did you choose the knots? Plot the resulting fit.*
+**Use the `bs()` function to fit a regression spline to predict `nox` using `dis` . Report the output for the fit using four degrees of freedom. How did you choose the knots? Plot the resulting fit.**
 
 
 We let the `bs()` function determinet he knots by specifying the degrees of freedom.
@@ -368,7 +368,7 @@ tibble(x = seq(min(boston$dis),max(boston$dis),.1)) %>%
 
 ### e)
 
-*Now fit a regression spline for a range of degrees of freedom, and plot the resulting fits and report the resulting RSS. Describe the results obtained.*
+**Now fit a regression spline for a range of degrees of freedom, and plot the resulting fits and report the resulting RSS. Describe the results obtained.**
 
 ```{r 9.e.1}
 boston_reg_train <- tibble(df = 3:15, data = list(boston)) %>%
@@ -419,11 +419,11 @@ We see the minimum RSS when there are 11 degrees of freedom.
 
 ## 10) 
 
-*This question relates to the `College` data set.*
+**This question relates to the `College` data set.**
 
 ### a)
 
-*Split the data into a training set and a test set. Using out-of-state tuition as the response and the other variables as the predictors, perform forward stepwise selection on the training set in order to identify a satisfactory model that uses just a subset of the predictors.*
+**Split the data into a training set and a test set. Using out-of-state tuition as the response and the other variables as the predictors, perform forward stepwise selection on the training set in order to identify a satisfactory model that uses just a subset of the predictors.**
 
 
 ```{r 10.a.1}
@@ -461,7 +461,7 @@ college_regsub_mdl %>% coef(id = 6)
 
 ### b)
 
-*Fit a GAM on the training data, using out-of-state tuition as the response and the features selected in the previous step as the predictors. Plot the results, and explain your findings.*
+**Fit a GAM on the training data, using out-of-state tuition as the response and the features selected in the previous step as the predictors. Plot the results, and explain your findings.**
 
 ```{r 10_setup, message = F}
 library(gam)
@@ -474,7 +474,7 @@ plot(college_train_mdl)
 ```
 ### c)
 
-*Evaluate the model obtained on the test set, and explain the results obtained.*
+**Evaluate the model obtained on the test set, and explain the results obtained.**
 
 ```{r 10.c.1}
 as.tibble(college_sample$test) %>%
@@ -486,7 +486,7 @@ as.tibble(college_sample$test) %>%
 
 ### d)
 
-*For which variables, if any, is there evidence of a non-linear relationship with the response?*
+**For which variables, if any, is there evidence of a non-linear relationship with the response?**
 
 ```{r 10.d.1}
 college_train_mdl %>% summary()
@@ -497,15 +497,15 @@ There is evidence of non-linearity for Expend.
 
 ## 11)
 
-*In Section 7.7, it was mentioned that GAMs are generally fit using a backfitting approach. The idea behind backfitting is actually quite simple. We will now explore backfitting in the context of multiple linear regression.*
+**In Section 7.7, it was mentioned that GAMs are generally fit using a backfitting approach. The idea behind backfitting is actually quite simple. We will now explore backfitting in the context of multiple linear regression.**
 
-*Suppose that we would like to perform multiple linear regression, but we do not have software to do so. Instead, we only have software to perform simple linear regression.*
+**Suppose that we would like to perform multiple linear regression, but we do not have software to do so. Instead, we only have software to perform simple linear regression.**
 
-*Therefore, we take the following iterative approach: we repeatedly hold all but one coefficient estimate fixed at its current value, and update only that coefficient estimate using a simple linear regression. The process is continued until convergence—that is, until the coefficient estimates stop changing. We now try this out on a toy example.*
+**Therefore, we take the following iterative approach: we repeatedly hold all but one coefficient estimate fixed at its current value, and update only that coefficient estimate using a simple linear regression. The process is continued until convergence—that is, until the coefficient estimates stop changing. We now try this out on a toy example.**
 
 ### a)
 
-*Generate a response Y and two predictors X 1 and X 2 , with n = 100.*
+**Generate a response Y and two predictors X 1 and X 2 , with n = 100.**
 
 ```{r 11.a.1}
 X1 <- rnorm(100, 0, .5)
@@ -515,7 +515,7 @@ Y <- -2 + 3*X1 + .5*X2 + rnorm(100)
 
 ### b)
 
-*Initialise $\hat{\beta}_1$ to take on a value of your choice*
+**Initialise $\hat{\beta}_1$ to take on a value of your choice**
 
 ```{r 11.b.1}
 beta_hat_1 <- 20
@@ -523,7 +523,7 @@ beta_hat_1 <- 20
 
 ### c)
 
-*Keeping $\hat{\beta}_1$ fixed, fit the model:*
+**Keeping $\hat{\beta}_1$ fixed, fit the model:**
 
 $$ Y - \hat\beta_1X_1 = \beta_0 + \beta_2X2 + \epsilon $$
 
@@ -534,7 +534,7 @@ beta_hat_2 <- lm(A ~ X2)$coef[2]
 
 ### d)
 
-*Do the same for $\hat\beta_2$*
+**Do the same for $\hat\beta_2$**
 
 ```{r 11.d.1}
 A <- Y - beta_hat_2 * X1
@@ -543,7 +543,7 @@ beta_hat_1 <- lm(A ~ X1)$coef[2]
 
 ### e)
 
-*Write a for loop to repeat this 1000 times and report the estimates of the loop*
+**Write a for loop to repeat this 1000 times and report the estimates of the loop**
 
 ```{r 11.e.1}
 backfit <- function(y, x1, x2, imax = 1000) {
@@ -576,7 +576,7 @@ bf %>%
 
 ### f)
 
-*Compare the answer to performing a multiple linear regression*
+**Compare the answer to performing a multiple linear regression**
 
 ```{r 11.f.1}
 lm(Y ~ X1 + X2) %>% tidy()
@@ -590,7 +590,7 @@ Only two iterations were needed for a 'good' approximation.
 
 ## 12)
 
-*This problem is a continuation of the previous exercise. In a toy example with $p = 100$, show that one can approximate the multiple linear regression coefficient estimates by repeatedly performing simple linear regression in a backfitting procedure. How many backfitting iterations are required in order to obtain a “good” approximation to the multiple regression coefficient estimates? Create a plot to justify your answer.*
+**This problem is a continuation of the previous exercise. In a toy example with $p = 100$, show that one can approximate the multiple linear regression coefficient estimates by repeatedly performing simple linear regression in a backfitting procedure. How many backfitting iterations are required in order to obtain a “good” approximation to the multiple regression coefficient estimates? Create a plot to justify your answer.**
 
 We first generate our random predictor matrix $X$ with $n = 1000$ and $p = 100$. We also generate random coefficients, and perform matrix multiplication to calculate $Y$.
 

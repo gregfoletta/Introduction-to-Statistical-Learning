@@ -25,7 +25,7 @@ library(kableExtra)
 
 ## 4)
 
-*Generate a simulated two-class data set with 100 observations and two features in which there is a visible but non-linear separation between the two classes. Show that in this setting, a support vector machine with a polynomial kernel (with degree greater than 1) or a radial kernel will outperform a support vector classifier on the training data. Which technique performs best on the test data? Make plots and report training and test error rates in order to back up your assertions.*
+**Generate a simulated two-class data set with 100 observations and two features in which there is a visible but non-linear separation between the two classes. Show that in this setting, a support vector machine with a polynomial kernel (with degree greater than 1) or a radial kernel will outperform a support vector classifier on the training data. Which technique performs best on the test data? Make plots and report training and test error rates in order to back up your assertions.**
 
 We first create the data set:
 
@@ -100,11 +100,11 @@ Interestingly the linear SVC has a lower error rate over the training data, howe
 
 ## 5)
 
-*We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.*
+**We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.**
 
 ### a)
 
-*Generate a data set with $n = 500$ and $p = 2$, such that the observations belong to two classes with a quadratic decision boundary between them.*
+**Generate a data set with $n = 500$ and $p = 2$, such that the observations belong to two classes with a quadratic decision boundary between them.**
 
 ```{r 5.1}
 q5_data <- tibble(
@@ -116,7 +116,7 @@ q5_data <- tibble(
 
 ### b)
 
-*Plot the observations*
+**Plot the observations**
 
 ```{r 5.2}
 q5_data %>%
@@ -126,7 +126,7 @@ q5_data %>%
 
 ### c)
 
-*Fit a logistic regression model to the data, using $X_1$ and $X_2$ as predictors*
+**Fit a logistic regression model to the data, using $X_1$ and $X_2$ as predictors**
 
 ```{r 5.3}
 q5_data_partition <- q5_data %>% resample_partition(c(test = .5, train = .5))
@@ -137,7 +137,7 @@ q5_lr <- q5_data_partition$train %>%
 
 ### d)
 
-*Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be linear.*
+**Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be linear.**
 
 ```{r 5.d}
 q5_data_partition$train %>%
@@ -153,7 +153,7 @@ We can see the clear linear decision boundary.
 
 ### e)
 
-*Now fit a logistic regression model to the data using non-linear functions of $X_1$ and $X_2$ as predictors.*
+**Now fit a logistic regression model to the data using non-linear functions of $X_1$ and $X_2$ as predictors.**
 
 ```{r 5.e}
 q5_poly_lr <- q5_data_partition$train %>%
@@ -162,7 +162,7 @@ q5_poly_lr <- q5_data_partition$train %>%
 
 ### f)
 
-*Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be obviously non-linear.*
+**Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be obviously non-linear.**
 
 ```{r 5.f}
 q5_data_partition$train %>%
@@ -180,7 +180,7 @@ We can see a clear non-linear decision boundary.
 
 ### g)
 
-*Fit a support vector classifier to the data with $X_1$ and $X_2$ as predictors.*
+**Fit a support vector classifier to the data with $X_1$ and $X_2$ as predictors.**
 
 ```{r 5.g}
 q5_svc <- q5_data_partition$train %>%
@@ -197,7 +197,7 @@ q5_data_partition$train %>%
 
 ### h)
 
-*Fit a SVM using a non-linear kernel to the data. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.*
+**Fit a SVM using a non-linear kernel to the data. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.**
 
 ```{r 5.h}
 q5_svm_radial <- q5_data_partition$train %>%
@@ -214,17 +214,17 @@ q5_data_partition$train %>%
 
 ### i) 
 
-*Comment on your results.*
+**Comment on your results.**
 
 We see that we can gain a non-linear decision boundary by using non-linear kernels within our logistic regressions and SVCs.
 
 ## 6)
 
-*It is claimed that in the case of data that is just barely linearly separable, a support vector classifier with a small value of cost that misclassifies a couple of training observations may perform better on test data than one with a huge value of cost that does not misclassify any training observations. You will now investigate this claim.*
+**It is claimed that in the case of data that is just barely linearly separable, a support vector classifier with a small value of cost that misclassifies a couple of training observations may perform better on test data than one with a huge value of cost that does not misclassify any training observations. You will now investigate this claim.**
 
 ### a)
 
-*Generate two-class data with $p = 2$ in such a way that the classes are just barely linearly separable.*
+**Generate two-class data with $p = 2$ in such a way that the classes are just barely linearly separable.**
 
 ```{r 6.a}
 # Generate training data
@@ -243,7 +243,7 @@ q6_train_data %>%
 
 ### b)
 
-*Compute the cross-validation error rates for support vector classifiers with a range of `cost` values. How many training errors are misclassified for each value of `cost` considered, and howdoes this relate to the cross-validation errors obtained?*
+**Compute the cross-validation error rates for support vector classifiers with a range of `cost` values. How many training errors are misclassified for each value of `cost` considered, and howdoes this relate to the cross-validation errors obtained?**
 
 We can use the `tune()` function to perform the cross validation.
 
@@ -267,7 +267,7 @@ tibble(cost = c(0.001, 0.01, 0.1, 1, 10, 20, 40, 100), train = nest(q6_train_dat
 
 333 c)
 
-*Generate an appropriate test data set, and compute the test errors corresponding to each of the values of cost considered. Which value of cost leads to the fewest test errors, and how does this compare to the values of cost that yield the fewest training errors and the fewest cross-validation errors?*
+**Generate an appropriate test data set, and compute the test errors corresponding to each of the values of cost considered. Which value of cost leads to the fewest test errors, and how does this compare to the values of cost that yield the fewest training errors and the fewest cross-validation errors?**
 
 
 ```{r 6.c}
@@ -308,11 +308,11 @@ What we see is the bias/variance tradeoff. As the cost is increased, the model b
 
 ## 7)
 
-*In this problem, you will use support vector approaches in order to predict whether a given car gets high or low gas mileage based on the `Auto` data set.*
+**In this problem, you will use support vector approaches in order to predict whether a given car gets high or low gas mileage based on the `Auto` data set.**
 
 ### a)
 
-*Create a binary variable that takes on a 1 for cars with gas mileage above the median, and a 0 for cars with gas mileage below the median.*
+**Create a binary variable that takes on a 1 for cars with gas mileage above the median, and a 0 for cars with gas mileage below the median.**
 
 ```{r 7.a}
 Auto %>%
@@ -323,7 +323,7 @@ Auto %>%
 
 ### b)
 
-*Fit a support vector classifier to the data with various values of cost , in order to predict whether a car gets high or low gas mileage. Report the cross-validation errors associated with different values of this parameter. Comment on your results.*
+**Fit a support vector classifier to the data with various values of cost , in order to predict whether a car gets high or low gas mileage. Report the cross-validation errors associated with different values of this parameter. Comment on your results.**
 
 ```{r 7.b}
 set.seed(1)
@@ -363,7 +363,7 @@ For a radial kernel, we see a minimisation of ther error when `gamma = 0.01` and
 
 ### d)
 
-*Make some plots to back up your assertions*
+**Make some plots to back up your assertions**
 
 ```{r 7.d}
 svm_linear <- svm(above_median ~ ., data = auto, kernel = 'linear', cost = 1)
@@ -384,11 +384,11 @@ plot_pairs(svm_radial, auto, 'mpg', c('acceleration', 'displacement', 'horsepowe
 
 ## 8)
 
-*This problem involves the OJ data set which is part of the ISLR package.*
+**This problem involves the OJ data set which is part of the ISLR package.**
 
 ### a)
 
-*Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.*
+**Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations.**
 
 ```{r 8.a}
 set.seed(1)
@@ -409,7 +409,7 @@ summary(oj_linear_svc)
 
 ### c) 
 
-*What are the training and test error rates?*
+**What are the training and test error rates?**
 
 ```{r 8.c}
 oj_samples$train %>%
@@ -425,7 +425,7 @@ oj_samples$test %>%
 
 ### d)
 
-*Use the `tune()` function to select an optimal cost . Consider values in the range 0.01 to 10.*
+**Use the `tune()` function to select an optimal cost . Consider values in the range 0.01 to 10.**
 
 ```{r 8.d}
 set.seed(1)
@@ -442,7 +442,7 @@ summary(oj_svc_tune)
 
 ### e)
 
-*Compute the training and test error rates using this new value for `cost`.*
+**Compute the training and test error rates using this new value for `cost`.**
 
 ```{r 8.e}
 oj_linear_svc <- svm(
@@ -465,7 +465,7 @@ oj_samples$test %>%
 
 ### f)
 
-*Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for `gamma`.*
+**Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for `gamma`.**
 
 ```{r 8.f}
 oj_radial_svc <- svm(
@@ -517,7 +517,7 @@ oj_samples$test %>%
 
 ### g)
 
-*Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set `degree = 2`.*
+**Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set `degree = 2`.**
 
 ```{r 8.g}
 oj_poly_svc <- svm(

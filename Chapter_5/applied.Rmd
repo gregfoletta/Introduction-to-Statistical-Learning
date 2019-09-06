@@ -19,10 +19,10 @@ library(tidyverse)
 
 ## 5)
 
-*In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.*
+**In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.**
 
 ### a)
-*Fit a logistic regression model that uses income and balance to predict default.*
+**Fit a logistic regression model that uses income and balance to predict default.**
 
 ```{r 5.5.a}
 default <- as.tibble(Default)
@@ -30,30 +30,30 @@ default.log <- glm(default~balance, data = default, family = binomial)
 ```
 
 ### b)
-*Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:*
+**Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:**
 
 #### i)
-*Split the sample set into a training set and a validation set.*
+**Split the sample set into a training set and a validation set.**
 ```{r 5.5.b.i}
 set.seed(1)
 default_split <- resample_partition(default, c(train = 0.5, test = 0.5))
 ```
 
 #### ii)
-*Fit a multiple logistic regression model using only the training observations.*
+**Fit a multiple logistic regression model using only the training observations.**
 ```{r 5.5.b.ii}
 default_split_train <- glm(default ~ balance, data = as.tibble(default_split$train), family = binomial)
 ```
 
 #### iii)
-*Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.*
+**Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.**
 ```{r 5.5.b.iii}
 as.tibble(default_split$test) %>% 
     mutate(pred_default = ifelse(predict(default_split_train, ., type = 'response') < 0.5, "No", "Yes"))
 ```
 
 #### iv)
-*Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.*
+**Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.**
 ```{r 5.5.b.iv}
 as.tibble(default_split$test) %>% 
     mutate(pred_default = ifelse(predict(default_split_train, ., type = 'response') < 0.5, "No", "Yes")) %>% 
@@ -64,7 +64,7 @@ as.tibble(default_split$test) %>%
 Out of 5001 observations, 11 + 122 are incorrect. The error rate is therefore (11 + 122) / 5001 = 2.65%
 
 ### c)
-*Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.*
+**Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.**
 
 We'll be a bit lazy with this and use a for loop.
 
@@ -84,16 +84,16 @@ for (i in 1:3) {
 We get error rates of 2.4%, 2.8% and 2.7%.
 
 ### d)
-*Now consider a logistic regression model that predicts the prob ability of default using income , balance , and a dummy variable for student . Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.*
+**Now consider a logistic regression model that predicts the prob ability of default using income , balance , and a dummy variable for student . Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.**
 
 We modify the formula in the `glm()` to be `default ~ balance + student`. We then run the three validation set tests and get error percentages of 2.4%, 2.7% and 2.7%. There seems to be no reduction in the error rate by adding in the student variable.
 
 
 ## 6)
-*We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression co efficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.*
+**We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression co efficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.**
 
 ### a)
-*Using the summary() and glm() functions, determine the estimated standard errors for the coefficients associated with income and balance in a multiple logistic regression model that uses both predictors.*
+**Using the summary() and glm() functions, determine the estimated standard errors for the coefficients associated with income and balance in a multiple logistic regression model that uses both predictors.**
 
 ```{r 5.6.a}
 glm(default ~ income + balance, data = default, family = 'binomial') %>% tidy()
@@ -102,7 +102,7 @@ glm(default ~ income + balance, data = default, family = 'binomial') %>% tidy()
 We see the standard error for the coefficients is 0.00000499 for income and 0.000227 for balance.
 
 ### b) & c)
-*Use the bootstrap to estimate the standard errors of the logistic regression coefficients*
+**Use the bootstrap to estimate the standard errors of the logistic regression coefficients**
 
 
 ```{r 5.6.bc}
@@ -119,15 +119,15 @@ default %>%
 We see the average standard error to be 0.000225 for balance and 0.00000498 for income.
 
 ### d)
-*Comment on the estimated standard errors.*
+**Comment on the estimated standard errors.**
 
 The difference in the standard errors from the bootstrap compared to the formula is small: a 1% different from balance and a .2% difference for income.
 
 ## 7)
-*Compute the LOOCV error for a simple logistic regression model on the Weekly data set.*
+**Compute the LOOCV error for a simple logistic regression model on the Weekly data set.**
 
 ### a) 
-*Fit a logistic regression model that predicts Direction using Lag1 and Lag2*
+**Fit a logistic regression model that predicts Direction using Lag1 and Lag2**
 
 ```{r 5.7.a}
 weekly <- as.tibble(Weekly)
@@ -135,13 +135,13 @@ weekly.logistic <- glm(Direction ~ Lag1 + Lag2, data = weekly, family = 'binomia
 ``` 
 
 ### b)
-*Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.*
+**Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.**
 ```{r 5.7.b}
 weekly.logistic.loo <- glm(Direction ~ Lag1 + Lag2, data = weekly[-1,], family = 'binomial')
 ```
 
 ### c)
-*Use the model from (b) to predict the direction of the first observation.*
+**Use the model from (b) to predict the direction of the first observation.**
 
 ```{r 5.7.c}
 weekly[1,] %>% 
@@ -152,7 +152,7 @@ weekly[1,] %>%
 The prediction was 'Up', but the true direction was 'Down'.
 
 ### d)
-*Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:*
+**Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:**
     * Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2 .
     * Compute the posterior probability of the market moving up for the ith observation.
     * Use the posterior probability for the ith observation in order to predict whether or not the market moves up.
@@ -167,10 +167,10 @@ weekly %>%
 ```
 
 ## 8)
-*We will now perform cross-validation on a simulated data set.*
+**We will now perform cross-validation on a simulated data set.**
 
 ### a) 
-*Generate a simulated data set*
+**Generate a simulated data set**
 
 ```{r 5.8.a}
 set.seed(1)
@@ -180,7 +180,7 @@ set.seed(1)
 In this daya set, *n* is 100 and *p* is 2.
 
 ### b)
-*Create a scatterplot of X against Y . Comment on what you find.*
+**Create a scatterplot of X against Y . Comment on what you find.**
 
 ```{r 5.8.b}
 simulated %>% 
@@ -191,7 +191,7 @@ simulated %>%
 We see that Y appears have a quadratic relationship to X.
 
 ### c)
-*Compute the LOOCV errors that result from fitting `Y ~ poly(X, d)` where `d = {1 .. 4}`.*
+**Compute the LOOCV errors that result from fitting `Y ~ poly(X, d)` where `d = {1 .. 4}`.**
 
 In our pipeline, we create a tibble with a degree column and four rows. We then generate a kfold set with k being the number of rows in the dataset, which then becomes a LOOCV set.
 
@@ -218,7 +218,7 @@ results %>% ggplot(aes(degree, loocv_err)) + geom_point() + geom_line()
 Skipped
 
 ### e) 
-*Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.*
+**Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.**
 
 The model with a second degree polynomial provided the lowest error. This is to be expected given that the response variable is explicitly quadratically realted to *x*.
 
@@ -239,10 +239,10 @@ We can see that across all degrees, *x* and *x^2* terms have the strongest stati
 
 
 ## 9)
-*We will now consider the Boston housing data set.*
+**We will now consider the Boston housing data set.**
 
 ### a) 
-*Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat*
+**Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat**
 
 ```{r 5.9.a}
 boston <- as.tibble(Boston)
@@ -252,7 +252,7 @@ boston %>% summarise(medv_mu_hat = mean(medv))
 The estimate for the population mean is 22.5
 
 ### b)
-*Provide an estimate of the standard error of mu_hat. Interpret this result.*
+**Provide an estimate of the standard error of mu_hat. Interpret this result.**
 ```{r 5.9.b}
 boston %>% summarise(sd = sd(medv), stderr = sd/sqrt(n()))
 ```
@@ -275,7 +275,7 @@ boston %>%
 We see the SD across the bootstraps is 0.416 - close to the 0.409 from b).
 
 ### d)
-*Based on your bootstrap estimate from (c), provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).*
+**Based on your bootstrap estimate from (c), provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).**
 
 Our calculate SD is 0.416, so our 95% confidence interval is [22.53 - 1.96 * 0.416, 22.53 + 196 * 0.416] = [21.71464 23.34536].
 
@@ -285,7 +285,7 @@ t.test(boston$medv) %>% tidy()
 ```
 
 ### e)
-*Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.*
+**Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.**
 
 ```{r 5.9.e}
 boston %>% summarise(median = median(medv))
@@ -293,7 +293,7 @@ boston %>% summarise(median = median(medv))
 
 
 ### f)
-*We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.*
+**We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.**
 
 ```{r 5.9.f}
 set.seed(1)
@@ -306,14 +306,14 @@ boston %>%
 We see the standard error for the median is 0.383.
 
 ### g)
-*Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.*
+**Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.**
 
 ```{r 5.9.g}
 quantile(boston$medv, probs = c(.1))
 ```
 
 ### h)
-*Use the bootstrap to estimate the standard error of this 10% quantile*
+**Use the bootstrap to estimate the standard error of this 10% quantile**
 
 ```{r 5.9.h}
 set.seed(1)

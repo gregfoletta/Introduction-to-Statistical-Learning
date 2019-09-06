@@ -25,7 +25,7 @@ library(data.tree)
 
 # 1)
 
-*Draw an example (of your own invention) of a partition of two-dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions $R_1, R_2, \ldots$, the cutpoints $t_1, t_2, \ldots$, and so forth.*
+**Draw an example (of your own invention) of a partition of two-dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions $R_1, R_2, \ldots$, the cutpoints $t_1, t_2, \ldots$, and so forth.**
 
 ```{r 1}
 tibble(
@@ -59,7 +59,7 @@ The final boosting form is $\hat{f}(x) = \sum_{b=1}^B \lambda \hat{f}^b(x)$. As 
 
 # 3)
 
-*Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes. Create a single plot that displays each of these quantities as a function of $\hat{p}_{m1}$. The x-axis should display $\hat{p}_{m1}$, ranging from 0 to 1, and the y-axis should display the value of the Gini index, classification error, and entropy.*
+**Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes. Create a single plot that displays each of these quantities as a function of $\hat{p}_{m1}$. The x-axis should display $\hat{p}_{m1}$, ranging from 0 to 1, and the y-axis should display the value of the Gini index, classification error, and entropy.**
 
 The three concepts metntioned are the 'replacements' for RSS is a classification setting when determining the binary splits.
 
@@ -92,11 +92,11 @@ tibble(
 
 # 4)
 
-*This question relates to the plots in Figure 8.12.*
+**This question relates to the plots in Figure 8.12.**
 
 ## a) 
 
-*Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of Y within each region.*
+**Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of Y within each region.**
 
 The plot is as such:
 
@@ -139,7 +139,7 @@ tibble(
 
 ## b)
 
-*Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.*
+**Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.**
 
 The diagram appears as such:
 
@@ -175,11 +175,11 @@ tibble(
 
 # 5)
 
-*Suppose we produce ten bootstrapped samples from a data set containing red and green classes. We then apply a classification tree to each bootstrapped sample and, for a specific value of $X$, produce 10 estimates of $P(Class is Red|X)$:*
+**Suppose we produce ten bootstrapped samples from a data set containing red and green classes. We then apply a classification tree to each bootstrapped sample and, for a specific value of $X$, produce 10 estimates of $P(Class is Red|X)$:**
 
-*0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, and 0.75.*
+**0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, and 0.75.**
 
-*There are two common ways to combine these results together into a single class prediction. One is the majority vote approach discussed in this chapter. The second approach is to classify based on the average probability. In this example, what is the final classification under each of these two approaches?*
+**There are two common ways to combine these results together into a single class prediction. One is the majority vote approach discussed in this chapter. The second approach is to classify based on the average probability. In this example, what is the final classification under each of these two approaches?**
 
 In this instance, if the probability is $\ge .5$ then then observtion is classified as red.
 
@@ -199,7 +199,7 @@ ifelse( mean(q6) < .5, 'Green', 'Red' )
 
 # 6) 
 
-*Provide a detailed explanation of the algorithm that is used to fit a regression tree.*
+**Provide a detailed explanation of the algorithm that is used to fit a regression tree.**
 
 Ideally we would like to partition the feature space into $J$ boxes $R_1, \ldots, R_J$ which minimises the RSS given by:
 
@@ -209,17 +209,17 @@ For each region, the squared difference between the response and the mean respon
 
 The algorithm for a regression tree is:
 
-**Use 'Recursive Binary Splitting' to create a large tree:**
+***Use 'Recursive Binary Splitting' to create a large tree:***
 
 1. For each predictor $X_j$ and every cutpoint $s$, pick the cutpoint that results in the lowest RSS.
 2. This process is repeated, except instead of splitting the entire predictor space, we only split one of the two previously created regions.
 3. This is continued until a stopping criteria is reached - i.e. no region contains less than $x$ observations. 
 
-**Apply 'Cost Complexity Pruning' to obtain a sequence of best subtrees as a function of $\alpha$.**
+***Apply 'Cost Complexity Pruning' to obtain a sequence of best subtrees as a function of $\alpha$.***
 
-**Use K-fold cross-validation to choose $\alpha$.**
+***Use K-fold cross-validation to choose $\alpha$.***
 
-**Return the subtree that responds to a chosed value of $\alpha$.**
+***Return the subtree that responds to a chosed value of $\alpha$.***
 
 
 

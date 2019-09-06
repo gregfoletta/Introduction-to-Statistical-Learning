@@ -249,12 +249,12 @@ We don't have to use splines as the building blocks for GAMs: we can just as wel
 
 #### Pros and Cons of GAMs
 
-* **Pros::**
+** **Pros::***
     * Allow us to fit a non-linear $f_j$ to each $X_j$ so that we can automatically model non-linear relationships that a standard linear model will miss.
     * The non-linear fits can potentially make more accurate predictions for the response $Y$.
     * Because the model is additive, we can still examine the effect of each $X_j$ on $Y$ independently while holding all other variables fixed.
     * The smoothness of the function $f_j$ for the variable $X_J$ can be summarised via degrees of freedom.
-* **Cons:**
+** **Cons:***
     * The main limitation is the the model is restricted to being additive. With many variables, important interactions can be missed. However as with linear regresion, we can add interation terms ($X_j \times X_k$). We can also add low-dimensional interaction functions of the form $f_j(X_j, X_k)$ into the model. Such terms can be fit using two-dimensional smoothers such as local regression or two-dimensional splines. 
 
 ### 7.7.2 - GAMs for Classification

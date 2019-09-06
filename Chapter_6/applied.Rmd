@@ -19,21 +19,21 @@ library(ISLR)
 ## 8 - Subset Selection
 
 ### a)
-*Use the rnorm() function to generate a predictor $X$ of length $n = 100$, as well as a noise vector of length $n = 100$.*
+**Use the rnorm() function to generate a predictor $X$ of length $n = 100$, as well as a noise vector of length $n = 100$.**
 ```{r 8.a}
 set.seed(1)
 subset_selection = tibble(x = rnorm(100), e = rnorm(100, 0, 4))
 ```
 
 ### b)
-*Generate a response vector Y of length n = 100 according to a cubic model*
+**Generate a response vector Y of length n = 100 according to a cubic model**
 ```{r 8.b}
 subset_selection <- subset_selection %>%
     mutate(y = 4 - 2*x + 6*x^2 - x^3 + e)
 ```
 
 ### c)
-*Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors $X, X^2, \ldots, X^10$. What is the best model obtained according to $C_p$, BIC, and adjusted $R^2$?*
+**Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors $X, X^2, \ldots, X^10$. What is the best model obtained according to $C_p$, BIC, and adjusted $R^2$?**
 
 ```{r 8.c.1}
 bestsub_result <- subset_selection %>%
@@ -75,7 +75,7 @@ coefficients(bestsub_result, id = 3)
 We see the coefficients are reasonably close to the 4, -2, 6 and -1, however it's chosen the 2nd, 3rd and 5th monomials.
 
 ### d)
-*Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?*
+**Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?**
 
 ```{r 8.d.1}
 fw_result <- subset_selection %>%
@@ -146,7 +146,7 @@ coefficients(bw_result, id = 6)
 The forward stepwise has chosed coefficients close to the real ones. The backwards stepwise has not done as well.
 
 ### e)
-*Now fit a lasso model to the simulated data, again using $X, X^2 ,\ldots, X^10$ as predictors. Use cross-validation to select the optimal value of $\lambda$.*
+**Now fit a lasso model to the simulated data, again using $X, X^2 ,\ldots, X^10$ as predictors. Use cross-validation to select the optimal value of $\lambda$.**
 
 We first generate our lasso model - we remove the intercept from the model matrix.
 
@@ -184,16 +184,16 @@ cubic_lasso_cv %>%
 cubic_lasso_cv$lambda.min
 ```
 
-*Report the resulting coefficient estimates, and discuss the results obtained.*
+**Report the resulting coefficient estimates, and discuss the results obtained.**
 
 ```{r 8.e.4}
 best_lasso <- glmnet(cubic_predictors, cubic_response, alpha = 1)
 ```
 
 ### f)
-**Now generate a response vector Y according to the model**
+***Now generate a response vector Y according to the model***
 $$ Y = \beta_0 + \beta_7X^7 + e $$
-*and perform best subset selection and the lasso. Discuss the results obtained.*
+**and perform best subset selection and the lasso. Discuss the results obtained.**
 
 We choose $\beta_7$ to be 9.
 
@@ -230,10 +230,10 @@ glmnet(septic_x, septic_y, alpha = 1, lambda = septic_lasso_cv$lambda.min) %>% c
 The lasso correctly picks the seventh degree polynomial, and is also close to the real value.
 
 ## 9
-*In this exercise, we will predict the number of applications received using the other variables in the College data set.*
+**In this exercise, we will predict the number of applications received using the other variables in the College data set.**
 
 ### a)
-*Split the data set into a training set and a test set.*
+**Split the data set into a training set and a test set.**
 
 ```{r 9.a.1}
 set.seed(1)
@@ -246,7 +246,7 @@ college
 ```
 
 ### b)
-*Fit a linear model using least squares on the training set, and report the test error obtained.*
+**Fit a linear model using least squares on the training set, and report the test error obtained.**
 
 ```{r 9.b.1}
 college <- college %>%
@@ -261,7 +261,7 @@ college
 ```
 
 ### c)
-*Fit a ridge regression model on the training set, with $\lambda$ chosen by cross-validation. Report the test error obtained.*
+**Fit a ridge regression model on the training set, with $\lambda$ chosen by cross-validation. Report the test error obtained.**
 
 ```{r 9.c.1}
 set.seed(1)
@@ -287,7 +287,7 @@ college
 ```
 
 ### d)
-*Fit a lasso model on the training set, with $\lambda$ chosen by crossvalidation. Report the test error obtained, along with the number of non-zero coefficient estimates.*
+**Fit a lasso model on the training set, with $\lambda$ chosen by crossvalidation. Report the test error obtained, along with the number of non-zero coefficient estimates.**
 
 ```{r 9.d.1}
 set.seed(1)
@@ -322,7 +322,7 @@ college %>%
 We see it's reduced *Enroll*, *P.Undergrad*, *Terminal* and *S.F Ratio* to zero.
 
 ### e)
-*Fit a PCR model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
+**Fit a PCR model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.**
 ```{r 9.e.1_setup, message = F}
 library(pls)
 ```
@@ -341,7 +341,7 @@ college <- college %>%
 ```
 
 ### f)
-*Fit a PLS model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.*
+**Fit a PLS model on the training set, with M chosen by crossvalidation. Report the test error obtained, along with the value of M selected by cross-validation.**
 
 ```{r 9.f.1}
 college <- college %>%
@@ -356,7 +356,7 @@ college <- college %>%
 college
 ```
 ### g)
-*Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?*
+**Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?**
 
 Let's have a look at the MSE across the different methods:
 
@@ -371,10 +371,10 @@ college %>%
 We see most of the methods return similar MSEs - except for PCR which is much greater.
 
 ## 10)
-*We have seen that as the number of features used in a model increases, the training error will necessarily decrease, but the test error may not. We will now explore this in a simulated data set.*
+**We have seen that as the number of features used in a model increases, the training error will necessarily decrease, but the test error may not. We will now explore this in a simulated data set.**
 
 ### a)
-*Generate a data set with $p = 20$ features, $n = 1,000$ observations, and an associated quantitative response vector generated according a standard linear model. Let $\beta$ have some elements that are 0*
+**Generate a data set with $p = 20$ features, $n = 1,000$ observations, and an associated quantitative response vector generated according a standard linear model. Let $\beta$ have some elements that are 0**
 
 ```{r 10.a.1}
 set.seed(1)
@@ -389,7 +389,7 @@ data_set <- as.tibble(X) %>% mutate(Y = Y)
 ```
 
 ### b)
-*Split your data set into a training set containing 100 observations and a test set containing 900 observations.*
+**Split your data set into a training set containing 100 observations and a test set containing 900 observations.**
 
 ```{r 10.b.1}
 set.seed(1)
@@ -400,7 +400,7 @@ data_set <- data_set %>%
 
 ### c)
 
-*Perform best subset selection on the training set, and plot the training set MSE associated with the best model of each size.*
+**Perform best subset selection on the training set, and plot the training set MSE associated with the best model of each size.**
 
 The first thing we create is a `predict.regsubsets()` function we can use.
 This function takes the model and data, and returns a list of responses, one for each of the sizes.
@@ -453,7 +453,7 @@ regsub_train_mse %>%
 ```
 
 ### d)
-*Plot the test set MSE associated with the best model of each size.*
+**Plot the test set MSE associated with the best model of each size.**
 
 We perform the same pipeline, but use the test partition.
 
@@ -480,7 +480,7 @@ regsub_test_mse %>%
  ```
 
 ### e)
-*For which model size does the test set MSE take on its minimum value? Comment on your results.*
+**For which model size does the test set MSE take on its minimum value? Comment on your results.**
 
 Which model has the minimum test MSE?
 
@@ -516,7 +516,7 @@ full_coefs[!full_coefs %in% model_coefs]
 The best subset has removed an additional coefficient.
 
 ### g)
-*Create a plot displaying $\sqrt{\sum_{j=1}\beta_j − \hat{\beta_j^r}}$ for a range of values f r, where β̂ j r is the jth coefficient estimate for the best model containing r coefficients. Comment on what you observe. How does this compare to the test MSE plot from (d)?i*
+**Create a plot displaying $\sqrt{\sum_{j=1}\beta_j − \hat{\beta_j^r}}$ for a range of values f r, where β̂ j r is the jth coefficient estimate for the best model containing r coefficients. Comment on what you observe. How does this compare to the test MSE plot from (d)?i**
 
 We take our best_subset model, and add a column with the vector of original $\beta$ and a vector with each of the model sizes. We unnest the model size while preserving the model and the $\beta$ 
 

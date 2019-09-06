@@ -128,14 +128,14 @@ If the relationship between the features and the response is complex or non-line
 
 ### 8.1.4 - Advantages and Disadvantages of Trees
 
-*Advantages*
+**Advantages**
 
 1. Easy to explain to people.
 2. Some belief that decision trees more closely mirror human decision making.
 3. Trees can be displayed graphically.
 4. Can handle qualitative predictors without the need to create dummy variables.
 
-*Disadvantages*
+**Disadvantages**
 
 1. Do not generally have the same predictive accuracy as some other regression and classification approaches.
  a. By aggregating many decision trees using methods like *bagging*, *random forrests* and *boosting*, predictive performance can be substantially improved.
