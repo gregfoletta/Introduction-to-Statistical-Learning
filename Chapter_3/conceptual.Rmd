@@ -9,7 +9,7 @@ output:
 
 ## 1) Null Hypothesis
 
-*Describe the null hypothesis to which the p-values given in table 3.4 correspond. Explain the conclusions you can draw based on these values. Explaination should be phrased in terms of `sales`, `TV`, `radio`, and `newspaper`.*
+**Describe the null hypothesis to which the p-values given in table 3.4 correspond. Explain the conclusions you can draw based on these values. Explaination should be phrased in terms of `sales`, `TV`, `radio`, and `newspaper`.**
 
 The p-value is a value between 0 and 1 that gives a probability that the null hypothesis is true. 
 
@@ -19,7 +19,7 @@ From the values, we can reject the null hypothesis for the `Intercept`, `TV` and
 
 ## 2) KNN
 
-*Carefully explain the differences between the KNN classifier and KNN regression methods.*
+**Carefully explain the differences between the KNN classifier and KNN regression methods.**
 
 The KNN classifier and the KNN regression are related. The classifier estimates a qualitative class for an observation based on its `K` nearest neighbours.
 
