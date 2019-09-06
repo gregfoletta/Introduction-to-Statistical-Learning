@@ -73,6 +73,7 @@ This chapter discusses polynomials, splines, and general additative models (GAMs
 
 * [Lab](Chapter_7/lab.html)
 * [Conceptual](Chapter_7/conceptual.html)
+* [Applied](Chapter_7/applied.html)
 
 ## Chapter 8 - Tree-based Methods
 

@@ -30,13 +30,13 @@ To perform best subset select we fit a separate least squares regression for eac
 
 The selection of the 'best' model is non-trivial, and usually broken into stages:
 
-* Let $M_0$ denote the *null model*, which contains no predictors. This predicts the sample mean for each observation.
+* Let $\mathcal{N}_0$ denote the *null model*, which contains no predictors. This predicts the sample mean for each observation.
 * For $k = 1, 2, ..., p$.
     * Fit all ${p}\choose{k}$ models that contain exactly $k$ predictors
-    * Pick the best amongst the ${p}\choose{k}$ models and call it $M_K$. Best is defines as the smallest RSS, or the largest $R^2$.
-* Select the single best model from $M_0,...,M_p$ using cross-validated prediction error $C_p$ (AIC), BIC, or adjusted $R^2$. 
+    * Pick the best amongst the ${p}\choose{k}$ models and call it $\mathcal{M}_K$. Best is defines as the smallest RSS, or the largest $R^2$.
+* Select the single best model from $\mathcal{M}_0,...,\mathcal{M}_p$ using cross-validated prediction error $C_p$ (AIC), BIC, or adjusted $R^2$. 
 
-With $M_0,...,M_p$, the RSS will decrease as more predictors are added, so we would always end up choosing the model with all of the variables. Hence a cross-validated error, BIC or adjusted $R^2$ is used in order to select the model.
+With $\mathcal{M}_0,...,\mathcal{M}_p$, the RSS will decrease as more predictors are added, so we would always end up choosing the model with all of the variables. Hence a cross-validated error, BIC or adjusted $R^2$ is used in order to select the model.
 
 The same ideas apply to other models such as logistic. With a logistic regression we use *deviance* which plays the role of RSS for a broader class of models.
 
@@ -66,15 +66,15 @@ The main issues with best subset are computational, and statistical: whem *p* is
 
 Forward stepwise begins with a model with no predictors, the adds predictors one at a time, until all the predictors are in the model.
 
-* Let $M_0$ denote the *null model*, which contains no predictors. This predicts the sample mean for each observation.
+* Let $\mathcal{M}_0$ denote the *null model*, which contains no predictors. This predicts the sample mean for each observation.
 * For $k = 0, 1, ..., p - 1$.
-    * Consider all the $p - k$ models that augment the predictors in $M_K$ with one additional predictor.
-    * Choose the best amongst these $p - k$ models and call it $M_{k+1}$. Here best is lowest RSS or highest $R^2$.
-* Select a single best model from among $M_0,...,M_p$ using cross validated prediction error, $C_p$ (AIC) or adjusted $R^2$.
+    * Consider all the $p - k$ models that augment the predictors in $\mathcal{M}_K$ with one additional predictor.
+    * Choose the best amongst these $p - k$ models and call it $\mathcal{M}_{k+1}$. Here best is lowest RSS or highest $R^2$.
+* Select a single best model from among $\mathcal{M}_0,...,\mathcal{M}_p$ using cross validated prediction error, $C_p$ (AIC) or adjusted $R^2$.
 
 This results in the fitting of $1 + p(p + 1)/2$ models.
 
-Can be used with $n < p$, however can only generate up to $M_{n_1}$ models.
+Can be used with $n < p$, however can only generate up to $\mathcal{M}_{n-1}$ models.
 
 #### Backward Stepwise Selection
 
@@ -167,9 +167,9 @@ In general in situations where the relationships between the predictors and the 
 Ridge regression has one disadvantage: it will will include all $p$ in the final model. It will shrink the coefficients to zero, but won't set them to zero. This isn't an issue with prediction, but can does pose issues for model interpretation, especially when $p$ is large.
 
 The lassoo coefficients $\hat\beta_\lambda^L$ minimise the quantity:
-$$ RSS + \lambda\sum_{j=1}^p\abs{\beta_j} $$
+$$ RSS + \lambda\sum_{j=1}^p\lvert{\beta_j}\lvert $$
 
-The lasso and the ridge regression have similar formulations. The lasoo uses an $\ell_1$ penalty instead of an $\ell_2$. The $\ell_1$ norm of a coefficient vector $\beta$ is given by $\norm{\beta}_1 = \sum\abs{\beta_j}$.
+The lasso and the ridge regression have similar formulations. The lasoo uses an $\ell_1$ penalty instead of an $\ell_2$. The $\ell_1$ norm of a coefficient vector $\beta$ is given by $\lvert\lvert{\beta}\lvert\lvert_1 = \sum\lvert{\beta_j}\lvert$.
 
 The lasso shrinks the coefficient estimates towards zero, however the $\ell_1$ penality forces some of the coefficients to be zero when $\lambda$ is sufficiently large. Hence it performs variable selection.
 
@@ -179,7 +179,7 @@ In general the lasso performs better in a setting where a relatively small numbe
 
 ### 6.2.3 - Selecting the Tuning Parameter
 
-Cross validation provides a simple way to tackle this problem. We choose a grid of $\lamba$ values and compute the cross-validation error for each one. We then select the tuning parameter for which the error is smallest. The model is then re-fit using all of the available observations and the selected value of the tuning parameter.
+Cross validation provides a simple way to tackle this problem. We choose a grid of $\lambda$ values and compute the cross-validation error for each one. We then select the tuning parameter for which the error is smallest. The model is then re-fit using all of the available observations and the selected value of the tuning parameter.
 
 ## 6.3 - Dimension Reduction
 
@@ -187,8 +187,8 @@ We now explore a class of approaches that *transform* the predictors and then fi
 
 Let $Z_1,\ldots,Z_M$ represent $Z < p$ linear combinations of our original predictors, i.e.
 $$ Z_m = \sum_{j=1}^p\phi_{jm}X_j $$
-for some constants $\phy_{1m},\ldots,\phi_{pm}$. We can then fit the linear regression model:
-$$ y_i = \theta_0 + \sum_{m=1}^M\theta_mz_{im} + \epsilon_i, i = 1,\ldots,n $$
+for some constants $\phi_{1m},\ldots,\phi_{pm}$. We can then fit the linear regression model:
+$$ y_i = \theta_0 + \sum_{m=1}^M\theta_mz_{im} + \epsilon_i, \ i = 1,\ldots,n $$
 
 If the constants are chosen wisely then such dimension reduction can ofter outperform least squares regression.
 
@@ -237,7 +237,7 @@ The process is:
 1. Standardise the $p$ predictors
 1. Sets each $\phi_{j1}$ (from the PCA formula) equal to the coefficient from the simple linear regression of $Y$ on to $X_j$.
 1. This coefficient is proportional to the correlation between $Y$ and $X_j$.
-1. Hence in computing $Z_1 = \sum_{j=1}^p\phy_{j1}X_j$, PLS places the highest weight on variables that are most strongly related to the response.
+1. Hence in computing $Z_1 = \sum_{j=1}^p\phi_{j1}X_j$, PLS places the highest weight on variables that are most strongly related to the response.
 
 To identify the second PLS direction we first adjust each of the variabes by $Z_1$, by regressing each variable on $Z_1$ and taking the residuals. 
 

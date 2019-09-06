@@ -7,6 +7,11 @@ output:
     highlight: tango
 ---
 
+```{r private_setup, include = F}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
 
 ```{r setup, message=F}
 library(broom)
@@ -27,7 +32,7 @@ set.seed(1)
 auto <- as_tibble(Auto)
 auto_sample <- auto %>% resample_partition(c(test = 0.5, train = 0.5))
 auto.lm <- lm(mpg ~ horsepower, data = auto_sample$train)
-as.tibble(auto_sample$test) %>% mse(auto.lm, data = .)
+as_tibble(auto_sample$test) %>% mse(auto.lm, data = .)
 ```
 
 Let's now run across a number of polynomials and see how the MSE changes:
@@ -37,7 +42,7 @@ auto.lms <- map(1:10, ~lm(mpg ~ poly(horsepower, .x), auto_sample$train))
 map_df(1:10, 
     ~ auto %>% 
        slice(auto_sample$test$idx) %>% 
-       mse(auto.lms[[.x]], .)
+       summarise(MSE = mse(auto.lms[[.x]], .)) %>%
        mutate(poly = .x)
     ) %>% 
     ggplot(aes(poly,MSE)) + 

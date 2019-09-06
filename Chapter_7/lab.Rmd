@@ -7,6 +7,12 @@ output:
     highlight: tango
 ---
 
+```{r private_setup, include = F}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
+
 ```{r setup, message = F}
 library(ISLR)
 library(broom)

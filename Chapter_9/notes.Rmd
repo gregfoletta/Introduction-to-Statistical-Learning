@@ -39,7 +39,7 @@ If $X$ doesn't satisfy the equation, it will be on either one side or another si
 
 ### 9.1.2 - Classification Using a Separating Hyperplane
 
-Suppose we have an $n \times p$ matrix $\matbf{X}$. The $n$ training observations fall into one of two classes - $y_1, \ldots, y_n \in \{-1, 1\}$. We also have a test observation $x^* = (x^*_1, \ldots, x^*_p)^T$. The goal is to develop a classifier that correctly classifies the test observation bases on its features.
+Suppose we have an $n \times p$ matrix $\mathbf{X}$. The $n$ training observations fall into one of two classes - $y_1, \ldots, y_n \in \{-1, 1\}$. We also have a test observation $x^* = (x^*_1, \ldots, x^*_p)^T$. The goal is to develop a classifier that correctly classifies the test observation bases on its features.
 
 We have previously seen:
 

@@ -7,6 +7,12 @@ output:
     highlight: tango
 ---
 
+```{r private_setup, include = F}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
+
 In many situations, the response variable in a regression may be qualitative instead of quantitative. These are often referred to as **categorical**.
 
 The process for predicting categorical variables is called **classification**. 
@@ -65,7 +71,10 @@ Maximum likelyhood seeks estimates for the coefficients such that the predictice
 Let's run the model against the default data:
 
 ```{r 4.3.1_2}
-glm(default ~ balance, family = binomial, default) %>% tidy()
+glm(default ~ balance, family = binomial, default) %>%
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We see the $\beta_1$ is 0.0055, meaning an increase in balance is associated with an increase in the probability of default. It increases the log-odds of default by 0.0055. The **z-statistic** plays the same role as the **t-statistic** in a linear regression.

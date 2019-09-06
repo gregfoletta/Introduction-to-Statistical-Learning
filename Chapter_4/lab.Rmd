@@ -7,6 +7,11 @@ output:
     highlight: tango
 ---
 
+```{r private_setup, include = F}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
 
 ## 4.6.1 - Stock Market Data
 
@@ -184,8 +189,10 @@ We apply the KNN approach to the `Caravan` data set. It contains 85 predictors f
 We can standardise the data so that all the data has a mean of 0 and a standard deviation of 1. We do this using the `scale()` function.
 
 ```{r 4.6.6_1}
-caravan <- as_tibble(Caravan)
-std_caravan <- caravan %>% select(-Purchase) %>% scale() %>% as_tibble()
+std_caravan <- Caravan %>% 
+    dplyr::select(-Purchase) %>%
+    scale() %>%
+    as_tibble()
 ```
 
 We split the observations into training and test sets.
@@ -193,12 +200,14 @@ We split the observations into training and test sets.
 ```{r 4.6.6_2}
 std_caravan_test <- std_caravan %>% slice(1:1000)
 std_caravan_train <- std_caravan %>% slice(1001:nrow(.))
-caravan_test_Y <- caravan %>% slice(1:1000) %>% .[['Purchase']]
-caravan_train_Y <- caravan %>% slice(1001:nrow(.)) %>% .[['Purchase']]
+caravan_test_Y <- Caravan %>% slice(1:1000) %>% .[['Purchase']]
+caravan_train_Y <- Caravan %>% slice(1001:nrow(.)) %>% .[['Purchase']]
 
 caravan_knn_pred <- knn(std_caravan_train, std_caravan_test, caravan_train_Y, k = 1)
 
-mean(caravan_knn_pred != caravan_test_Y)
+mean(caravan_knn_pred != caravan_test_Y) %>%
+    kable(align = 'left') %>%
+    kable_styling()
 ```
 
 The KNN error rate is just udner 12%. This appears to be good, but since only 6% of the customers purchased insurance, we could get the error rate down to 6% by always predicting `No`.

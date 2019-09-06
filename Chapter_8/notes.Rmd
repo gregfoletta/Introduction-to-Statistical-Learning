@@ -7,6 +7,12 @@ output:
     highlight: tango
 ---
 
+```{r private_setup, include = F}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
+
 This chapter discusses tree-based methods for regression and classification. These involve **stratifying** or **segmenting** the predictor space into a number of simple regions. These types of approaches are known as **decision tree* methods**.
 
 Tree based methods are good for interpretation, but are not competitative against the supervised learning methods in chapters 6 and 7 in terms of prediction accuracy. Hence this chapter also discusses **bagging**, **boosting**, and **random forrests**.
@@ -44,7 +50,7 @@ How do we construct the regions? They could have any shape, however we choose to
 
 The goal is to find regions that minimise the RSS given by:
 
-$$ \sum_{j=1}^J \sum_{i \in R_j}(y_i - \hat{y}_R_j)^2 $$
+$$ \sum_{j=1}^J \sum_{i \in R_j}(y_i - \hat{y}_{R_j})^2 $$
 
 where $ \hat{y}_R_j $ is the mean response for the training observations within the $j$th box.
 
@@ -74,9 +80,9 @@ Given a subtree, we can estimate its test error using cross-validation or the va
 4. Returnt he subtree from step 2 that corresponds to the chosen value of $\alpha$.
 
 For each value of $\alpha$ there corresponds a subtree $T \in T_0$ such that
-$$ \sum_{m=1}^{\abs{T}}\sum_{i: x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha\abs{T}$$
+$$ \sum_{m=1}^{\lvert{T}\lvert}\ \sum_{i:\ x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha\lvert T \lvert$$
 
-is as small as possible. Here $\abs{T}$ indicates the numner of terminal nodes of the tree $T$, $R_m$ is the rectangle corresponding to the $m$th terminal node, and $\hat{y}_{R_m}$ is the predicted response assoociated with $R_m$ - that is, the mean training observations in $R_m$.
+is as small as possible. Here $\vert T \vert$ indicates the numner of terminal nodes of the tree $T$, $R_m$ is the rectangle corresponding to the $m$th terminal node, and $\hat{y}_{R_m}$ is the predicted response assoociated with $R_m$ - that is, the mean training observations in $R_m$.
 
 The tuning parameter $\alpha$ controls a tradeoff between the subtrees complexity and its fit to the training data. When its 0, the subtree $T$ will simply equal $T_0$ because it just measures the training error.
 
@@ -100,7 +106,7 @@ Here $p_{mk}$ represents the proportion of training observations in the $n$th re
 
 The *Gini index* is defined by:
 
-$$ G = \sum_{k=1}^K \hat{p}_{mk}(1 - \hat{p}_{mk)) $$
+$$ G = \sum_{k=1}^K \hat{p}_{mk}(1 - \hat{p}_{mk})) $$
 
 It's a measure of the total variance across the $K$ classes. It takes on a small value if all of the $\hat{p}_{mk}$'s are close to zero or one. It is referred to as a measure of node *purity* - a small value indicates the a node contains observations from a sinlge class.
 
@@ -144,7 +150,7 @@ Decision trees suffer from *high variance* - if we split the training data at ra
 
 *Bootstrap aggregation* or *bagging* is a general purpose procedure for reducing the variance of a statistical learning method.
 
-Given $n$ independent observations $Z_1, \ldots, Z_n$, each with variance $\sigma^2$, the variance of the mean $\mean{Z}$ of the observations is given by $\frac{\sigma^2}{n}$. I.e averaging a set of observations reduces variance.
+Given $n$ independent observations $Z_1, \ldots, Z_n$, each with variance $\sigma^2$, the variance of the mean $\bar{Z}$ of the observations is given by $\frac{\sigma^2}{n}$. I.e averaging a set of observations reduces variance.
 
 Thus a way to reduce the variance of a statistical learning method is to take many training sets from the population, build a separate prediction model for each, then take thaverage of the resulting predictions.
 

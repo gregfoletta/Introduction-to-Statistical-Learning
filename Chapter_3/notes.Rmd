@@ -21,9 +21,9 @@ $$ \hat{y} = \beta_0 + \beta_1x$$
 
 The goal is to obtain coefficients such that the linear model fits the data well - i.e. as close as possible to the data points. The most common approach involves minimising the **least squares** criterion.
 
-We let $ e_i = y_i − \hat{y}_i $, which represents the *i*th **residual**. The **residual sum of squares** or **RSS** is the sum of the squares of each of these residuals.
+We let $e_i = y_i − \hat{y}_i$, which represents the $i$th **residual**. The **residual sum of squares** or **RSS** is the sum of the squares of each of these residuals.
 
-An example in R - we generate a our predictions base on f(x) + e, and also have a 'guess' at an f_hat(x). We calculate our y_i, and then calculate the RSS. 
+An example in R - we generate a our predictions base on $f(x) + e$, and also have a 'guess' at an $\hat{f}(x)$. We calculate our $y_i$, and then calculate the RSS. 
 
 
 ```{r 3.1.1 setup, message = F}

@@ -7,6 +7,11 @@ output:
     highlight: tango
 ---
 
+```{r cairo, include = F}
+library(knitr)
+knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
+```
+
 ## 8) Auto data set
 
 ```{r applied_setup, echo = F, message = F}
@@ -14,6 +19,8 @@ library(tidyverse)
 library(broom)
 library(ISLR)
 library(corrplot)
+library(knitr)
+library(kableExtra)
 ```
 
 ### a)
@@ -22,7 +29,10 @@ library(corrplot)
 ```{r applied_auto_linear}
 auto <- as_tibble(Auto)
 lm_auto <- auto %>% lm(mpg ~ horsepower, .)
-lm_auto %>% tidy()
+lm_auto %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 #### i) 
@@ -30,9 +40,15 @@ lm_auto %>% tidy()
 
 To determine if there is a relationship, we need to look at two items: the p-values for the coefficients, the F-statistic, and the p-value for the F-statistic:
 ```{r applied_p_val_and_f_stat}
-lm_auto %>% tidy()
-lm_auto %>% glance()
+lm_auto %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 
+lm_auto %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We in the `tidy()` output we can see the p-value for the intercept and the coefficient is very small, indicating a very low probability for the null hypothesis.A
@@ -55,8 +71,13 @@ There is a negative relationship between `mpg` and `horsepower`, thus miles per 
 
 We use the `interval` argument to the predict function. Note that the default `level` argument of `predict()` is 0.95 (95%).
 ```{r applied_linear_prediction}
-predict(lm_auto, tibble(horsepower = 98), interval = 'confidence')
-predict(lm_auto, tibble(horsepower = 98), interval = 'predict')
+predict(lm_auto, tibble(horsepower = 98), interval = 'confidence') %>%
+    kable() %>%
+    kable_styling()
+
+predict(lm_auto, tibble(horsepower = 98), interval = 'predict') %>%
+    kable() %>%
+    kable_styling()
 ```
 
 ### b)
@@ -96,14 +117,14 @@ library(corrplot)
 
 ### a)
 *Produce a scatterplot matrix which includes all the data in the data set*
-```{r applied_mult_auto_pairs, message = F}
-auto %>% select(-'name') %>% ggpairs()
+```{r applied_mult_auto_pairs}
+auto %>% dplyr::select(-name) %>% ggpairs()
 ```
 
 ### b)
 *Compute the matrix of correlations between the variables.*
 ```{r applied_mult_auto_corr}
-auto %>% select(-'name') %>% cor() %>% corrplot(method = 'color')
+auto %>% dplyr::select(-name) %>% cor() %>% corrplot(method = 'color')
 ```
 
 ### c)
@@ -111,8 +132,13 @@ auto %>% select(-'name') %>% cor() %>% corrplot(method = 'color')
 
 ```{r applied_mult_auto_lm}
 lin_reg_auto <- lm(mpg ~ . -name, auto)
-tidy(lin_reg_auto)
-glance(lin_reg_auto)
+tidy(lin_reg_auto) %>%
+    kable() %>%
+    kable_styling()
+
+glance(lin_reg_auto) %>%
+    kable() %>%
+    kable_styling()
 ```
 #### i)
 *Is there a relationship between the predictors and the response?*
@@ -147,7 +173,10 @@ A '*' adds the predictors and the interaction term, whereas the `:` only adds th
 Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be an f,Let's have a think about potential interactions - I think weight and year could interact, given the changes in materials. There could also be and interaction between cylinders and displacement:
 
 ```{r applied_auto_interaction}
-lm(mpg ~ weight*year + cylinders*displacement, auto) %>% tidy()
+lm(mpg ~ weight*year + cylinders*displacement, auto) %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 All of the values appear to be reasonably statistically significant. In fact, if we have a look at the fitted vs residuals, it looks much better than before:
@@ -165,7 +194,10 @@ lm(mpg ~ sqrt(horsepower), auto) %>% augment() %>% ggplot() + geom_point(aes(.fi
 lm(mpg ~ log(horsepower), auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
 lm(1/mpg ~ horsepower, auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
 lm(1/mpg ~ horsepower + weight*year, auto) %>% augment() %>% ggplot() + geom_point(aes(.fitted, .resid))
-lm(1/mpg ~ horsepower + weight*year, auto) %>% glance()
+lm(1/mpg ~ horsepower + weight*year, auto) %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 The last one looks quite good.
@@ -179,7 +211,10 @@ The last one looks quite good.
 ```{r applied_carseats_10_a}
 carseats <- as_tibble(Carseats)
 cs_regress <- lm(Sales ~ Price + Urban + US, carseats)
-cs_regress %>% tidy()
+cs_regress %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 ### b)
@@ -206,7 +241,10 @@ The null hypothesis can be rejected for `Price` and `US`.
 
 ```{r applied_carseats_10_e}
 cs_regress_reduced <- lm(Sales ~ Price + US, carseats)
-cs_regress_reduced %>% tidy()
+cs_regress_reduced %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 ### f)
@@ -214,8 +252,15 @@ cs_regress_reduced %>% tidy()
 
 We look at the F-statistic and its assoicated p-value to determine how well the models fit:
 ```{r applied_carseats_10_f}
-cs_regress %>% glance()
-cs_regress_reduced %>% glance()
+cs_regress %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
+
+cs_regress_reduced %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We see no increase in the R-sqaured value - but we do see an increase in the F-statistic, and a decrease in its p-value.
@@ -224,7 +269,10 @@ We see no increase in the R-sqaured value - but we do see an increase in the F-s
 *Using the model from (e), obtain 95 % confidence intervals for the coefficient(s).*
 
 ```{r applied_carseats_10_g}
-cs_regress_reduced %>% confint()
+cs_regress_reduced %>% 
+    confint()%>%
+    kable() %>%
+    kable_styling()
 ```
 
 ### h)
@@ -251,7 +299,10 @@ linear_response %>% ggplot(aes(x,y)) + geom_point()
 
 ```{r applied_11_a}
 lr_reg <- lm(y ~ x + 0, linear_response)
-lr_reg %>% tidy()
+lr_reg %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 The coefficient estimate is 1.99 - very close to the 2 that we used to generate the points. The standard error is .106, the t-statistic is 18.7 and the p-value is 2.64e-34. The t-statistic tells us how many standard deviations the coefficient is away from 0. The p-value gives us the probability that the null hypothesis - that the coefficient is 0 - is true.
@@ -261,7 +312,10 @@ The coefficient estimate is 1.99 - very close to the 2 that we used to generate 
 
 ```{r applied_11_b}
 lr_reg_reverse <- lm(x ~ y + 0, linear_response)
-lr_reg_reverse %>% tidy()
+lr_reg_reverse %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 The coefficient estimate and the standard error have changed, which is as expected. The t-statistic and p-value remain the same.
@@ -340,7 +394,10 @@ We can see an approximate linear relationship between x and y.
 *Fit a least squares linear model to predict y using x . Comment on the model obtained. How do β̂ 0 and β̂ 1 compare to β 0 and β 1 ?*
 
 ```{r appled_13_e}
-lm(y ~ x, simulated) %>% tidy()
+lm(y ~ x, simulated) %>%
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We see a `beta_0` of -0.988, and a `beta_1` of 0.527 - very close to the actual values of the function. The standard error is low at 0.0248 and 0.0241 respectively.
@@ -360,8 +417,15 @@ simulated %>% ggplot(aes(x,y)) +
 *Now fit a polynomial regression model that predicts `y` using `x` and `x^2` . Is there evidence that the quadratic term improves the model fit? Explain your answer.*
 
 ```{r applied_13_g}
-lm(y ~ poly(x,2), simulated) %>% tidy()
-lm(y ~ poly(x,2), simulated) %>% glance()
+lm(y ~ poly(x,2), simulated) %>%
+    tidy() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y ~ poly(x,2), simulated) %>%
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 We can see that the R^2 has not changed, and the RSE has increased slightly with the x^2 regression. However the F-statistic has decreased significantly with the x^2 regression, indicating a decrease in the significance of the model.
@@ -381,10 +445,25 @@ simulated_linear <- function(observations, mean, noise) {
 
 set.seed(1)
 low_and_high_noise <- bind_cols( simulated_linear(100, 0, .1), simulated_linear(100, 0, .5))
-lm(y ~ x, low_and_high_noise) %>% glance()
-lm(y ~ x, low_and_high_noise) %>% tidy()
-lm(y1 ~ x1, low_and_high_noise) %>% tidy()
-lm(y1 ~ x1, low_and_high_noise) %>% glance()
+lm(y ~ x, low_and_high_noise) %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y ~ x, low_and_high_noise) %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y1 ~ x1, low_and_high_noise) %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y1 ~ x1, low_and_high_noise) %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 Looking at the values, the low noise regression picks the exact coefficients that were used in the function. The R^2 is near 1 with a high F-statistic.
@@ -404,9 +483,20 @@ low_and_high_noise %>%
 * What are the confidence intervals of the data sets? Comment on the results*
 
 ```{r applied_13_j}
-lm(y ~ x, simulated) %>% confint()
-lm(y ~ x, low_and_high_noise) %>% confint()
-lm(y1 ~ x1, low_and_high_noise) %>% confint()
+lm(y ~ x, simulated) %>% 
+    confint() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y ~ x, low_and_high_noise) %>% 
+    confint() %>%
+    kable() %>%
+    kable_styling()
+
+lm(y1 ~ x1, low_and_high_noise) %>% 
+    confint() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 ## 14) Collinearity Problem
@@ -428,7 +518,11 @@ The beta_{0,1,2} coefficients of the model are (2,2,0.3) respectively.
 *What is the correlation between x1 and x2 ? Create a scatterplot displaying the relationship between the variables.*
 
 ```{r applied_14_b}
-colin_data %>% select(x1, x2) %>% cor()
+colin_data %>% 
+    dplyr::select(x1, x2) %>% 
+    cor() %>%
+    kable() %>%
+    kable_styling()
 
 colin_data %>% ggplot(aes(x1, x2)) + geom_point()
 ```
@@ -438,8 +532,15 @@ colin_data %>% ggplot(aes(x1, x2)) + geom_point()
 
 ```{r applied_14_c}
 colin_data_reg <- lm(y ~ x1 + x2, colin_data)
-colin_data_reg %>% tidy()
-colin_data_reg %>% glance()
+colin_data_reg %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
+
+colin_data_reg %>% 
+    glance() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 *Can the null hypotheses `beta_1 = 0` and `beta_2 = 0` be rejected?*
@@ -453,8 +554,15 @@ Let's take the general view that a p-value of 0.05 is statistically significant.
 ```{r applied_14_d_e}
 colin_data_reg_x1 <- lm(y ~ x1, colin_data)
 colin_data_reg_x2 <- lm(y ~ x2, colin_data)
-colin_data_reg_x1 %>% tidy()
-colin_data_reg_x2 %>% tidy()
+colin_data_reg_x1 %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
+
+colin_data_reg_x2 %>% 
+    tidy() %>%
+    kable() %>%
+    kable_styling()
 ```
 
 I both instances we have a p-value below 0.05, and thus we can rejct the null hypothesis in both instances.
@@ -479,16 +587,30 @@ colin_data_reg_x2 <- lm(y ~ x2, colin_data_add)
 
 We recall from 3.4 that an outlier is a point far from the value predicted by the model. We can look at residuals, but it can be difficult to decide how large a residual needs to be before it's classified as an outlier. This is where *studentised residuals* are used, where each residual is divided by e_i - its estimated standard error. Points with standardised residuals greater than 3 are possible outliers.
 
-```{r_applied_14_g_a_2}
-colin_data_reg_both %>% augment() %>% filter(y == 6)
-colin_data_reg_x1 %>% augment() %>% filter(y == 6)
-colin_data_reg_x2 %>% augment() %>% filter(y == 6)
+```{r applied_14_g_a_2}
+colin_data_reg_both %>% 
+    augment() %>%
+    filter(y == 6) %>%
+    kable() %>%
+    kable_styling()
+
+colin_data_reg_x1 %>%
+    augment() %>%
+    filter(y == 6) %>%
+    kable() %>%
+    kable_styling()
+
+colin_data_reg_x2 %>%
+    augment() %>%
+    filter(y == 6) %>%
+    kable() %>%
+    kable_styling()
 ```
 Only in the regression with `x1` as the predictor could the response be considered an outlier.
 
 Points with high leverage have an unusual x_i value, which tend to have significant impacts on the estimated regression lines. The *leverage statistic* is used to quantify leverage. We look at the `.hat` column which gives us the leverage statistic. We plot the `.hat` versus the `.std.resid`. When both `x1`, and `x2` are used in the regression, this point appears to be a high leverage point. In the `x1` regression it's not a high leverage point, and in the `x2` regression it has a bit of leverage.
 
-```{r_applied_14_g_a_3}
+```{r applied_14_g_a_3}
 colin_data_reg_both %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 colin_data_reg_x1 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
 colin_data_reg_x2 %>% augment() %>% ggplot() + geom_point(aes(.hat, .std.resid))
@@ -506,14 +628,23 @@ boston <- as_tibble(Boston)
 
 boston_regress <- tibble(predictor = names(boston)[-1]) %>% 
         mutate(predictor %>% map(function(x) lm(paste('crim ~', x), boston) %>% tidy())) %>% unnest() %>% filter(term != '(Intercept)')
-boston_regress %>% print(n = 26)
+boston_regress %>% 
+    print(n = 26) %>%
+    kable() %>%
+    kable_styling()
 ```
 
 ### b)
 *Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H 0 : β j = 0?*
 
 ```{r applied_15_b}
-(boston_mult_regress <- lm(crim ~ ., boston) %>% tidy() %>% arrange(p.value))
+boston_mult_regress <- lm(crim ~ ., boston) %>%
+    tidy() %>%
+    arrange(p.value)
+
+boston_mult_regress %>%
+    kable() %>%
+    kable_styling()
 ```
 
 From the results of the regression with all predictors, taking < 5e-2 to be statistically significant, `rad` (index of accessibility to radial highways.), `dis` (weighted mean of distances to five Boston employment centres.), `medv` (median value of owner-occupied homes in $1000s), `zn` (proportion of residential land zoned for lots over 25,000 sq.ft), and `black` (1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town) appear to have statistical significance.

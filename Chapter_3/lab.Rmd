@@ -7,7 +7,7 @@ output:
     highlight: tango
 ---
 
-```{r cairo, show = F}
+```{r cairo, include = F}
 library(knitr)
 knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
 ```

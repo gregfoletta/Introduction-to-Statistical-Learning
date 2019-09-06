@@ -229,7 +229,7 @@ We can again use CV to select the value, or specify it directly.
 
 The previous approaches can be seen as extensions of a standard linear model a response $Y$ and a single predictor $X$.
 
-In this section we discuss the problem of flexibly predicting $Y$ on the basis of several predctors $X_1, \ldots, \X_P$.
+In this section we discuss the problem of flexibly predicting $Y$ on the basis of several predctors $X_1, \ldots, X_P$.
 
 *Generalised additive models* provide a framework for extending the linear model by allowing non-linear models while maintaining *additivity*.
 
