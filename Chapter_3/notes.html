@@ -242,8 +242,8 @@ summary {
 <div id="estimating-coefficients" class="section level3">
 <h3>3.1.1 - Estimating Coefficients</h3>
 <p>The goal is to obtain coefficients such that the linear model fits the data well - i.e. as close as possible to the data points. The most common approach involves minimising the <strong>least squares</strong> criterion.</p>
-<p>We let $ e_i = y_i − _i $, which represents the <em>i</em>th <strong>residual</strong>. The <strong>residual sum of squares</strong> or <strong>RSS</strong> is the sum of the squares of each of these residuals.</p>
-<p>An example in R - we generate a our predictions base on f(x) + e, and also have a ‘guess’ at an f_hat(x). We calculate our y_i, and then calculate the RSS.</p>
+<p>We let <span class="math inline">\(e_i = y_i − \hat{y}_i\)</span>, which represents the <span class="math inline">\(i\)</span>th <strong>residual</strong>. The <strong>residual sum of squares</strong> or <strong>RSS</strong> is the sum of the squares of each of these residuals.</p>
+<p>An example in R - we generate a our predictions base on <span class="math inline">\(f(x) + e\)</span>, and also have a ‘guess’ at an <span class="math inline">\(\hat{f}(x)\)</span>. We calculate our <span class="math inline">\(y_i\)</span>, and then calculate the RSS.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="kw">library</span>(knitr)
 <span class="kw">library</span>(kableExtra)</code></pre></div>
@@ -302,76 +302,121 @@ population &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span cla
 (mu &lt;-<span class="st"> </span><span class="kw">mean</span>(population))</code></pre></div>
 <pre><code>## [1] 10.02345</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">sample</span>(population, <span class="dv">100</span>))</code></pre></div>
-<pre><code>## [1] 5.792191</code></pre>
+<pre><code>## [1] 52.15676</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(mu_hat &lt;-<span class="st"> </span><span class="kw">map_dbl</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2000</span>, <span class="op">~</span><span class="kw">mean</span>(<span class="kw">sample</span>(population, <span class="dv">100</span>))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mean</span>())</code></pre></div>
-<pre><code>## [1] 11.11699</code></pre>
+<pre><code>## [1] 10.75234</code></pre>
 <p>We see the population mean is 10.02.</p>
 <p>We take the mean of of a single sample, we see that this is a long way from the population mean.</p>
 <p>However when we take the mean of 2000 sample means, we get a result that is very close to the population mean.</p>
-<p>How close is a single estimate? In general we answer this by computing the <strong>standard error</strong> of <span class="math inline">\(\hat{\mu}\)</span> written <span class="math inline">\(SE(\mu)\)</span>. This is <code>σ/sqrt(n)</code>, where sigma is the population standard mean. The population deviation is seldom known, so the standard error of the mean is usually estimated as the <strong>sample standard deviation</strong>.</p>
-<p>The sample standard deviation is the sqaure root of the sum of the square of the difference between each x_i and the sample mean, divided by n - 1. Let’s do this for our reponse variable:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(y_i)</code></pre></div>
-<pre><code>## [1] 116.0403</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>( <span class="kw">sum</span>( (y_i <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(y_i))<span class="op">^</span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>(<span class="kw">length</span>(y_i) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) ) )</code></pre></div>
-<pre><code>## [1] 116.0403</code></pre>
-<p>The standard error estimate is known as the <strong>residual standard error</strong>, and is given by the formula <code>RSE = sqrt(RSS / (n - 2))</code>.</p>
+<p>How close is a single estimate? In general we answer this by computing the <strong>standard error</strong> of <span class="math inline">\(\hat{\mu}\)</span> written <span class="math inline">\(SE(\mu)\)</span>. We have the well known formula</p>
+<p><span class="math display">\[
+Var(\hat{\mu}) = SE(\hat{\mu})^2 = \frac{\sigma^2}{n}
+\]</span> where <span class="math inline">\(\sigma\)</span> is the standard deviation of each of the realisations <span class="math inline">\(y_i\)</span> of <span class="math inline">\(Y\)</span>.</p>
+<p>Roughly, the standard error tells us the average amount that <span class="math inline">\(\hat{\mu}\)</span> differs from the actual value of <span class="math inline">\(\mu\)</span>.</p>
+<p>We can wonder how close our estimates <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are to the true values. We use the following formulas:</p>
+<p><span class="math display">\[
+SE(\hat{\beta}_0)^2 = \sigma^2 \bigg[ 
+\frac{1}{n} + 
+\frac
+{ \bar{x}^2 }
+{ \sum_{i=1}^n (x_i - \bar{x})^2 }
+\bigg]
+\]</span> <span class="math display">\[
+SE(\hat{\beta}_1)^2 =
+\frac
+{ \sigma^2 }
+{ \sum_{i=1}^n (x_i - \bar{x})^2 }
+\]</span> where <span class="math inline">\(\sigma^2 = Var(\epsilon)\)</span>.</p>
+<p>For these formulas to be strictly valid, we need to assume that the errors <span class="math inline">\(\epsilon_i\)</span> for each observation are uncorrelated with common variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>In general <span class="math inline">\(\sigma^2\)</span> is not known, but can be estimated from the data. This is the residual standard error <span class="math inline">\(RSE = \sqrt{RSS/(n-2)}\)</span>.</p>
 <p>Using our previous generated values of <code>y_i</code> and <code>y_hat_i</code>, lets calculate the RSE:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSE &lt;-<span class="st"> </span><span class="kw">sqrt</span>( (<span class="kw">sum</span>((y_i <span class="op">-</span><span class="st"> </span>y_hat_i)<span class="op">^</span><span class="dv">2</span>)) <span class="op">/</span><span class="st"> </span>(<span class="kw">length</span>(y_i) <span class="op">-</span><span class="st"> </span><span class="dv">2</span>) )
 RSE</code></pre></div>
 <pre><code>## [1] 29.42717</code></pre>
 <p>The RSE for our ‘guess’ is 29.42.</p>
-<p>The standard error can be used to calculate confidence intervals. A 95% confidence interval is defined as a range of values such that with 95% probability, the range will contain the true unknown value of the parameter, or that it is within 2 standard deviations of the mean. Therefore the 95% confidence interval is +/- 2 * SE(β̂ _1) and +/- 2 * SE(β̂ _0). Thus there is a 95% probability that the true value of the slope of the linear regression is between 3.5 + 2 * 29.42, and 3.5 - 2 * 29.42. This is very wide, so we can’t be very ‘confident’. Of course our guess didn’t minimise the RSS.</p>
+<p>The standard error can be used to calculate confidence intervals. A 95% confidence interval is defined as a range of values such that with 95% probability, the range will contain the true unknown value of the parameter, or that it is within 2 standard deviations of the mean. Therefore the 95% confidence interval: <span class="math display">\[
+\hat{\beta}_1 \pm 2 \cdot SE(\hat{\beta}_1) 
+\]</span> Thus there is a 95% probability that the true value of the slope of the linear regression is between 3.5 + 2 * 29.42, and 3.5 - 2 * 29.42. This is very wide, so we can’t be very ‘confident’. Of course our guess didn’t minimise the RSS.</p>
 <div id="hypothesis-tests" class="section level4">
 <h4>Hypothesis Tests</h4>
-<p>The standard errors are used to perform hypothesis tests. The most common is the null hypothesis <code>H_0</code> - ‘there is no relationship between <code>X</code> and <code>Y</code> versus the <em>alternative hypthesis</em> - there is some relationship between <code>X</code> and <code>Y</code>’ (H_a : β_1 = 0).</p>
-<p>To test the null hypothesis, we need to derermine with the coefficient estimate is sufficiently far from zero that we can be confident that it’s non-zero. How far is far enough? This depends on the accuracy of the coefficient.</p>
+<p>The standard errors are used to perform hypothesis tests. The most common is the null hypothesis: <span class="math display">\[
+H_0 \text{ : there is no relationship between X and Y}
+\]</span> versus the alternative hypothesis: <span class="math display">\[
+H_a \text{ : there is some relationship between X and Y }
+\]</span> Mathematically: <span class="math display">\[
+H_0 \text{ : } \beta_1 = 0
+\]</span></p>
+<p>To test the null hypothesis, we need to derermine with the coefficient estimate is sufficiently far from zero that we can be confident that it’s non-zero. How far depends on the accuracy of the estimate - <span class="math inline">\(SE(\hat{\beta_1})\)</span>.</p>
 <ul>
 <li>If the standard error is small, then even small values of the coefficient may be strong evidence against the null hypothesis.</li>
 <li>If the stanard error is large, the coefficient must be large in absolute value in order for us to reject the null hypothesis.</li>
 </ul>
-<p>In practice, a <strong>t-statistic</strong> is calculated, where <code>t = β̂_1- 0 / SE(β̂_1)</code></p>
-<p>Let’s take a look at the t-statistic for the slope of our linear regression:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(t_stat &lt;-<span class="st"> </span>(<span class="fl">3.5</span> <span class="op">-</span><span class="st"> </span><span class="dv">0</span>) <span class="op">/</span><span class="st"> </span><span class="fl">29.42</span>)</code></pre></div>
-<pre><code>## [1] 0.1189667</code></pre>
-<p>This measures how many standard deviations the coefficient is away from 0. If there is no relationship, then we expect that the formula will have a <strong>t-distribution</strong> with n - 2 degrees of freedom.</p>
-<p>We can then compute the probability of observing any value equal to |t| or larger, assuming β̂_1 = 0. We call this probability the <strong>p-value</strong>. Roughtly speaking, we interpret the p-value as follows: *a small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance.</p>
+<p>We compute a <strong>t-statistic</strong>: <span class="math display">\[
+t = \frac
+{\hat{\beta}_1 - 0}
+{SE(\hat{\beta}_1)}
+\]</span> This measures the number of standard deviations <span class="math inline">\(\hat{\beta}_1\)</span> is away from 0.</p>
+<p>This measures how many standard deviations the coefficient is away from 0. If there is no relationship, then we expect that the formula will have a <strong>t-distribution</strong> with <span class="math inline">\(n - 2\)</span> degrees of freedom.</p>
+<p>We can then compute the probability of observing any value equal to <span class="math inline">\(\lvert t \lvert\)</span> or larger, assuming <span class="math inline">\(\hat{\beta}_1 = 0\)</span>. We call this probability the <strong>p-value</strong>. Roughtly speaking, we interpret the p-value as follows: *a small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance.</p>
 <p>If we see a small p-value, then we can infer ther is an association between the predictor and the response. We <em>reject the null hypothesis</em>. Typical p-value cutoffs for rejecting the null hypothesis are 5% or 1%. When n = 30, these correspond to t-statistics of around 2 and 2.75 respectively.</p>
 </div>
 </div>
 <div id="assessing-the-accuracy-of-the-model" class="section level3">
 <h3>3.1.3 - Assessing the Accuracy of the Model</h3>
-<p>The quality of the model is typically assessed using either the <strong>residual standard error (RSE)</strong> or the R^2 statistic.</p>
-<p>The RSE is considered a measure of the lack of fit of the model. However it’s an absolute measure, with the same units as Y. This makes it difficult to determine what a ‘good’ RSE is.A</p>
-<p>The R^2 is an alternative measure of fit, and is the <em>proportion</em> of variance explained. It takes on a value between 0 and 1. It is equal to 1 minus the RSS divided by the TSS.</p>
+<p>The quality of the model is typically assessed using either the <strong>residual standard error (RSE)</strong> or the <span class="math inline">\(R^2\)</span> statistic.</p>
+<p>The RSE is an estimate of the standard deviation of <span class="math inline">\(\epsilon\)</span>.</p>
+<p><span class="math display">\[
+RSE = \sqrt{ \frac{1}{n-2}RSS } = \sqrt{\frac{1}{n-2}\sum_{i=1}^n (y_i - \hat{y}_i)^2}
+\]</span> The RSE is considered a measure of the lack of fit of the model. However it’s an absolute measure, with the same units as Y. This makes it difficult to determine what a ‘good’ RSE is.</p>
+<p>The <span class="math inline">\(R^2\)</span> is an alternative measure of fit, and is the <em>proportion</em> of variance explained. It takes on a value between 0 and 1. It is <span class="math display">\[
+R^2 = \frac{TSS - RSS}{TSS} = 1 - \frac{RSS}{TSS}
+\]</span></p>
 <p>Let’s look at it using our generated data - we re-calculate RSS from above for visibility.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSS &lt;-<span class="st"> </span><span class="kw">sum</span>( (y_i <span class="op">-</span><span class="st"> </span>y_hat_i)<span class="op">^</span><span class="dv">2</span> )
 TSS &lt;-<span class="st"> </span><span class="kw">sum</span>( (y_i <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(y_i))<span class="op">^</span><span class="dv">2</span> )
 R_squared &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>(RSS <span class="op">/</span><span class="st"> </span>TSS)
 R_squared</code></pre></div>
 <pre><code>## [1] 0.9363395</code></pre>
-<p>The constituent parts can be thought of as such: * The TSS is the amount of variability inherent in the response before the regression is performed. * The RSS measures the amount of variability left unexplained after performing the regression. * TSS - RSS is therefore the amount variability in the response that is explained by performing the regression. * R^2 measures the <em>proportion</em> of variability in Y that can be explained using X.</p>
+<p>The constituent parts can be thought of as such: * The TSS is the amount of variability inherent in the response before the regression is performed. * The RSS measures the amount of variability left unexplained after performing the regression. * TSS - RSS is therefore the amount variability in the response that is explained by performing the regression. * <span class="math inline">\(R^2\)</span> measures the <em>proportion</em> of variability in Y that can be explained using X.</p>
 </div>
 </div>
 <div id="multiple-linear-regression" class="section level2">
 <h2>3.2 - Multiple Linear Regression</h2>
 <p>Instead of fitting multiple linear regressions, the simple linear regression can be extended to accomodate multiple predictors. Each predictor is given its own slope coefficient.</p>
-<p>Each coefficient <code>j</code> is then the average effect on Y of a one unit increase in X_j while <em>holding all other predictors fixed</em>.</p>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 X_1 + \ldots + \ldots \beta_p X_p + \epsilon
+\]</span></p>
+<p>Each <span class="math inline">\(\beta_j\)</span> quanties the association between the variable and the response. We interpret <span class="math inline">\(\beta_j\)</span> as the average effect on Y of a one unit increase in X_j while <em>holding all other predictors fixed</em>.</p>
 <div id="estimating-the-regressio-coefficients" class="section level3">
 <h3>3.2.1 Estimating the Regressio Coefficients</h3>
-<p>The parameters are estimated using the same least squares approach, minimising RSS where <code>RSS = sum( (y_i - f_hat(x))^2 )</code>. Each <code>f_hat(x)</code> now has multiple slope coefficients.</p>
+<p>we choose <span class="math inline">\(\beta_0, \ldots, \beta_p\)</span> to minimise the RSS:</p>
+<p><span class="math display">\[
+RSS = \sum_{i=1}^n (y_i - \hat{\beta}_0 - 
+\hat{\beta}_1 x_{i1} - 
+\hat{\beta}_2 x_{i2} -
+\ldots -
+\hat{\beta}_p x_{ip}
+\]</span></p>
 </div>
 <div id="important-questions" class="section level3">
 <h3>3.2.2 Important Questions</h3>
 <div id="is-there-a-relationship-between-the-response-and-the-predictors" class="section level4">
 <h4>Is there a relationship between the response and the predictors?</h4>
-<p>In a simple linear regression we simply check whether the slope coefficient = 0. In the multiple regression settings with <code>p</code> predictors, we need to ask whether all of the regression coefficients are 0.</p>
-<p>This hypothesis test is performed by computing the <strong>F-statistic</strong>, which is the TSS minus the RSS divided by p, divided by the RSS divided by n minus p minus 1.</p>
+<p>In a simple linear regression we simply check whether the <span class="math inline">\(\beta_1 = 0\)</span>. In the multiple regression settings with <span class="math inline">\(p\)</span> predictors, we need to ask whether all of the regression coefficients are 0:</p>
+<p><span class="math display">\[
+H_0 \text{ : } \beta_1 = \beta_2 = \dots = \beta_p = 0
+\]</span></p>
+<p>This hypothesis test is performed by computing the <strong>F-statistic</strong>: <span class="math display">\[
+F = \frac
+{(TSS - RSS)/p}
+{RSS / (n - p - 1)}
+\]</span> which is the TSS minus the RSS divided by p, divided by the RSS divided by n minus p minus 1.</p>
 <pre><code>F = ( (TSS - RSS)/p ) / ( RSS / (n - p - 1) )</code></pre>
-<p>If the linear model assumptions are correct: * E{ RSS / (n - p - 1) } = sigma^2 * E{ (TSS - RSS) / p } = sigma^2</p>
+<p>If the linear model assumptions are correct: <span class="math display">\[E\{ RSS / (n - p - 1) \} = \sigma^2\]</span> and that, provided <span class="math inline">\(H_0\)</span> is true: <span class="math display">\[E\{ (TSS - RSS) / p \} = \sigma^2\]</span></p>
 <p>Thus if there is no relationship between the response and the predictors, one would expect the F-statistic to be close to 1.</p>
-<p>How large does the F-statistic need to be? This depends<strong>n</strong> - when n is large, an F-statistic just a little larger than 1 might still provide evidence against H_0.</p>
-<p>For any value of <code>n</code> and <code>p</code>, the p-value for the F-statistic can be calculated. Base on the p-value, we can determine whether or not to reject H_0.</p>
-<p>Given individual p-values for each coefficient, why look at the overall F-statistic? Consider p = 100 and H_0: beta_0 … beta_p = 0, so no variable is truly associated with the response. About 5% of the p-values will be below 0.05 by chance. Hence if we used individual t-statistics and p-values, there is an incorrect assumption.</p>
+<p>How large does the F-statistic need to be? This depends on <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>- when <span class="math inline">\(n\)</span> is large, an F-statistic just a little larger than 1 might still provide evidence against H_0. However if <span class="math inline">\(n\)</span> is small, a large F-statistic is needed to reject <span class="math inline">\(H_0\)</span>.</p>
+<p>For any value of <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>, the p-value for the F-statistic can be calculated. Base on the p-value, we can determine whether or not to reject <span class="math inline">\(H_0\)</span>.</p>
+<p>Given individual p-values for each coefficient, why look at the overall F-statistic? Consider <span class="math inline">\(p = 100\)</span> and <span class="math inline">\(H_0: \beta_0 ... beta_p = 0\)</span> is true, so no variable is truly associated with the response. About 5% of the p-values will be below 0.05 by chance. Hence if we used individual t-statistics and p-values, there is an incorrect assumption. The F-statistic does not suffer from this problem because it adjusts for the number of predictors.</p>
 </div>
 <div id="deciding-on-important-variables." class="section level4">
 <h4>Deciding on important variables.</h4>
@@ -392,15 +437,16 @@ R_squared</code></pre></div>
 <div id="qualitative-predictors" class="section level3">
 <h3>3.3.1 - Qualitative Predictors</h3>
 <p>If a qualitative predcitor (factor) only has two levels, then it can be incorpoated into a model using a 0/1 encoding.</p>
-<p>When a qualitative predictor has more than two levels, additional dummy variables can be created. If there the three factors are {A,B,C}, then <code>x_i1</code> is 1 if the ith value is A, 0 if it’s not A, and <code>x_i2</code> is 1 if the ith value is B, 0 if it’s not B. If <code>x_i{1,2}</code> are both 0, then the value is C.</p>
+<p>When a qualitative predictor has more than two levels, additional dummy variables can be created. If there the three factors are <span class="math inline">\(\{A,B,C\}\)</span>, then <span class="math inline">\(x_i1\)</span> is 1 if the ith value is <span class="math inline">\(A\)</span>, 0 if it’s not A, and <span class="math inline">\(x_i2\)</span> is 1 if the ith value is B, 0 if it’s not B. If <span class="math inline">\(x_i{1,2}\)</span> are both 0, then the value is C.</p>
 <p>It should be noted that while the final predictions will be the same regardless of the encoding, the p-values do depend on the choice. The F-test should be used to assess the statistical evidence as this does not depend on the dummy variable.</p>
 </div>
 <div id="extensions-of-the-linear-model" class="section level3">
 <h3>3.3.2 - Extensions of the Linear Model</h3>
 <div id="removing-the-additive-assumption" class="section level4">
 <h4>Removing the Additive Assumption</h4>
-<p>Interaction terms can be used by adding another predictor which includes the product of two of the predictors:</p>
-<pre><code>Y = β_0 + β_1*X_1 + β_2*X_2 + β_3*X_1*X_2 + e</code></pre>
+<p>Interaction terms can be used by adding another predictor which includes the product of two of the predictors: <span class="math display">\[
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + e
+\]</span></p>
 <p>A model with no interaction terms contains only <strong>main effects</strong>.</p>
 <p>The hierarchical principal states that <em>if we include an interaction in a model, we should also include the main effects, even if the p-values are not significant</em>.</p>
 </div>
@@ -410,87 +456,51 @@ R_squared</code></pre></div>
 <div id="non-linearity-of-data" class="section level4">
 <h4>Non-linearity of Data</h4>
 <p>The linear model assumes that there is a straight line relationship between the predictors and the response.</p>
-<p><strong>Residual plots</strong> are a graphical tool for identifying non-linearity. The residuals (<code>y_i</code> - <code>y_hat_i</code>) are plotted against the predictor <code>x_i</code>. When there are multiple predictors, the residuals are plotted against the predicted values <code>y_hat_i</code>. Ideally the residual plot will show no discernible pattern.</p>
+<p><strong>Residual plots</strong> are a graphical tool for identifying non-linearity. The residuals <span class="math inline">\((y_i - \hat{y}_i)\)</span> are plotted against the predictor <span class="math inline">\(x_i\)</span>. When there are multiple predictors, the residuals are plotted against the predicted values <span class="math inline">\(\hat{y}_i\)</span>. Ideally the residual plot will show no discernible pattern.</p>
 </div>
 <div id="correlation-of-error-terms" class="section level4">
 <h4>Correlation of Error Terms</h4>
-<p>An important assumption of the linear regression model is that the error terms <code>e_1 .. e_n</code> are uncorrelated. If the error terms are correlated, the estimated <em>standard errors</em> will tend to underestimate the true standard errors. Thus p-values will be lower than they should be.</p>
+<p>An important assumption of the linear regression model is that the error terms <span class="math inline">\(\epsilon_1, \epsilon_2, \ldots, \epsilon_n\)</span> are uncorrelated. If the error terms are correlated, the estimated <em>standard errors</em> will tend to underestimate the true standard errors. Thus p-values will be lower than they should be.</p>
 <p>These correlations frequently occur in time series data, where observations obtained at adjacent time points will have positively correlated errors.</p>
 <p>The residuals can be plotted against the time, and we can discern if there is <strong>tracking</strong> - i.e. adjacent rediduals with similar values.</p>
 </div>
 <div id="non-constant-variance-of-error-terms" class="section level4">
 <h4>Non-constant Variance of Error Terms</h4>
-<p>Another important assumption is that the error terms have a constant variance. This is called <strong>heteroscedasticity</strong>. In our examples above, we’ve been using the <code>rnorm()</code> function to generate the error term. Let’s take a look at the variance:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_dbl</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, <span class="op">~</span><span class="kw">var</span>(<span class="kw">rnorm</span>(<span class="dv">100000</span>, <span class="dv">20</span>, <span class="dv">20</span>)))</code></pre></div>
-<pre><code>##   [1] 403.3808 400.8416 402.6056 399.4225 399.2907 400.8111 398.6619
-##   [8] 397.9034 401.4579 402.5080 400.0995 401.2521 401.7782 398.7372
-##  [15] 400.0678 399.2497 398.9672 400.4496 401.0884 402.2850 400.9890
-##  [22] 397.9784 401.1113 401.4596 399.3313 400.0410 401.4089 400.9274
-##  [29] 401.3057 403.6934 401.6553 399.8828 400.7241 401.7493 399.7317
-##  [36] 399.6951 402.1125 397.2382 399.7465 399.8248 398.2104 403.1310
-##  [43] 400.9255 402.2613 397.8635 399.8278 400.3458 399.7543 398.8995
-##  [50] 402.0375 396.7860 398.3474 395.9835 399.4761 398.1977 401.5203
-##  [57] 402.5569 399.1727 400.4041 399.5038 401.1424 403.2816 399.8968
-##  [64] 399.0057 401.6487 396.2006 399.1162 399.7784 401.1871 401.0142
-##  [71] 398.3664 401.3048 402.8537 400.3081 397.4752 401.7776 400.2131
-##  [78] 400.3786 398.6023 395.3044 400.1765 402.1358 399.7962 401.6068
-##  [85] 397.7290 401.4106 397.2019 399.8393 401.4370 398.6800 398.1980
-##  [92] 397.3539 399.8196 402.5669 397.3587 399.0257 398.9578 402.3168
-##  [99] 402.0074 400.3258</code></pre>
-<p>We see that the values are all ~400, which is 20^2, so we’re confident it’s generating random values with constant variance.</p>
+<p>Another important assumption is that the error terms have a constant variance: <span class="math inline">\(Var(\epsilon_i) = \sigma^2\)</span>. This is called <strong>heteroscedasticity</strong>. In our examples above, we’ve been using the <code>rnorm()</code> function to generate the error term. Let’s take a look at the variance:</p>
 <p>One can identify non-constant variances from the presence of a <em>funnel shape</em> in the residual plot (x = fitted, y = residuals).</p>
 <p>When faced with this issue, transforming the response with a concave function such as <code>sqrt(Y)</code> or <code>log(Y)</code> results in a greater amount of shrinkage of the larger values, leading to a reduction in heteroscedasticity.</p>
 </div>
 <div id="outliers" class="section level4">
 <h4>Outliers</h4>
-<p>An outlier is a point for which <code>y_i</code> is far from the value predicted by the model. An outlier typically does not effect on the least squares fit, but it can have an impact on the RSE, and therefore the confidence intervals and p-values.</p>
-<p>Compute the studentised residuals, which are each residual <code>e_i</code> by its estimated standard error. Observations whose studentised residuals are greater than 3 in absolute value are possible outliers.</p>
+<p>An outlier is a point for which <span class="math inline">\(y_i\)</span> is far from the value predicted by the model. An outlier typically does not effect on the least squares fit, but it can have an impact on the RSE, and therefore the confidence intervals and p-values.</p>
+<p>Compute the studentised residuals, which are each residual <span class="math inline">\(e_i\)</span> by its estimated standard error. Observations whose studentised residuals are greater than 3 in absolute value are possible outliers.</p>
 <p>If it’s an error in data collection, the observation may be removed. However care must be taken since it may be a deficiency with the model.</p>
 </div>
 <div id="high-leverage-points" class="section level4">
 <h4>High Leverage Points</h4>
-<p>Observations with <strong>high leverage</strong> have an unusual value for <code>x_i</code>. These observations have a large impact on the least squares line.</p>
-<p>In order to quantify an observations leverage, a <strong>leverage statistic</strong> for each observation is computed. For a simple linear regression it’s <code>x_i</code> minus the mean of <code>x</code>, all squared, then divided by the TSS, then all divided by <code>n</code>. Let’s generate some random data, then add an additional point with high leverage, then calculate its leverage statistic.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
-x_lev &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dv">30</span>)
-lev_stat &lt;-<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="kw">length</span>(x_lev)) <span class="op">+</span><span class="st"> </span>( (x_lev <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(x_lev))<span class="op">^</span><span class="dv">2</span> )<span class="op">/</span><span class="st"> </span>( <span class="kw">sum</span>((x_lev <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(x_lev))<span class="op">^</span><span class="dv">2</span>) )
-lev_stat</code></pre></div>
-<pre><code>##   [1] 0.011003699 0.009951718 0.011496384 0.011370300 0.009906874
-##   [6] 0.011457626 0.009908062 0.010016296 0.009931287 0.010423978
-##  [11] 0.011171409 0.009901223 0.010992579 0.017015528 0.010438607
-##  [16] 0.010110731 0.010084780 0.010202201 0.010080745 0.009938050
-##  [21] 0.010175057 0.010048583 0.010014086 0.015844109 0.009948911
-##  [26] 0.010121302 0.010226869 0.013548306 0.010709355 0.009901168
-##  [31] 0.010844287 0.010168159 0.009901296 0.010119086 0.013193014
-##  [36] 0.010597855 0.010563101 0.010124357 0.010402061 0.010034121
-##  [41] 0.010237095 0.010350163 0.009989468 0.009924889 0.011140956
-##  [46] 0.011183815 0.009902670 0.010038132 0.010178315 0.010136171
-##  [51] 0.009901037 0.010973062 0.009905200 0.012341396 0.010997063
-##  [56] 0.012474746 0.010519006 0.012077787 0.009929176 0.010203203
-##  [61] 0.014034861 0.010105454 0.009985146 0.010048223 0.011267666
-##  [66] 0.009949384 0.014963921 0.011067518 0.009966615 0.013141026
-##  [71] 0.009906168 0.011189476 0.009944940 0.011759723 0.012752753
-##  [76] 0.009914321 0.010646791 0.010069990 0.010014239 0.010926133
-##  [81] 0.010883588 0.010203342 0.010520909 0.013756607 0.009938068
-##  [86] 0.009906348 0.010350245 0.010422206 0.009902247 0.009920661
-##  [91] 0.010831511 0.010569579 0.010492877 0.009991447 0.011349521
-##  [96] 0.009925467 0.012832256 0.010892889 0.012653823 0.010700683
-## [101] 0.918010868</code></pre>
-<p>The average leverage for all the observations is <code>(p + 1) / n</code>, so if a given observation has a leverage statistic that greatly exceeds this, we may suspect the coressponding point has high leverage.</p>
+<p>Observations with <strong>high leverage</strong> have an unusual value for <span class="math inline">\(x_i\)</span>. These observations have a large impact on the least squares line.</p>
+<p>In order to quantify an observations leverage, a <strong>leverage statistic</strong> for each observation is computed. For a simple linear regression:</p>
+<p><span class="math display">\[
+h_i = \frac{1}{n} + \frac
+{ (x_i - \bar{x})^2 }
+{ \sum_{i'=1}^n (x_{i'} - \bar{x})^2}
+\]</span></p>
+<p>The leverage statistic is always between <span class="math inline">\(1/n\)</span> and <span class="math inline">\(n\)</span>.</p>
+<p>The average leverage for all the observations is <span class="math inline">\((p + 1) / n\)</span>, so if a given observation has a leverage statistic that greatly exceeds this, we may suspect the coressponding point has high leverage.</p>
 </div>
 <div id="collinearity" class="section level4">
 <h4>Collinearity</h4>
 <p><strong>Collinearity</strong> refers to the situation where two or more predictor values are closely related to one another. It can be difficult to separate the individual effects of collinear variables on the response.</p>
-<p>Collinearity reduces the accuracy of the coefficient estimates, and causes the standard error of <code>beta_j</code> to grow. The <em>t-statistic</em> is the coefficient divided by the standard error, therefore collinearity results in a decline in the <em>t-statistic</em>.</p>
-<p>Looking at the correlation matrix is a way to see if there is collinearity. However with <em>multicollinearity</em> it could exist between 3 or 4 variables. The <strong>variance inflation factor</strong> calculates the ratio of the variance of <code>beta_j</code> with the full model to <code>beta_j</code> fit on its own. The smallest <strong>VIF</strong> is 1. In general a VIF over 5 or 10 indicates a problematic amount of collinearity.</p>
+<p>Collinearity reduces the accuracy of the coefficient estimates, and causes the standard error of <span class="math inline">\(\beta_j\)</span> to grow. The <em>t-statistic</em> is the coefficient divided by the standard error, therefore collinearity results in a decline in the <em>t-statistic</em>. We may then fail to reject <span class="math inline">\(H_0 \text{ : } \beta_j = 0\)</span>.</p>
+<p>Looking at the correlation matrix is a way to see if there is collinearity. However with <em>multicollinearity</em> it could exist between 3 or 4 variables. The <strong>variance inflation factor</strong> calculates the ratio of the variance of <span class="math inline">\(\beta_j\)</span> with the full model to <span class="math inline">\(\beta_j\)</span> fit on its own. The smallest <strong>VIF</strong> is 1. In general a VIF over 5 or 10 indicates a problematic amount of collinearity.</p>
 </div>
 </div>
 </div>
 <div id="linear-regression-with-k-nearest-neighbours" class="section level2">
 <h2>3.5 - Linear Regression with K-Nearest Neighbours</h2>
-<p>The KNN regression is closely related to the KNN classifier. Given a value for <code>K</code> and a prediction point <code>x_0</code>, KNN regression identifies <code>K</code> training observations that are closest to <code>x_0</code>, represented by <code>N_0</code>. It then estimates <code>f(x_0)</code> using the average of all the training responses.</p>
-<p>As the number of dimensions increases (<code>p</code> gets bigger) it is typical for the MSE of KNN to increase. This results from the fact that in higher dimensions there is effectively a reduction in sample sizse. This is called the <strong>curse of dimensionality</strong>: The <code>K</code> observations nearest to <code>x_0</code> may be far away in p-dimensional space when p is large.</p>
-<p>As a general rule, parametric methods outperform non-parametric methods when p is high.</p>
+<p>The KNN regression is closely related to the KNN classifier. Given a value for <span class="math inline">\(K\)</span> and a prediction point <span class="math inline">\(x_0\)</span>, KNN regression identifies <span class="math inline">\(K\)</span> training observations that are closest to <span class="math inline">\(x_0\)</span>, represented by <span class="math inline">\(\mathcal{N}_0\)</span>. It then estimates <span class="math inline">\(f(x_0)\)</span> using the average of all the training responses in <span class="math inline">\(\mathcal{N}_0\)</span>.</p>
+<p>As the number of dimensions increases (<span class="math inline">\(p\)</span> gets bigger) it is typical for the MSE of KNN to increase. This results from the fact that in higher dimensions there is effectively a reduction in sample sizse. This is called the <strong>curse of dimensionality</strong>: The <span class="math inline">\(k\)</span> observations nearest to <span class="math inline">\(x_0\)</span> may be far away in p-dimensional space when <span class="math inline">\(p\)</span> is large.</p>
+<p>As a general rule, parametric methods outperform non-parametric methods when <span class="math inline">\(p\)</span> is high.</p>
 </div>
 
 

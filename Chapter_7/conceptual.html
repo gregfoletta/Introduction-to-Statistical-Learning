@@ -234,23 +234,23 @@ summary {
 
 <div id="section" class="section level2">
 <h2>1)</h2>
-<p><em>It was mentioned in the chapter that a cubic regression spline with one knot at <span class="math inline">\(\xi\)</span> can be obtained using a basis of the form <span class="math inline">\(x, x^2, x^3, (x - \xi)^3_+\)</span>, where <span class="math inline">\((x - \xi)^3_+ = (x - \xi)^3\)</span> if <span class="math inline">\(x &gt; \xi\)</span>. and equals 0 otherwise.</em></p>
-<p><em>We will now show that a function of the form:</em></p>
+<p><strong>It was mentioned in the chapter that a cubic regression spline with one knot at <span class="math inline">\(\xi\)</span> can be obtained using a basis of the form <span class="math inline">\(x, x^2, x^3, (x - \xi)^3_+\)</span>, where <span class="math inline">\((x - \xi)^3_+ = (x - \xi)^3\)</span> if <span class="math inline">\(x &gt; \xi\)</span>. and equals 0 otherwise.</strong></p>
+<p><strong>We will now show that a function of the form:</strong></p>
 <p><span class="math display">\[ f(x) = \beta_0 + \beta_1x + \beta_2x^2 + \beta_3x^3 + \beta_4(x - \xi)^3_+ \]</span></p>
-<p><em>is indeed a cubic regression spline, regardless of the values of <span class="math inline">\(\beta\)</span>.</em></p>
+<p><strong>is indeed a cubic regression spline, regardless of the values of <span class="math inline">\(\beta\)</span>.</strong></p>
 <div id="a" class="section level3">
 <h3>a)</h3>
-<p><em>Find a cubic polynomial:</em></p>
+<p><strong>Find a cubic polynomial:</strong></p>
 <p><span class="math display">\[ f_1(x) = a_1 + b_1x +c_1x^2 + d_1x3 \]</span></p>
-<p><em>such that <span class="math inline">\(f(x) = f_1(x)\)</span> for all <span class="math inline">\(x \le \xi\)</span>. Express <span class="math inline">\(a_1,b_1,c_1,d_1\)</span> in terms of <span class="math inline">\(\beta_1,\beta_2,\beta_3,\beta_4\)</span>.</em></p>
+<p><strong>such that <span class="math inline">\(f(x) = f_1(x)\)</span> for all <span class="math inline">\(x \le \xi\)</span>. Express <span class="math inline">\(a_1,b_1,c_1,d_1\)</span> in terms of <span class="math inline">\(\beta_1,\beta_2,\beta_3,\beta_4\)</span>.</strong></p>
 <p>If <span class="math inline">\(x \le \xi\)</span> then the <em>truncated power basis function</em> is equal to zero. Therefore we have:</p>
 <p><span class="math display">\[ a_1 = \beta_0, b_1 = \beta_1, c_1 = \beta_2, d_1 = \beta_3 \]</span></p>
 </div>
 <div id="b" class="section level3">
 <h3>b)</h3>
-<p><em>Find a cubic polynomial:</em></p>
+<p><strong>Find a cubic polynomial:</strong></p>
 <p><span class="math display">\[ f_2(x) = a_2 + b_2x +c_2x^2 + d_2x3 \]</span></p>
-<p><em>such that <span class="math inline">\(f(x) = f_2(x)\)</span> for all <span class="math inline">\(x &gt; \xi\)</span>. Express <span class="math inline">\(a_2,b_2,c_2,d_2\)</span> in terms of <span class="math inline">\(\beta_1,\beta_2,\beta_3,\beta_4\)</span>.</em></p>
+<p><strong>such that <span class="math inline">\(f(x) = f_2(x)\)</span> for all <span class="math inline">\(x &gt; \xi\)</span>. Express <span class="math inline">\(a_2,b_2,c_2,d_2\)</span> in terms of <span class="math inline">\(\beta_1,\beta_2,\beta_3,\beta_4\)</span>.</strong></p>
 <p><span class="math display">\[ \beta_0 + \beta_1x + \beta_2x^2 + \beta_3x^3 + \beta_4(x - \xi)^3 \]</span></p>
 <p><span class="math display">\[ = \beta_0 + \beta_1x + \beta_2x^2 + \beta_3x^3 + \beta_4(x - \xi)(x - \xi)(x - \xi)\]</span></p>
 <p><span class="math display">\[ = \beta_0 + \beta_1x + \beta_2x^2 + \beta_3x^3 + \beta_4(x^2 - 2x\xi + \xi^2)(x - \xi)\]</span></p>
@@ -268,7 +268,7 @@ summary {
 </div>
 <div id="c" class="section level3">
 <h3>c)</h3>
-<p><em>Show that <span class="math inline">\(f_1(\xi) = f_2(\xi)\)</span></em></p>
+<p><strong>Show that <span class="math inline">\(f_1(\xi) = f_2(\xi)\)</span></strong></p>
 <p><span class="math display">\[ \beta_0 + \beta_1\xi + \beta_2\xi^2 + \beta_3\xi^3 = \beta_0 - \beta_4\xi^3 + (\beta_1 + 3\beta_4\xi^2)\xi + (\beta_2 - 3\beta_4\xi)\xi^2 + (\beta_3 + \beta_4)\xi^3 \]</span></p>
 <p><span class="math display">\[ \beta_0 + \beta_1\xi + \beta_2\xi^2 + \beta_3\xi^3 = \beta_0 - \beta_4\xi^3 + \beta_1\xi + 3\beta_4\xi^3 + \beta_2\xi^2 - 3\beta_4\xi^3 + \beta_3\xi^3 + \beta_4\xi^3 \]</span></p>
 <p><span class="math display">\[ \beta_0 + \beta_1\xi + \beta_2\xi^2 + \beta_3\xi^3 = \beta_0 + \beta_1\xi + \beta_2\xi^2 + \beta_3\xi^3 \]</span></p>
@@ -276,7 +276,7 @@ summary {
 </div>
 <div id="d" class="section level3">
 <h3>d)</h3>
-<p><em>Show that <span class="math inline">\(f_1^\prime(\xi) = f_2^\prime(\xi)\)</span></em></p>
+<p><strong>Show that <span class="math inline">\(f_1^\prime(\xi) = f_2^\prime(\xi)\)</span></strong></p>
 <p><span class="math display">\[ f_1^\prime(\xi) = \beta_1 + 2\beta_2\xi + 3\beta_3\xi^2 \]</span></p>
 <p><span class="math display">\[ f_2^\prime(\xi) = -3\beta_4\xi^2 + \beta_1 + 9\beta_4\xi^2 + 2\beta_2\xi - 9\ beta_4\xi^2 + 3\beta_3\xi^2 + 3\beta_4\xi^2 \]</span></p>
 <p><span class="math display">\[ f_2^\prime(\xi) = \beta_1 + 2\beta_2\xi + 3\beta_3\xi^2 \]</span></p>
@@ -284,7 +284,7 @@ summary {
 </div>
 <div id="e" class="section level3">
 <h3>e)</h3>
-<p><em>Show that <span class="math inline">\(f_1^{\prime\prime}(\xi) = f_2^{\prime\prime}(\xi)\)</span></em></p>
+<p><strong>Show that <span class="math inline">\(f_1^{\prime\prime}(\xi) = f_2^{\prime\prime}(\xi)\)</span></strong></p>
 <p><span class="math display">\[ f_1^{\prime\prime}(\xi) = 4\beta_2 + 9\beta_3\xi \]</span></p>
 <p><span class="math display">\[ f_2^{\prime\prime}(\xi) = 4\beta_2 + 9\beta_3\xi \]</span></p>
 <p><span class="math display">\[ f_1^{\prime\prime}(\xi) = f_2^{\prime\prime}(\xi) \]</span></p>
@@ -292,9 +292,9 @@ summary {
 </div>
 <div id="section-1" class="section level2">
 <h2>2)</h2>
-<p><em>Suppose that a curve <span class="math inline">\(\hat{g}\)</span> is computed to smoothly fit a set of n points using the following formula:</em></p>
+<p><strong>Suppose that a curve <span class="math inline">\(\hat{g}\)</span> is computed to smoothly fit a set of n points using the following formula:</strong></p>
 <p><span class="math display">\[ \hat{g} = arg \ \underset{g}{min}\bigg{(}\sum_{i=1}^n(y_i - g(x_i))^2 + \lambda \int\bigg[g^{(m)}(x)\bigg]^2 dx\bigg{)} \]</span></p>
-<p><em>where <span class="math inline">\(g^{(m)}\)</span> represents the <span class="math inline">\(m\)</span> th derivative of <span class="math inline">\(g\)</span> (and <span class="math inline">\(g^{(0)} = g\)</span>). Provide example sketches of <span class="math inline">\(\hat{g}\)</span> in the following scenarios:</em></p>
+<p><strong>where <span class="math inline">\(g^{(m)}\)</span> represents the <span class="math inline">\(m\)</span> th derivative of <span class="math inline">\(g\)</span> (and <span class="math inline">\(g^{(0)} = g\)</span>). Provide example sketches of <span class="math inline">\(\hat{g}\)</span> in the following scenarios:</strong></p>
 <p>The <span class="math inline">\(arg \ \underset{g}{min}\)</span> is the <strong>arguments of the maxima</strong>. It is the argument to the function that attains it’s minimum value. This is constrasted against the value that is returned from the function.</p>
 <div id="a-1" class="section level3">
 <h3>a)</h3>
@@ -322,9 +322,9 @@ summary {
 </div>
 <div id="section-2" class="section level2">
 <h2>3)</h2>
-<p><em>Suppose we fit a curve with basis functions <span class="math inline">\(b_1(X) = X,\ b_2(X) = (X - 1)^2I(X \ge 1)\)</span>.</em></p>
-<p><em>We fit a linear regression model <span class="math inline">\(Y = \beta_0 + \beta_1b_1(X) + \beta_2b_2(X) + \epsilon\)</span>.</em></p>
-<p>*and obtain coefficient estimates $_0 = 1, _1 = 1, _2 = −2. Sketch the estimated curve between X = −2 and X = 2. Note the intercepts, slopes, and other relevant information.*</p>
+<p><strong>Suppose we fit a curve with basis functions <span class="math inline">\(b_1(X) = X,\ b_2(X) = (X - 1)^2I(X \ge 1)\)</span>.</strong></p>
+<p><strong>We fit a linear regression model <span class="math inline">\(Y = \beta_0 + \beta_1b_1(X) + \beta_2b_2(X) + \epsilon\)</span>.</strong></p>
+<p>**and obtain coefficient estimates $_0 = 1, _1 = 1, _2 = −2. Sketch the estimated curve between X = −2 and X = 2. Note the intercepts, slopes, and other relevant information.**</p>
 <p>Between -2 and 1 the curve is a linear curve. From 1 to 2 the curve is a quadratic.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">b1 &lt;-<span class="st"> </span><span class="cf">function</span>(X) X
@@ -340,9 +340,9 @@ b2 &lt;-<span class="st"> </span><span class="cf">function</span>(X) (X <span cl
 </div>
 <div id="section-3" class="section level2">
 <h2>4)</h2>
-<p><em>Suppose we fit a curve with basis functions <span class="math inline">\(b_1(X) = I(0 \le X \le 2) - (X - 1)I(1 \le X \le 2),\ b_2(X) = (X - 3)I(3 \le X \le 4) + I(4 &lt; X \le 5)\)</span></em></p>
-<p><em>We fit the linear regression model and obtain coefficient estimates of <span class="math inline">\(\hat\beta_0 = 1, \hat\beta_1 = 1, \hat\beta_2 = 3\)</span></em></p>
-<p><em>Sketch the estimated curve between <span class="math inline">\(X = -2\)</span> and <span class="math inline">\(X = 2\)</span></em></p>
+<p><strong>Suppose we fit a curve with basis functions <span class="math inline">\(b_1(X) = I(0 \le X \le 2) - (X - 1)I(1 \le X \le 2),\ b_2(X) = (X - 3)I(3 \le X \le 4) + I(4 &lt; X \le 5)\)</span></strong></p>
+<p><strong>We fit the linear regression model and obtain coefficient estimates of <span class="math inline">\(\hat\beta_0 = 1, \hat\beta_1 = 1, \hat\beta_2 = 3\)</span></strong></p>
+<p><strong>Sketch the estimated curve between <span class="math inline">\(X = -2\)</span> and <span class="math inline">\(X = 2\)</span></strong></p>
 <ul>
 <li>[-2, 0) straight line with no slope at <span class="math inline">\(Y = 1\)</span> solely due due to the <span class="math inline">\(\hat\beta_0\)</span>;</li>
 <li>[0, 1) there is a straight line with no slope at <span class="math inline">\(Y = 2\)</span>.</li>
@@ -360,27 +360,27 @@ b2 &lt;-<span class="st"> </span><span class="cf">function</span>(X) (X <span cl
 </div>
 <div id="section-4" class="section level2">
 <h2>5)</h2>
-<p><em>Consider two curves <span class="math inline">\(\hat{g_1},\ \hat{g_2}\)</span> defined by:</em></p>
+<p><strong>Consider two curves <span class="math inline">\(\hat{g_1},\ \hat{g_2}\)</span> defined by:</strong></p>
 <p><span class="math display">\[ \hat{g_1} = arg \ \underset{g}{min}\bigg(\sum_{i=1}^n(y_i - g(x_i))^2 + \lambda\int\bigg[g^{(3)}(x)\bigg]^2\ dx\bigg) \]</span></p>
 <p><span class="math display">\[ \hat{g_1} = arg \ \underset{g}{min}\bigg(\sum_{i=1}^n(y_i - g(x_i))^2 + \lambda\int\bigg[g^{(3)}(x)\bigg]^2\ dx\bigg) \]</span></p>
-<p><em>where <span class="math inline">\(g^{(m)}\)</span> represents the <span class="math inline">\(m\)</span> th derivative of <span class="math inline">\(g\)</span>.</em></p>
+<p><strong>where <span class="math inline">\(g^{(m)}\)</span> represents the <span class="math inline">\(m\)</span> th derivative of <span class="math inline">\(g\)</span>.</strong></p>
 <div id="a-2" class="section level3">
 <h3>a)</h3>
-<p><em>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller training RSS?</em></p>
+<p><strong>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller training RSS?</strong></p>
 <p>As <span class="math inline">\(\lambda \to \infty\)</span>, the first term becomes irrelevant. In the second term to minimuse <span class="math inline">\(g\)</span>, <span class="math inline">\(\hat{g_1}\)</span> will be a cubic, and <span class="math inline">\(\hat{g_4}\)</span> will be a quartic.</p>
 <p>The quartic function is more flexible, so we would expect <span class="math inline">\(\hat{g_2}\)</span> to have the smaller training RSS.</p>
 </div>
 <div id="b-1" class="section level3">
 <h3>b)</h3>
-<p><em>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller test RSS?</em></p>
-<p><strong>My answer</strong></p>
+<p><strong>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller test RSS?</strong></p>
+<p><strong><em>My answer</em></strong></p>
 <p>This depends on the underlying data, and whether the response variable is best modelled by a cubic or a quartic function.</p>
-<p><strong>Another answer</strong></p>
+<p><strong><em>Another answer</em></strong></p>
 <p><span class="math inline">\(\hat{g_1}\)</span> will provide a better test RSS as <span class="math inline">\(\hat{g_2}\)</span> could overfit the data due to the extra degree of freedom.</p>
 </div>
 <div id="c-1" class="section level3">
 <h3>c)</h3>
-<p><em>For <span class="math inline">\(\lambda = 0\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller training and test RSS?</em></p>
+<p><strong>For <span class="math inline">\(\lambda = 0\)</span>, will <span class="math inline">\(\hat{g_1}\)</span> or <span class="math inline">\(\hat{g_2}\)</span> have the smaller training and test RSS?</strong></p>
 <p>The functions are the same (a standard least squares regression), so the RSS in both cases will be the same.</p>
 </div>
 </div>

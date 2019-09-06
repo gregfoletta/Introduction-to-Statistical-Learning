@@ -239,10 +239,10 @@ summary {
 <span class="kw">library</span>(tidyverse)</code></pre></div>
 <div id="section" class="section level2">
 <h2>5)</h2>
-<p><em>In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.</em></p>
+<p><strong>In Chapter 4, we used logistic regression to predict the probability of default using income and balance on the Default data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.</strong></p>
 <div id="a" class="section level3">
 <h3>a)</h3>
-<p><em>Fit a logistic regression model that uses income and balance to predict default.</em></p>
+<p><strong>Fit a logistic regression model that uses income and balance to predict default.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">default &lt;-<span class="st"> </span><span class="kw">as.tibble</span>(Default)</code></pre></div>
 <pre><code>## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
 ## This warning is displayed once per session.</code></pre>
@@ -250,41 +250,41 @@ summary {
 </div>
 <div id="b" class="section level3">
 <h3>b)</h3>
-<p><em>Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:</em></p>
+<p><strong>Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:</strong></p>
 <div id="i" class="section level4">
 <h4>i)</h4>
-<p><em>Split the sample set into a training set and a validation set.</em></p>
+<p><strong>Split the sample set into a training set and a validation set.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
 default_split &lt;-<span class="st"> </span><span class="kw">resample_partition</span>(default, <span class="kw">c</span>(<span class="dt">train =</span> <span class="fl">0.5</span>, <span class="dt">test =</span> <span class="fl">0.5</span>))</code></pre></div>
 </div>
 <div id="ii" class="section level4">
 <h4>ii)</h4>
-<p><em>Fit a multiple logistic regression model using only the training observations.</em></p>
+<p><strong>Fit a multiple logistic regression model using only the training observations.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">default_split_train &lt;-<span class="st"> </span><span class="kw">glm</span>(default <span class="op">~</span><span class="st"> </span>balance, <span class="dt">data =</span> <span class="kw">as.tibble</span>(default_split<span class="op">$</span>train), <span class="dt">family =</span> binomial)</code></pre></div>
 </div>
 <div id="iii" class="section level4">
 <h4>iii)</h4>
-<p><em>Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.</em></p>
+<p><strong>Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.tibble</span>(default_split<span class="op">$</span>test) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">pred_default =</span> <span class="kw">ifelse</span>(<span class="kw">predict</span>(default_split_train, ., <span class="dt">type =</span> <span class="st">'response'</span>) <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.5</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>))</code></pre></div>
 <pre><code>## # A tibble: 5,001 x 5
 ##    default student balance income pred_default
 ##    &lt;fct&gt;   &lt;fct&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       
-##  1 No      Yes        817. 12106. No          
+##  1 No      No        1074. 31767. No          
 ##  2 No      No         529. 35704. No          
-##  3 No      No         786. 38463. No          
+##  3 No      Yes        920.  7492. No          
 ##  4 No      No         826. 24905. No          
-##  5 No      No        1161. 37469. No          
-##  6 No      Yes          0  21871. No          
-##  7 No      Yes       1221. 13269. No          
-##  8 No      No         607. 44995. No          
-##  9 No      No         286. 45042. No          
-## 10 No      No           0  50265. No          
+##  5 No      Yes        809. 17600. No          
+##  6 No      No        1161. 37469. No          
+##  7 No      No         237. 28252. No          
+##  8 No      No        1113. 23810. No          
+##  9 No      No           0  50265. No          
+## 10 No      Yes        528. 17637. No          
 ## # … with 4,991 more rows</code></pre>
 </div>
 <div id="iv" class="section level4">
 <h4>iv)</h4>
-<p><em>Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.</em></p>
+<p><strong>Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.tibble</span>(default_split<span class="op">$</span>test) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">pred_default =</span> <span class="kw">ifelse</span>(<span class="kw">predict</span>(default_split_train, ., <span class="dt">type =</span> <span class="st">'response'</span>) <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.5</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">group_by</span>(default, pred_default) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -293,16 +293,16 @@ default_split &lt;-<span class="st"> </span><span class="kw">resample_partition<
 ## # Groups:   default [2]
 ##   default pred_default     n
 ##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
-## 1 No      No            4797
-## 2 No      Yes             37
-## 3 Yes     No             111
-## 4 Yes     Yes             56</code></pre>
+## 1 No      No            4821
+## 2 No      Yes             11
+## 3 Yes     No             122
+## 4 Yes     Yes             47</code></pre>
 <p>Out of 5001 observations, 11 + 122 are incorrect. The error rate is therefore (11 + 122) / 5001 = 2.65%</p>
 </div>
 </div>
 <div id="c" class="section level3">
 <h3>c)</h3>
-<p><em>Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.</em></p>
+<p><strong>Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.</strong></p>
 <p>We’ll be a bit lazy with this and use a for loop.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2</span>)
 <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>) {
@@ -318,40 +318,40 @@ default_split &lt;-<span class="st"> </span><span class="kw">resample_partition<
 ## # Groups:   default [2]
 ##   default pred_default     n
 ##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4827
+## 2 No      Yes             24
+## 3 Yes     No              99
+## 4 Yes     Yes             51
+## # A tibble: 4 x 3
+## # Groups:   default [2]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
+## 1 No      No            4826
+## 2 No      Yes             23
+## 3 Yes     No             113
+## 4 Yes     Yes             39
+## # A tibble: 4 x 3
+## # Groups:   default [2]
+##   default pred_default     n
+##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
 ## 1 No      No            4807
-## 2 No      Yes             32
-## 3 Yes     No             107
-## 4 Yes     Yes             55
-## # A tibble: 4 x 3
-## # Groups:   default [2]
-##   default pred_default     n
-##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
-## 1 No      No            4814
 ## 2 No      Yes             20
-## 3 Yes     No             111
-## 4 Yes     Yes             56
-## # A tibble: 4 x 3
-## # Groups:   default [2]
-##   default pred_default     n
-##   &lt;fct&gt;   &lt;chr&gt;        &lt;int&gt;
-## 1 No      No            4801
-## 2 No      Yes             27
 ## 3 Yes     No             125
-## 4 Yes     Yes             48</code></pre>
+## 4 Yes     Yes             49</code></pre>
 <p>We get error rates of 2.4%, 2.8% and 2.7%.</p>
 </div>
 <div id="d" class="section level3">
 <h3>d)</h3>
-<p><em>Now consider a logistic regression model that predicts the prob ability of default using income , balance , and a dummy variable for student . Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.</em></p>
+<p><strong>Now consider a logistic regression model that predicts the prob ability of default using income , balance , and a dummy variable for student . Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.</strong></p>
 <p>We modify the formula in the <code>glm()</code> to be <code>default ~ balance + student</code>. We then run the three validation set tests and get error percentages of 2.4%, 2.7% and 2.7%. There seems to be no reduction in the error rate by adding in the student variable.</p>
 </div>
 </div>
 <div id="section-1" class="section level2">
 <h2>6)</h2>
-<p><em>We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression co efficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.</em></p>
+<p><strong>We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression co efficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.</strong></p>
 <div id="a-1" class="section level3">
 <h3>a)</h3>
-<p><em>Using the summary() and glm() functions, determine the estimated standard errors for the coefficients associated with income and balance in a multiple logistic regression model that uses both predictors.</em></p>
+<p><strong>Using the summary() and glm() functions, determine the estimated standard errors for the coefficients associated with income and balance in a multiple logistic regression model that uses both predictors.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(default <span class="op">~</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>balance, <span class="dt">data =</span> default, <span class="dt">family =</span> <span class="st">'binomial'</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term           estimate  std.error statistic   p.value
@@ -363,7 +363,7 @@ default_split &lt;-<span class="st"> </span><span class="kw">resample_partition<
 </div>
 <div id="b-c" class="section level3">
 <h3>b) &amp; c)</h3>
-<p><em>Use the bootstrap to estimate the standard errors of the logistic regression coefficients</em></p>
+<p><strong>Use the bootstrap to estimate the standard errors of the logistic regression coefficients</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
 default <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span>modelr<span class="op">::</span><span class="kw">bootstrap</span>(<span class="dt">n =</span> <span class="dv">20</span>) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -375,34 +375,34 @@ default <span class="op">%&gt;%</span><span class="st"> </span>
 <pre><code>## # A tibble: 3 x 2
 ##   term        avg_stderr
 ##   &lt;chr&gt;            &lt;dbl&gt;
-## 1 (Intercept) 0.437     
-## 2 balance     0.000228  
-## 3 income      0.00000504</code></pre>
+## 1 (Intercept) 0.429     
+## 2 balance     0.000225  
+## 3 income      0.00000498</code></pre>
 <p>We see the average standard error to be 0.000225 for balance and 0.00000498 for income.</p>
 </div>
 <div id="d-1" class="section level3">
 <h3>d)</h3>
-<p><em>Comment on the estimated standard errors.</em></p>
+<p><strong>Comment on the estimated standard errors.</strong></p>
 <p>The difference in the standard errors from the bootstrap compared to the formula is small: a 1% different from balance and a .2% difference for income.</p>
 </div>
 </div>
 <div id="section-2" class="section level2">
 <h2>7)</h2>
-<p><em>Compute the LOOCV error for a simple logistic regression model on the Weekly data set.</em></p>
+<p><strong>Compute the LOOCV error for a simple logistic regression model on the Weekly data set.</strong></p>
 <div id="a-2" class="section level3">
 <h3>a)</h3>
-<p><em>Fit a logistic regression model that predicts Direction using Lag1 and Lag2</em></p>
+<p><strong>Fit a logistic regression model that predicts Direction using Lag1 and Lag2</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">weekly &lt;-<span class="st"> </span><span class="kw">as.tibble</span>(Weekly)
 weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direction <span class="op">~</span><span class="st"> </span>Lag1 <span class="op">+</span><span class="st"> </span>Lag2, <span class="dt">data =</span> weekly, <span class="dt">family =</span> <span class="st">'binomial'</span>)</code></pre></div>
 </div>
 <div id="b-1" class="section level3">
 <h3>b)</h3>
-<p><em>Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.</em></p>
+<p><strong>Fit a logistic regression model that predicts Direction using Lag1 and Lag2 using all but the first observation.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">weekly.logistic.loo &lt;-<span class="st"> </span><span class="kw">glm</span>(Direction <span class="op">~</span><span class="st"> </span>Lag1 <span class="op">+</span><span class="st"> </span>Lag2, <span class="dt">data =</span> weekly[<span class="op">-</span><span class="dv">1</span>,], <span class="dt">family =</span> <span class="st">'binomial'</span>)</code></pre></div>
 </div>
 <div id="c-1" class="section level3">
 <h3>c)</h3>
-<p><em>Use the model from (b) to predict the direction of the first observation.</em></p>
+<p><strong>Use the model from (b) to predict the direction of the first observation.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">weekly[<span class="dv">1</span>,] <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Prediction =</span> <span class="kw">ifelse</span>(<span class="kw">predict</span>(weekly.logistic.loo, ., <span class="dt">type =</span> <span class="st">'response'</span>) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, <span class="st">&quot;Up&quot;</span>, <span class="st">&quot;Down&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">select</span>(Direction, Prediction)</code></pre></div>
@@ -414,7 +414,7 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="d-2" class="section level3">
 <h3>d)</h3>
-<p><em>Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:</em> * Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2 . * Compute the posterior probability of the market moving up for the ith observation. * Use the posterior probability for the ith observation in order to predict whether or not the market moves up.</p>
+<p><strong>Write a for loop from i = 1 to i = n, where n is the number of observations in the data set, that performs each of the following steps:</strong> * Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2 . * Compute the posterior probability of the market moving up for the ith observation. * Use the posterior probability for the ith observation in order to predict whether or not the market moves up.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">weekly <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">crossv_kfold</span>(<span class="dt">k =</span> <span class="kw">nrow</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">model =</span> <span class="kw">map</span>(train, <span class="op">~</span><span class="kw">glm</span>(Direction <span class="op">~</span><span class="st"> </span>Lag1 <span class="op">+</span><span class="st"> </span>Lag2, <span class="dt">data =</span> .x, <span class="dt">family =</span> <span class="st">'binomial'</span>))) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -429,10 +429,10 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="section-3" class="section level2">
 <h2>8)</h2>
-<p><em>We will now perform cross-validation on a simulated data set.</em></p>
+<p><strong>We will now perform cross-validation on a simulated data set.</strong></p>
 <div id="a-3" class="section level3">
 <h3>a)</h3>
-<p><em>Generate a simulated data set</em></p>
+<p><strong>Generate a simulated data set</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
 (simulated &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">y =</span> x <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)))</code></pre></div>
 <pre><code>## # A tibble: 100 x 2
@@ -453,7 +453,7 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="b-2" class="section level3">
 <h3>b)</h3>
-<p><em>Create a scatterplot of X against Y . Comment on what you find.</em></p>
+<p><strong>Create a scatterplot of X against Y . Comment on what you find.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">simulated <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(x, y)) <span class="op">+</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">geom_point</span>()</code></pre></div>
@@ -462,7 +462,7 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="c-2" class="section level3">
 <h3>c)</h3>
-<p><em>Compute the LOOCV errors that result from fitting <code>Y ~ poly(X, d)</code> where <code>d = {1 .. 4}</code>.</em></p>
+<p><strong>Compute the LOOCV errors that result from fitting <code>Y ~ poly(X, d)</code> where <code>d = {1 .. 4}</code>.</strong></p>
 <p>In our pipeline, we create a tibble with a degree column and four rows. We then generate a kfold set with k being the number of rows in the dataset, which then becomes a LOOCV set.</p>
 <p>We unnest all of the sets and fit a model based on the degree on each sample’s training set. We then predict the y_hat value using the model and the test set.</p>
 <p>We extract out the real y value from the test set, calculate the MSE, then calculate the LOOCV error based on the degree.</p>
@@ -492,7 +492,7 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="e" class="section level3">
 <h3>e)</h3>
-<p><em>Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.</em></p>
+<p><strong>Which of the models in (c) had the smallest LOOCV error? Is this what you expected? Explain your answer.</strong></p>
 <p>The model with a second degree polynomial provided the lowest error. This is to be expected given that the response variable is explicitly quadratically realted to <em>x</em>.</p>
 </div>
 <div id="f" class="section level3">
@@ -528,10 +528,10 @@ weekly.logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(Direct
 </div>
 <div id="section-4" class="section level2">
 <h2>9)</h2>
-<p><em>We will now consider the Boston housing data set.</em></p>
+<p><strong>We will now consider the Boston housing data set.</strong></p>
 <div id="a-4" class="section level3">
 <h3>a)</h3>
-<p><em>Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat</em></p>
+<p><strong>Based on this data set, provide an estimate for the population mean of medv . Call this estimate mu_hat</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boston &lt;-<span class="st"> </span><span class="kw">as.tibble</span>(Boston)
 boston <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">medv_mu_hat =</span> <span class="kw">mean</span>(medv))</code></pre></div>
 <pre><code>## # A tibble: 1 x 1
@@ -542,7 +542,7 @@ boston <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">s
 </div>
 <div id="b-3" class="section level3">
 <h3>b)</h3>
-<p><em>Provide an estimate of the standard error of mu_hat. Interpret this result.</em></p>
+<p><strong>Provide an estimate of the standard error of mu_hat. Interpret this result.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boston <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">sd =</span> <span class="kw">sd</span>(medv), <span class="dt">stderr =</span> sd<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">n</span>()))</code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##      sd stderr
@@ -563,12 +563,12 @@ boston <span class="op">%&gt;%</span><span class="st"> </span>
 <pre><code>## # A tibble: 1 x 1
 ##      sd
 ##   &lt;dbl&gt;
-## 1 0.397</code></pre>
+## 1 0.416</code></pre>
 <p>We see the SD across the bootstraps is 0.416 - close to the 0.409 from b).</p>
 </div>
 <div id="d-4" class="section level3">
 <h3>d)</h3>
-<p><em>Based on your bootstrap estimate from (c), provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).</em></p>
+<p><strong>Based on your bootstrap estimate from (c), provide a 95 % confidence interval for the mean of medv. Compare it to the results obtained using t.test(Boston$medv).</strong></p>
 <p>Our calculate SD is 0.416, so our 95% confidence interval is [22.53 - 1.96 * 0.416, 22.53 + 196 * 0.416] = [21.71464 23.34536].</p>
 <p>Compared to :</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>(boston<span class="op">$</span>medv) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
@@ -580,7 +580,7 @@ boston <span class="op">%&gt;%</span><span class="st"> </span>
 </div>
 <div id="e-1" class="section level3">
 <h3>e)</h3>
-<p><em>Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.</em></p>
+<p><strong>Based on this data set, provide an estimate, μ̂ med , for the median value of medv in the population.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boston <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">median =</span> <span class="kw">median</span>(medv))</code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##   median
@@ -589,7 +589,7 @@ boston <span class="op">%&gt;%</span><span class="st"> </span>
 </div>
 <div id="f-1" class="section level3">
 <h3>f)</h3>
-<p><em>We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.</em></p>
+<p><strong>We now would like to estimate the standard error of μ̂ med . Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
 boston <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span>modelr<span class="op">::</span><span class="kw">bootstrap</span>(<span class="dt">n =</span> <span class="dv">1000</span>) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -598,19 +598,19 @@ boston <span class="op">%&gt;%</span><span class="st"> </span>
 <pre><code>## # A tibble: 1 x 1
 ##   median_std_err
 ##            &lt;dbl&gt;
-## 1          0.369</code></pre>
+## 1          0.383</code></pre>
 <p>We see the standard error for the median is 0.383.</p>
 </div>
 <div id="g" class="section level3">
 <h3>g)</h3>
-<p><em>Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.</em></p>
+<p><strong>Based on this data set, provide an estimate for the tenth percentile of medv in Boston suburbs.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>(boston<span class="op">$</span>medv, <span class="dt">probs =</span> <span class="kw">c</span>(.<span class="dv">1</span>))</code></pre></div>
 <pre><code>##   10% 
 ## 12.75</code></pre>
 </div>
 <div id="h" class="section level3">
 <h3>h)</h3>
-<p><em>Use the bootstrap to estimate the standard error of this 10% quantile</em></p>
+<p><strong>Use the bootstrap to estimate the standard error of this 10% quantile</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
 boston <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span>modelr<span class="op">::</span><span class="kw">bootstrap</span>(<span class="dt">n =</span> <span class="dv">1000</span>) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -619,7 +619,7 @@ boston <span class="op">%&gt;%</span><span class="st"> </span>
 <pre><code>## # A tibble: 1 x 1
 ##   quant_std_err
 ##           &lt;dbl&gt;
-## 1         0.479</code></pre>
+## 1         0.498</code></pre>
 <p>We estimated standard error is 0.498.</p>
 </div>
 </div>

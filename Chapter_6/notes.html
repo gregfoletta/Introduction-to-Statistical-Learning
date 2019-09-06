@@ -248,15 +248,15 @@ summary {
 <p>To perform best subset select we fit a separate least squares regression for each posisble combination of <em>p</em> predictors. We then look at the model that is ‘best’.</p>
 <p>The selection of the ‘best’ model is non-trivial, and usually broken into stages:</p>
 <ul>
-<li>Let <span class="math inline">\(M_0\)</span> denote the <em>null model</em>, which contains no predictors. This predicts the sample mean for each observation.</li>
+<li>Let <span class="math inline">\(\mathcal{N}_0\)</span> denote the <em>null model</em>, which contains no predictors. This predicts the sample mean for each observation.</li>
 <li>For <span class="math inline">\(k = 1, 2, ..., p\)</span>.
 <ul>
 <li>Fit all <span class="math inline">\({p}\choose{k}\)</span> models that contain exactly <span class="math inline">\(k\)</span> predictors</li>
-<li>Pick the best amongst the <span class="math inline">\({p}\choose{k}\)</span> models and call it <span class="math inline">\(M_K\)</span>. Best is defines as the smallest RSS, or the largest <span class="math inline">\(R^2\)</span>.</li>
+<li>Pick the best amongst the <span class="math inline">\({p}\choose{k}\)</span> models and call it <span class="math inline">\(\mathcal{M}_K\)</span>. Best is defines as the smallest RSS, or the largest <span class="math inline">\(R^2\)</span>.</li>
 </ul></li>
-<li>Select the single best model from <span class="math inline">\(M_0,...,M_p\)</span> using cross-validated prediction error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+<li>Select the single best model from <span class="math inline">\(\mathcal{M}_0,...,\mathcal{M}_p\)</span> using cross-validated prediction error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
 </ul>
-<p>With <span class="math inline">\(M_0,...,M_p\)</span>, the RSS will decrease as more predictors are added, so we would always end up choosing the model with all of the variables. Hence a cross-validated error, BIC or adjusted <span class="math inline">\(R^2\)</span> is used in order to select the model.</p>
+<p>With <span class="math inline">\(\mathcal{M}_0,...,\mathcal{M}_p\)</span>, the RSS will decrease as more predictors are added, so we would always end up choosing the model with all of the variables. Hence a cross-validated error, BIC or adjusted <span class="math inline">\(R^2\)</span> is used in order to select the model.</p>
 <p>The same ideas apply to other models such as logistic. With a logistic regression we use <em>deviance</em> which plays the role of RSS for a broader class of models.</p>
 <p>Best subset is simple however it suffers from comutational limitations. In general there are <span class="math inline">\(2^P\)</span> models that involve subsets of <span class="math inline">\(p\)</span> predictors - let’s see this computationally.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(broom)
@@ -280,16 +280,16 @@ summary {
 <h4>Forward Stepwise Selection</h4>
 <p>Forward stepwise begins with a model with no predictors, the adds predictors one at a time, until all the predictors are in the model.</p>
 <ul>
-<li>Let <span class="math inline">\(M_0\)</span> denote the <em>null model</em>, which contains no predictors. This predicts the sample mean for each observation.</li>
+<li>Let <span class="math inline">\(\mathcal{M}_0\)</span> denote the <em>null model</em>, which contains no predictors. This predicts the sample mean for each observation.</li>
 <li>For <span class="math inline">\(k = 0, 1, ..., p - 1\)</span>.
 <ul>
-<li>Consider all the <span class="math inline">\(p - k\)</span> models that augment the predictors in <span class="math inline">\(M_K\)</span> with one additional predictor.</li>
-<li>Choose the best amongst these <span class="math inline">\(p - k\)</span> models and call it <span class="math inline">\(M_{k+1}\)</span>. Here best is lowest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
+<li>Consider all the <span class="math inline">\(p - k\)</span> models that augment the predictors in <span class="math inline">\(\mathcal{M}_K\)</span> with one additional predictor.</li>
+<li>Choose the best amongst these <span class="math inline">\(p - k\)</span> models and call it <span class="math inline">\(\mathcal{M}_{k+1}\)</span>. Here best is lowest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
 </ul></li>
-<li>Select a single best model from among <span class="math inline">\(M_0,...,M_p\)</span> using cross validated prediction error, <span class="math inline">\(C_p\)</span> (AIC) or adjusted <span class="math inline">\(R^2\)</span>.</li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0,...,\mathcal{M}_p\)</span> using cross validated prediction error, <span class="math inline">\(C_p\)</span> (AIC) or adjusted <span class="math inline">\(R^2\)</span>.</li>
 </ul>
 <p>This results in the fitting of <span class="math inline">\(1 + p(p + 1)/2\)</span> models.</p>
-<p>Can be used with <span class="math inline">\(n &lt; p\)</span>, however can only generate up to <span class="math inline">\(M_{n_1}\)</span> models.</p>
+<p>Can be used with <span class="math inline">\(n &lt; p\)</span>, however can only generate up to <span class="math inline">\(\mathcal{M}_{n-1}\)</span> models.</p>
 </div>
 <div id="backward-stepwise-selection" class="section level4">
 <h4>Backward Stepwise Selection</h4>
@@ -373,8 +373,8 @@ summary {
 <div id="the-lasso" class="section level3">
 <h3>6.2.2 - The Lasso</h3>
 <p>Ridge regression has one disadvantage: it will will include all <span class="math inline">\(p\)</span> in the final model. It will shrink the coefficients to zero, but won’t set them to zero. This isn’t an issue with prediction, but can does pose issues for model interpretation, especially when <span class="math inline">\(p\)</span> is large.</p>
-<p>The lassoo coefficients <span class="math inline">\(\hat\beta_\lambda^L\)</span> minimise the quantity: <span class="math display">\[ RSS + \lambda\sum_{j=1}^p\abs{\beta_j} \]</span></p>
-<p>The lasso and the ridge regression have similar formulations. The lasoo uses an <span class="math inline">\(\ell_1\)</span> penalty instead of an <span class="math inline">\(\ell_2\)</span>. The <span class="math inline">\(\ell_1\)</span> norm of a coefficient vector <span class="math inline">\(\beta\)</span> is given by <span class="math inline">\(\norm{\beta}_1 = \sum\abs{\beta_j}\)</span>.</p>
+<p>The lassoo coefficients <span class="math inline">\(\hat\beta_\lambda^L\)</span> minimise the quantity: <span class="math display">\[ RSS + \lambda\sum_{j=1}^p\lvert{\beta_j}\lvert \]</span></p>
+<p>The lasso and the ridge regression have similar formulations. The lasoo uses an <span class="math inline">\(\ell_1\)</span> penalty instead of an <span class="math inline">\(\ell_2\)</span>. The <span class="math inline">\(\ell_1\)</span> norm of a coefficient vector <span class="math inline">\(\beta\)</span> is given by <span class="math inline">\(\lvert\lvert{\beta}\lvert\lvert_1 = \sum\lvert{\beta_j}\lvert\)</span>.</p>
 <p>The lasso shrinks the coefficient estimates towards zero, however the <span class="math inline">\(\ell_1\)</span> penality forces some of the coefficients to be zero when <span class="math inline">\(\lambda\)</span> is sufficiently large. Hence it performs variable selection.</p>
 <div id="comparing-the-lasso-and-ridge-regression" class="section level4">
 <h4>Comparing the Lasso and Ridge Regression</h4>
@@ -383,13 +383,13 @@ summary {
 </div>
 <div id="selecting-the-tuning-parameter" class="section level3">
 <h3>6.2.3 - Selecting the Tuning Parameter</h3>
-<p>Cross validation provides a simple way to tackle this problem. We choose a grid of <span class="math inline">\(\lamba\)</span> values and compute the cross-validation error for each one. We then select the tuning parameter for which the error is smallest. The model is then re-fit using all of the available observations and the selected value of the tuning parameter.</p>
+<p>Cross validation provides a simple way to tackle this problem. We choose a grid of <span class="math inline">\(\lambda\)</span> values and compute the cross-validation error for each one. We then select the tuning parameter for which the error is smallest. The model is then re-fit using all of the available observations and the selected value of the tuning parameter.</p>
 </div>
 </div>
 <div id="dimension-reduction" class="section level2">
 <h2>6.3 - Dimension Reduction</h2>
 <p>We now explore a class of approaches that <em>transform</em> the predictors and then fit a least squares model using the transformed variables.</p>
-<p>Let <span class="math inline">\(Z_1,\ldots,Z_M\)</span> represent <span class="math inline">\(Z &lt; p\)</span> linear combinations of our original predictors, i.e. <span class="math display">\[ Z_m = \sum_{j=1}^p\phi_{jm}X_j \]</span> for some constants <span class="math inline">\(\phy_{1m},\ldots,\phi_{pm}\)</span>. We can then fit the linear regression model: <span class="math display">\[ y_i = \theta_0 + \sum_{m=1}^M\theta_mz_{im} + \epsilon_i, i = 1,\ldots,n \]</span></p>
+<p>Let <span class="math inline">\(Z_1,\ldots,Z_M\)</span> represent <span class="math inline">\(Z &lt; p\)</span> linear combinations of our original predictors, i.e. <span class="math display">\[ Z_m = \sum_{j=1}^p\phi_{jm}X_j \]</span> for some constants <span class="math inline">\(\phi_{1m},\ldots,\phi_{pm}\)</span>. We can then fit the linear regression model: <span class="math display">\[ y_i = \theta_0 + \sum_{m=1}^M\theta_mz_{im} + \epsilon_i, \ i = 1,\ldots,n \]</span></p>
 <p>If the constants are chosen wisely then such dimension reduction can ofter outperform least squares regression.</p>
 <p>This is termed <em>dimension reduction</em> because it reduces the problem of estimating the <span class="math inline">\(p + 1\)</span> coefficients <span class="math inline">\(\beta_0,\ldots,\beta_p\)</span> to the simpler problem of estimating <span class="math inline">\(M + 1\)</span> coefficients <span class="math inline">\(\theta_0,\dots,\theta_M\)</span>, where <span class="math inline">\(M &lt; p\)</span>.</p>
 <p>Dimension reduction serves to constrain and therefore bias the coefficient estimates. However in situations where <span class="math inline">\(p\)</span> is large relative to <span class="math inline">\(n\)</span>, selecting a value of <span class="math inline">\(M \ll p\)</span> can significantly reduce the variance of the fitted coefficients.</p>
@@ -418,7 +418,7 @@ summary {
 <p>The PCR approach is <em>unsupervised</em>, as the response <span class="math inline">\(Y\)</span> is not used to help determine the principal component directions.</p>
 <p>PLS is a supervised alternative to PCR. It’s a dimension reduction method, which: 1. Identifies a new set of features <span class="math inline">\(Z_1,\dots,Z_M\)</span> that are linear combinations of the original features. 1. Fits a linear model via least squares on these <span class="math inline">\(M\)</span> features.</p>
 <p>Unlike PCR, it identifies the features in a supervised way.</p>
-<p>The process is: 1. Standardise the <span class="math inline">\(p\)</span> predictors 1. Sets each <span class="math inline">\(\phi_{j1}\)</span> (from the PCA formula) equal to the coefficient from the simple linear regression of <span class="math inline">\(Y\)</span> on to <span class="math inline">\(X_j\)</span>. 1. This coefficient is proportional to the correlation between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X_j\)</span>. 1. Hence in computing <span class="math inline">\(Z_1 = \sum_{j=1}^p\phy_{j1}X_j\)</span>, PLS places the highest weight on variables that are most strongly related to the response.</p>
+<p>The process is: 1. Standardise the <span class="math inline">\(p\)</span> predictors 1. Sets each <span class="math inline">\(\phi_{j1}\)</span> (from the PCA formula) equal to the coefficient from the simple linear regression of <span class="math inline">\(Y\)</span> on to <span class="math inline">\(X_j\)</span>. 1. This coefficient is proportional to the correlation between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X_j\)</span>. 1. Hence in computing <span class="math inline">\(Z_1 = \sum_{j=1}^p\phi_{j1}X_j\)</span>, PLS places the highest weight on variables that are most strongly related to the response.</p>
 <p>To identify the second PLS direction we first adjust each of the variabes by <span class="math inline">\(Z_1\)</span>, by regressing each variable on <span class="math inline">\(Z_1\)</span> and taking the residuals.</p>
 <p>The residuals can be interpreted as the remaining information that has not been explained by the first PLS direction.</p>
 <p>We then compute <span class="math inline">\(Z_2\)</span> using this <em>orthogonalised</em> data in exactly the same fashion as <span class="math inline">\(Z_1\)</span>. This iterative aproach can be applied <span class="math inline">\(M\)</span> times. Finally we use a least squares to fit a linear model to predict <span class="math inline">\(Y\)</span> using <span class="math inline">\(Z_1,\ldots,Z_M\)</span>.</p>

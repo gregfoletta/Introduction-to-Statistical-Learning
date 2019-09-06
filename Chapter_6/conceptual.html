@@ -234,126 +234,126 @@ summary {
 
 <div id="section" class="section level2">
 <h2>1)</h2>
-<p><em>We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain <span class="math inline">\(p + 1\)</span> models, containing <span class="math inline">\(0, 1, 2,\ldots,p\)</span> predictors. Explain your answers:</em></p>
+<p><strong>We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain <span class="math inline">\(p + 1\)</span> models, containing <span class="math inline">\(0, 1, 2,\ldots,p\)</span> predictors. Explain your answers:</strong></p>
 <div id="a" class="section level3">
 <h3>a)</h3>
-<p><em>Which of the three models with k predictors has the smallest training RSS?</em></p>
+<p><strong>Which of the three models with k predictors has the smallest training RSS?</strong></p>
 <p>As the best-subset fits every combination of predictors, it will have the smallest training RSS.</p>
 </div>
 <div id="b" class="section level3">
 <h3>b)</h3>
-<p><em>Which of the three models with k predictors has the smallest test RSS?</em></p>
+<p><strong>Which of the three models with k predictors has the smallest test RSS?</strong></p>
 <p>Best subset may have the smallest test RSS because it considers more models. However it also may be overfitting the training data, and one of the other models may find a better model for the test data.</p>
 </div>
 <div id="c" class="section level3">
 <h3>c)</h3>
-<p><em>True or False:</em></p>
+<p><strong>True or False:</strong></p>
 <div id="i" class="section level4">
 <h4>i)</h4>
-<p><em>The predictors in the <span class="math inline">\(k\)</span>-variable model identified by forward stepwise are a subset of the predictors in the <span class="math inline">\((k+1)\)</span> variable model identified by forward stepwise selection.</em></p>
+<p><strong>The predictors in the <span class="math inline">\(k\)</span>-variable model identified by forward stepwise are a subset of the predictors in the <span class="math inline">\((k+1)\)</span> variable model identified by forward stepwise selection.</strong></p>
 <p>In each step, forward stepwise augments with one additional predictor, hence the statement is <strong>true</strong>.</p>
 </div>
 <div id="ii" class="section level4">
 <h4>ii)</h4>
-<p><em>The predictors in the k-variable model identified by backward stepwise are a subset of the predictors in the (k + 1) variable model identified by backward stepwise selection.</em></p>
+<p><strong>The predictors in the k-variable model identified by backward stepwise are a subset of the predictors in the (k + 1) variable model identified by backward stepwise selection.</strong></p>
 <p>In each step the backward stepwise the least useful predictor is removed, hence the answer is <strong>true</strong>.</p>
 </div>
 <div id="iii" class="section level4">
 <h4>iii)</h4>
-<p><em>The predictors in the k-variable model identified by backward stepwise are a subset of the predictors in the (k + 1) variable model identified by forward stepwise selection.</em></p>
+<p><strong>The predictors in the k-variable model identified by backward stepwise are a subset of the predictors in the (k + 1) variable model identified by forward stepwise selection.</strong></p>
 <p>Forward and backward stepwise are independent functions, thus the above statement is <strong>false</strong>.</p>
 </div>
 <div id="iv" class="section level4">
 <h4>iv)</h4>
-<p><em>The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k +1)-variable model identified by backward stepwise selection.</em></p>
+<p><strong>The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k +1)-variable model identified by backward stepwise selection.</strong></p>
 <p><strong>False</strong>.</p>
 </div>
 <div id="v" class="section level4">
 <h4>v)</h4>
-<p><em>The predictors in the k-variable model identified by best subset are a subset of the predictors in the (k + 1)-variable model identified by best subset selection.</em></p>
+<p><strong>The predictors in the k-variable model identified by best subset are a subset of the predictors in the (k + 1)-variable model identified by best subset selection.</strong></p>
 <p>Best subset chooses the best model for each <span class="math inline">\(k\)</span>, therefore the above statement is <strong>false</strong>.</p>
 </div>
 </div>
 </div>
 <div id="section-1" class="section level2">
 <h2>2)</h2>
-<p><em>For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.</em></p>
+<p><strong>For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.</strong></p>
 <div id="a-1" class="section level3">
 <h3>a)</h3>
-<p><em>The lasso, relative to least squares, is:</em></p>
+<p><strong>The lasso, relative to least squares, is:</strong></p>
 <p>Less flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.</p>
 <p>The lasso reduces the flexibility, decreasing the variance and increasing the bias.</p>
 </div>
 <div id="b-1" class="section level3">
 <h3>b)</h3>
-<p><em>The ridge regression, relative to least squares, is:</em></p>
+<p><strong>The ridge regression, relative to least squares, is:</strong></p>
 <p>Less flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.</p>
 <p>Same as a)</p>
 </div>
 <div id="c-1" class="section level3">
 <h3>c)</h3>
-<p><em>Non-linear methods, relative to least squares, are:</em></p>
+<p><strong>Non-linear methods, relative to least squares, are:</strong></p>
 <p>More flexible, and will give improves accuracy when its increase in variance is less than it’s decrease in bias.</p>
 </div>
 </div>
 <div id="section-2" class="section level2">
 <h2>3)</h2>
-<p><em>Suppose we estimate the regression coefficients in a linear regression model by minimizing:</em></p>
+<p><strong>Suppose we estimate the regression coefficients in a linear regression model by minimizing:</strong></p>
 <p><span class="math display">\[ \sum_{i=1}^n\bigg(y_i - \beta_0 - \sum_{j=1}^p\beta_jx_{ij}\bigg) \]</span> subject to <span class="math display">\[ \sum_{j=1}^p\lvert\beta_j\rvert \le s \]</span></p>
-<p><em>for a particular value of <span class="math inline">\(s\)</span>. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer.</em></p>
+<p><strong>for a particular value of <span class="math inline">\(s\)</span>. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer.</strong></p>
 <div id="a-2" class="section level3">
 <h3>a)</h3>
-<p><em>As we increase s from 0, the training RSS will:</em></p>
+<p><strong>As we increase s from 0, the training RSS will:</strong></p>
 <p>When <span class="math inline">\(s = 0\)</span> we have the intercept, which is the expected mean value. As <span class="math inline">\(s \to \infty\)</span>, we end up with a standard least squares. We should see a decrease in the bias and therefore a steady decrease in the training RSS as we approach a least squares regression.</p>
 </div>
 <div id="b-2" class="section level3">
 <h3>b)</h3>
-<p><em>Repeat for the test RSS</em></p>
+<p><strong>Repeat for the test RSS</strong></p>
 <p>When <span class="math inline">\(s = 0\)</span> we have a very high test RSS. As <span class="math inline">\(s\)</span> increases we see the model start to fit the test data and thus the test RSS decreases. However there is a point where the variance starts to increase faster than the bias is decreasing and it starts to overfit the training data. At this point the test RSS will start to increase again.</p>
 </div>
 <div id="c-2" class="section level3">
 <h3>c)</h3>
-<p><em>Repeat for variance</em></p>
+<p><strong>Repeat for variance</strong></p>
 <p>When <span class="math inline">\(s = 0\)</span> the variance is very low. As <span class="math inline">\(s\)</span> increases, the variance steadily increases as the model starts to fit the training data.</p>
 </div>
 <div id="d" class="section level3">
 <h3>d)</h3>
-<p><em>Repeat for squared bias</em></p>
+<p><strong>Repeat for squared bias</strong></p>
 <p>When <span class="math inline">\(s = 0\)</span>, the bias is very high, and as <span class="math inline">\(s\)</span> increases the bias steadily decreases as the model fits the training data better.</p>
 </div>
 <div id="e" class="section level3">
 <h3>e)</h3>
-<p><em>Repeat for irreducible error</em></p>
+<p><strong>Repeat for irreducible error</strong></p>
 <p>The irreducible error is a constant and does not change as <span class="math inline">\(s\)</span> increases is it is by definition independent of the model and this independent of the value of <span class="math inline">\(s\)</span>.</p>
 </div>
 </div>
 <div id="section-3" class="section level2">
 <h2>4)</h2>
-<p><em>Suppose we estimate the regression coefficients in a linear regression model by minimizing:</em></p>
+<p><strong>Suppose we estimate the regression coefficients in a linear regression model by minimizing:</strong></p>
 <p><span class="math display">\[ \sum_{i=1}^n\bigg(y_i - \beta_0 - \sum_{j=1}^p\beta_jx_{ij}\bigg) + \lambda\sum_{j=1}^p\beta_j^2 \]</span></p>
 <p>for a particular value of <span class="math inline">\(\lambda\)</span>.</p>
 <div id="a-3" class="section level3">
 <h3>a)</h3>
-<p><em>As we increase λ from 0, the training RSS will:</em></p>
+<p><strong>As we increase λ from 0, the training RSS will:</strong></p>
 <p>When <span class="math inline">\(\lambda = 0\)</span>, we have the standard partial least squares. As <span class="math inline">\(\lambda \to \infty\)</span> we applying a shrinking penaty which is small when <span class="math inline">\(\beta_j\)</span> is close to zero and therefore shrinks <span class="math inline">\(\beta_j\)</span> close to zero. As <span class="math inline">\(\lambda\)</span> increases, the bias increases and thus we should see a steady increase in the training RSS.</p>
 </div>
 <div id="b-3" class="section level3">
 <h3>b)</h3>
-<p><em>The test RSS will:</em></p>
+<p><strong>The test RSS will:</strong></p>
 <p>As we increase <span class="math inline">\(\lambda\)</span>, we see an increase in bias but a decrease in variance up until a point where the coefficients are shrunk too. At the end of the scale when <span class="math inline">\(\lambda \to \infty\)</span> we approach the null model.</p>
 <p>Therefore we should see an initial decrease in the test RSS up to a point, then an increase in the test RSS.</p>
 </div>
 <div id="c-3" class="section level3">
 <h3>c)</h3>
-<p><em>The variance will:</em> As we constrain the coefficients we see the variance steadily decrease.</p>
+<p><strong>The variance will:</strong> As we constrain the coefficients we see the variance steadily decrease.</p>
 </div>
 <div id="d-1" class="section level3">
 <h3>d)</h3>
-<p><em>The squared bias will:</em> As we constrain the coefficients we see a steady increase in the bias.</p>
+<p><strong>The squared bias will:</strong> As we constrain the coefficients we see a steady increase in the bias.</p>
 </div>
 <div id="e-1" class="section level3">
 <h3>e)</h3>
-<p><em>The irreducible error will:</em> The irreducible error is independent of the model and therefore is a constant.</p>
+<p><strong>The irreducible error will:</strong> The irreducible error is independent of the model and therefore is a constant.</p>
 </div>
 </div>
 <div id="section-4" class="section level2">
@@ -363,7 +363,7 @@ summary {
 <p>Furthermore, suppose that <span class="math inline">\(y_1 + y_2 = 0\)</span> and <span class="math inline">\(x_{11} + x_{21} = 0\)</span> and <span class="math inline">\(x_{12} + x_{22} = 0\)</span>, so that the estimate for the intercept in a least squares, ridge regression, or lasso model is zero: <span class="math inline">\(β̂_0 = 0\)</span>.</p>
 <div id="a-4" class="section level3">
 <h3>a)</h3>
-<p><em>Write out the ridge regression optimization problem in this setting.</em></p>
+<p><strong>Write out the ridge regression optimization problem in this setting.</strong></p>
 <p>The ridge regression seeks to minimise: <span class="math display">\[ \sum_{i=1}^n\bigg(y_i - \hat{\beta}_0 - \sum_{j=1}^p\hat{\beta}_jx_{ij}\bigg)^2 + \lambda\sum_{j=1}^p\hat{\beta}_j^2 \]</span></p>
 <p>If we expand this out we end up with:</p>
 <p><span class="math display">\[ (y_1 - \hat{\beta}_0 - \hat{\beta}_1x_{11} + \hat{\beta}_2x_{12})^2 + (y_2 - \hat{\beta}_0 - \hat{\beta}_1x_{21} + \hat{\beta}_2x_{22})^2 + \lambda\hat{\beta}_1^2 + \lambda{\beta}_2^2\]</span></p>
@@ -377,14 +377,14 @@ summary {
 </div>
 <div id="section-5" class="section level2">
 <h2>6)</h2>
-<p><em>We now explore the simplified ridge regression and lasso</em></p>
+<p><strong>We now explore the simplified ridge regression and lasso</strong></p>
 <p>In this scenario we have: * <span class="math inline">\(n = p\)</span> * An <span class="math inline">\(\mathbf{X}\)</span> diagonal matrix with 1s on the diagonal and 0s on the off-diagonal elements. * A regression without the intercept.</p>
 <p>In this case the least squares is minimising <span class="math inline">\(\sum_{j=1}^p(y_j - \beta_j)^2\)</span> and the solution is given by <span class="math inline">\(\hat{\beta}_j = y_j\)</span>.</p>
 <p>The ridge regression (6.12) is therefore m <span class="math inline">\(\sum_{j=1}^p(y_j - \beta_j)^2 + \lambda\sum_{j=1}^p\beta_j^2\)</span></p>
 <p>The lasoo (6.13) is therefore m <span class="math inline">\(\sum_{j=1}^p(y_j - \beta_j)^2 + \lambda\sum_{j=1}^p\lvert\beta_j\rvert\)</span></p>
 <div id="a-5" class="section level3">
 <h3>a)</h3>
-<p><em>Consider (6.12) with <span class="math inline">\(p = 1\)</span>. For some choice of <span class="math inline">\(y_1\)</span> and <span class="math inline">\(λ \gt 0\)</span>, plot (6.12) as a function of <span class="math inline">\(\beta_1\)</span> . Your plot should confirm that (6.12) is solved by (6.14).</em></p>
+<p><strong>Consider (6.12) with <span class="math inline">\(p = 1\)</span>. For some choice of <span class="math inline">\(y_1\)</span> and <span class="math inline">\(λ \gt 0\)</span>, plot (6.12) as a function of <span class="math inline">\(\beta_1\)</span> . Your plot should confirm that (6.12) is solved by (6.14).</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)</code></pre></div>
 <p>Taking 6.12 with <span class="math inline">\(p = 1\)</span>, we end up with the following formula: <span class="math display">\[ (y_1 - \beta_1)^2 + \lambda\beta_1^2 \]</span></p>
 <p>6.14 is:</p>
@@ -402,7 +402,7 @@ beta_hat =<span class="st"> </span>y_<span class="dv">1</span> <span class="op">
 </div>
 <div id="b-5" class="section level3">
 <h3>b)</h3>
-<p><em>Consider (6.13) with <span class="math inline">\(p = 1\)</span>. For some choice of <span class="math inline">\(y_1\)</span> and <span class="math inline">\(\lambda &gt; 0\)</span>, plot (6.13) as a function of <span class="math inline">\(\beta_1\)</span> . Your plot should confirm that (6.13) is solved by (6.15).</em></p>
+<p><strong>Consider (6.13) with <span class="math inline">\(p = 1\)</span>. For some choice of <span class="math inline">\(y_1\)</span> and <span class="math inline">\(\lambda &gt; 0\)</span>, plot (6.13) as a function of <span class="math inline">\(\beta_1\)</span> . Your plot should confirm that (6.13) is solved by (6.15).</strong></p>
 <p>Taking 6.13 with <span class="math inline">\(p = 1\)</span> we have:</p>
 <p><span class="math display">\[ (y_1 - \beta_1)^2 + \lambda\lvert\beta_1\rvert \]</span></p>
 <p>6.15 with <span class="math inline">\(y_j \gt -\lambda/2\)</span> is <span class="math inline">\(y_j - \lambda/2\)</span></p>

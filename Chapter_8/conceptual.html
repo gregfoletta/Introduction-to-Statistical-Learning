@@ -238,7 +238,7 @@ summary {
 
 <div id="section" class="section level1">
 <h1>1)</h1>
-<p><em>Draw an example (of your own invention) of a partition of two-dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions <span class="math inline">\(R_1, R_2, \ldots\)</span>, the cutpoints <span class="math inline">\(t_1, t_2, \ldots\)</span>, and so forth.</em></p>
+<p><strong>Draw an example (of your own invention) of a partition of two-dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions <span class="math inline">\(R_1, R_2, \ldots\)</span>, the cutpoints <span class="math inline">\(t_1, t_2, \ldots\)</span>, and so forth.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tibble</span>(
     <span class="dt">xmin =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>),
     <span class="dt">xmax =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">4</span>),
@@ -265,7 +265,7 @@ summary {
 </div>
 <div id="section-2" class="section level1">
 <h1>3)</h1>
-<p><em>Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes. Create a single plot that displays each of these quantities as a function of <span class="math inline">\(\hat{p}_{m1}\)</span>. The x-axis should display <span class="math inline">\(\hat{p}_{m1}\)</span>, ranging from 0 to 1, and the y-axis should display the value of the Gini index, classification error, and entropy.</em></p>
+<p><strong>Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes. Create a single plot that displays each of these quantities as a function of <span class="math inline">\(\hat{p}_{m1}\)</span>. The x-axis should display <span class="math inline">\(\hat{p}_{m1}\)</span>, ranging from 0 to 1, and the y-axis should display the value of the Gini index, classification error, and entropy.</strong></p>
 <p>The three concepts metntioned are the ‘replacements’ for RSS is a classification setting when determining the binary splits.</p>
 <ul>
 <li>Classification error - the fraction of training observations in a region that do not belong to the most common class.</li>
@@ -296,10 +296,10 @@ summary {
 </div>
 <div id="section-3" class="section level1">
 <h1>4)</h1>
-<p><em>This question relates to the plots in Figure 8.12.</em></p>
+<p><strong>This question relates to the plots in Figure 8.12.</strong></p>
 <div id="a" class="section level2">
 <h2>a)</h2>
-<p><em>Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of Y within each region.</em></p>
+<p><strong>Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of Y within each region.</strong></p>
 <p>The plot is as such:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tibble</span>(
     <span class="dt">xmin =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>),
@@ -333,12 +333,12 @@ summary {
 <span class="st">    </span><span class="kw">unite</span>(<span class="dt">col =</span> <span class="st">'pathString'</span>, <span class="dt">sep =</span> <span class="st">'/'</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">as.Node</span>() <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">plot</span>()</code></pre></div>
-<div id="htmlwidget-7e1167b2a386c1dbf53e" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7e1167b2a386c1dbf53e">{"x":{"diagram":"digraph {\n\n\n\n\n  \"1\" [label = \"X1 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"2\" [label = \"X2 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"3\" [label = \"X1 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"4\" [label = \"3\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"5\" [label = \"X2 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"6\" [label = \"10\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"7\" [label = \"0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"8\" [label = \"15\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"9\" [label = \"5\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"1\"->\"2\" \n  \"1\"->\"9\" \n  \"2\"->\"3\" \n  \"2\"->\"8\" \n  \"3\"->\"4\" \n  \"3\"->\"5\" \n  \"5\"->\"6\" \n  \"5\"->\"7\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-41b7f619c3f2d14ea6f4" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-41b7f619c3f2d14ea6f4">{"x":{"diagram":"digraph {\n\n\n\n\n  \"1\" [label = \"X1 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"2\" [label = \"X2 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"3\" [label = \"X1 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"4\" [label = \"3\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"5\" [label = \"X2 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"6\" [label = \"10\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"7\" [label = \"0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"8\" [label = \"15\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"9\" [label = \"5\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"1\"->\"2\" \n  \"1\"->\"9\" \n  \"2\"->\"3\" \n  \"2\"->\"8\" \n  \"3\"->\"4\" \n  \"3\"->\"5\" \n  \"5\"->\"6\" \n  \"5\"->\"7\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="b" class="section level2">
 <h2>b)</h2>
-<p><em>Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.</em></p>
+<p><strong>Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.</strong></p>
 <p>The diagram appears as such:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tibble</span>(
     <span class="dt">L1 =</span> <span class="kw">c</span>( <span class="kw">rep</span>(<span class="st">'X2 &lt; 1'</span>, <span class="dv">5</span>) ),
@@ -349,8 +349,8 @@ summary {
 <span class="st">    </span><span class="kw">unite</span>(<span class="dt">col =</span> <span class="st">'pathString'</span>, <span class="dt">sep =</span> <span class="st">'/'</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">as.Node</span>() <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">plot</span>()</code></pre></div>
-<div id="htmlwidget-34d8430f7f740a11adc5" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-34d8430f7f740a11adc5">{"x":{"diagram":"digraph {\n\n\n\n\n  \"1\" [label = \"X2 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"2\" [label = \"X1 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"3\" [label = \"-1.80\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"4\" [label = \"0.63\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"5\" [label = \"X2 < 2\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"6\" [label = \"X1 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"7\" [label = \"-1.06\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"8\" [label = \"0.21\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"9\" [label = \"2.49\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"1\"->\"2\" \n  \"1\"->\"5\" \n  \"2\"->\"3\" \n  \"2\"->\"4\" \n  \"5\"->\"6\" \n  \"5\"->\"9\" \n  \"6\"->\"7\" \n  \"6\"->\"8\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-f457432a5282ec82410b" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f457432a5282ec82410b">{"x":{"diagram":"digraph {\n\n\n\n\n  \"1\" [label = \"X2 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"2\" [label = \"X1 < 1\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"3\" [label = \"-1.80\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"4\" [label = \"0.63\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"5\" [label = \"X2 < 2\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"6\" [label = \"X1 < 0\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"7\" [label = \"-1.06\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"8\" [label = \"0.21\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"9\" [label = \"2.49\", fillcolor = \"#FFFFFF\", fontcolor = \"#000000\"] \n  \"1\"->\"2\" \n  \"1\"->\"5\" \n  \"2\"->\"3\" \n  \"2\"->\"4\" \n  \"5\"->\"6\" \n  \"5\"->\"9\" \n  \"6\"->\"7\" \n  \"6\"->\"8\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>This translates to:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tibble</span>(
     <span class="dt">xmin =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">-3</span>, <span class="dv">1</span>, <span class="dv">-3</span>),
@@ -370,9 +370,9 @@ summary {
 </div>
 <div id="section-4" class="section level1">
 <h1>5)</h1>
-<p><em>Suppose we produce ten bootstrapped samples from a data set containing red and green classes. We then apply a classification tree to each bootstrapped sample and, for a specific value of <span class="math inline">\(X\)</span>, produce 10 estimates of <span class="math inline">\(P(Class is Red|X)\)</span>:</em></p>
-<p><em>0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, and 0.75.</em></p>
-<p><em>There are two common ways to combine these results together into a single class prediction. One is the majority vote approach discussed in this chapter. The second approach is to classify based on the average probability. In this example, what is the final classification under each of these two approaches?</em></p>
+<p><strong>Suppose we produce ten bootstrapped samples from a data set containing red and green classes. We then apply a classification tree to each bootstrapped sample and, for a specific value of <span class="math inline">\(X\)</span>, produce 10 estimates of <span class="math inline">\(P(Class is Red|X)\)</span>:</strong></p>
+<p><strong>0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, and 0.75.</strong></p>
+<p><strong>There are two common ways to combine these results together into a single class prediction. One is the majority vote approach discussed in this chapter. The second approach is to classify based on the average probability. In this example, what is the final classification under each of these two approaches?</strong></p>
 <p>In this instance, if the probability is <span class="math inline">\(\ge .5\)</span> then then observtion is classified as red.</p>
 <ul>
 <li>Majority vote - the most common class among the predictions.</li>
@@ -388,19 +388,19 @@ summary {
 </div>
 <div id="section-5" class="section level1">
 <h1>6)</h1>
-<p><em>Provide a detailed explanation of the algorithm that is used to fit a regression tree.</em></p>
+<p><strong>Provide a detailed explanation of the algorithm that is used to fit a regression tree.</strong></p>
 <p>Ideally we would like to partition the feature space into <span class="math inline">\(J\)</span> boxes <span class="math inline">\(R_1, \ldots, R_J\)</span> which minimises the RSS given by:</p>
 <p><span class="math display">\[ \sum_{j=1}^J \sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2\]</span> For each region, the squared difference between the response and the mean response for the training observations is minimised. This is infeasible to do.</p>
 <p>The algorithm for a regression tree is:</p>
-<p><strong>Use ‘Recursive Binary Splitting’ to create a large tree:</strong></p>
+<p><strong><em>Use ‘Recursive Binary Splitting’ to create a large tree:</em></strong></p>
 <ol style="list-style-type: decimal">
 <li>For each predictor <span class="math inline">\(X_j\)</span> and every cutpoint <span class="math inline">\(s\)</span>, pick the cutpoint that results in the lowest RSS.</li>
 <li>This process is repeated, except instead of splitting the entire predictor space, we only split one of the two previously created regions.</li>
 <li>This is continued until a stopping criteria is reached - i.e. no region contains less than <span class="math inline">\(x\)</span> observations.</li>
 </ol>
-<p><strong>Apply ‘Cost Complexity Pruning’ to obtain a sequence of best subtrees as a function of <span class="math inline">\(\alpha\)</span>.</strong></p>
-<p><strong>Use K-fold cross-validation to choose <span class="math inline">\(\alpha\)</span>.</strong></p>
-<p><strong>Return the subtree that responds to a chosed value of <span class="math inline">\(\alpha\)</span>.</strong></p>
+<p><strong><em>Apply ‘Cost Complexity Pruning’ to obtain a sequence of best subtrees as a function of <span class="math inline">\(\alpha\)</span>.</em></strong></p>
+<p><strong><em>Use K-fold cross-validation to choose <span class="math inline">\(\alpha\)</span>.</em></strong></p>
+<p><strong><em>Return the subtree that responds to a chosed value of <span class="math inline">\(\alpha\)</span>.</em></strong></p>
 </div>
 
 

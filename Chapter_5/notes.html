@@ -174,7 +174,7 @@ summary {
 <div id="validation-set" class="section level3">
 <h3>5.1.1 - Validation Set</h3>
 <p>It involves randomly dividing the available set of observations into two parts: the <em>training set</em> and the <em>validation set</em>. The validation set error rate provides an estimate of the test error rate.</p>
-<p><strong>Drawbacks</strong> * The validation estimate of the test error rate can be highly variable, depending on which observations are included in the training set. * Only a subset of the observations are used to fit the model. Since statistical methods perform worse with fewer observations, the validation set error rate may overestimate the test error rate.</p>
+<p><strong><em>Drawbacks</em></strong> * The validation estimate of the test error rate can be highly variable, depending on which observations are included in the training set. * Only a subset of the observations are used to fit the model. Since statistical methods perform worse with fewer observations, the validation set error rate may overestimate the test error rate.</p>
 </div>
 <div id="leave-one-out-cross-validation-loocv" class="section level3">
 <h3>5.1.2 - Leave-One-Out Cross Validation (LOOCV)</h3>
@@ -190,7 +190,7 @@ summary {
 <p>An alternative to LOOCV is k-fold. This involves randomly dividing the set of observations into k groups - or folds - of approximately equal size. The first fold is treated as a validation set, and the method is fit on the remaining k - 1 folds. The MSE is computed on the observations in the held out fold. The k-fold estimate is then computed by averaging the k MSEs:</p>
 <p><span class="math display">\[ CV_{(k)} = \frac{1}{k}\sum_{i=1}^kMSE_i \]</span></p>
 <p>LOOCV is therefore a special case of k-fold where k = n.</p>
-<p><em>Advantages:</em> * Computational - fit the model only k times, not n.</p>
+<p><strong>Advantages:</strong> * Computational - fit the model only k times, not n.</p>
 <div id="bias-variance-trade-off" class="section level4">
 <h4>Bias-Variance Trade-off</h4>
 <p>Another advantage of the k-fold is that it often gives more accurate estimates due to the bias-variance trade-off. The LOOCV gives almost unbiased estimates of he test error, since each training set contains n-1 observations - almost the full data set. For increasing k there is an increase in the bias, since each training set contains (k-1)n/k observations. From a bias reductions perspecive LOOCV is preferable to k-fold.</p>
