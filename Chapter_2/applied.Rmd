@@ -11,7 +11,8 @@ output:
 library(knitr)
 library(kableExtra)
 knitr::opts_chunk$set(dpi = 300, dev.args = list(type = "cairo"))
-```
+```summarise(MSE = mse(auto.lms[[.x]], .)) %>%
+
 
 # 9)
 
